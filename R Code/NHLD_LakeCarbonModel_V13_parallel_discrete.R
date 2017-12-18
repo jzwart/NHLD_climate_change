@@ -24,7 +24,7 @@ require(marelac)
 dir<-'/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/Data/Water/NHLD_Results_2017_11_29_CESM1_CAM5/'
 
 # forcings directory (from VIC)
-forceDir<-file.path(dir,'DisAgg_Force')
+forceDir<-file.path(dir,'DisAgg_FORCE')
 # daily lake hydrology flux directory
 lakeFluxDir<-file.path(dir,'OUT_RESULTS_Rev24_CESM1_CAM5')
 # daily lake geomorphology directory 

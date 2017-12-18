@@ -7,9 +7,9 @@
 rm(list=ls())
 
 ########## load utility functions and packages
-source('/afs/crc.nd.edu/user/j/jzwart/NHLDLakeCarbonModel/R_code/NHLD_LakeCarbonModel_supporting_V13_discrete.R')
-source('/afs/crc.nd.edu/user/j/jzwart/NHLDLakeCarbonModel/R_code/AveLightClimate.R')
-source('/afs/crc.nd.edu/user/j/jzwart/NHLDLakeCarbonModel/R_code/DOY.r')
+source('/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/R_code/NHLD_LakeCarbonModel_supporting_V13_discrete.R')
+source('/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/R_code/AveLightClimate.R')
+source('/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/R_code/DOY.r')
 require(deSolve)
 require(LakeMetabolizer)
 require(snow)
@@ -21,26 +21,28 @@ require(maptools)
 require(AquaEnv)
 require(marelac)
 
-dir<-'/afs/crc.nd.edu/user/j/jzwart/NHLDLakeCarbonModel/Data/20170609'
+dir<-'/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/Data/Water/NHLD_Results_2017_11_29_CESM1_CAM5/'
 
 # forcings directory (from VIC)
-forceDir<-file.path(dir,'Force')
+forceDir<-file.path(dir,'DisAgg_FORCE')
 # daily lake hydrology flux directory
-lakeFluxDir<-file.path(dir,'OUT_RESULTS')
+lakeFluxDir<-file.path(dir,'OUT_RESULTS_Rev24_CESM1_CAM5')
 # daily lake geomorphology directory 
-lakeGeomorphDir<-file.path(dir,'OUT_RESULTS')
+lakeGeomorphDir<-file.path(dir,'OUT_RESULTS_Rev24_CESM1_CAM5')
 # daily lake initial conditions directory 
-lakeInitGeomorphDir<-file.path(dir,'OUT_RESULTS')
-# lake watershed information 
-watersheds<-read.table(file.path(dir,"NHLDsheds_20170323.txt"),header=TRUE,sep="\t",stringsAsFactors=FALSE)
+lakeInitGeomorphDir<-file.path(dir,'OUT_RESULTS_Rev24_CESM1_CAM5')
+# lake watershed information .
+lakeShedDir<-'/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/Data/GIS/'
+watersheds<-read.table(file.path(lakeShedDir,"NHLDsheds_20170323.txt"),header=TRUE,sep="\t",stringsAsFactors=FALSE)
 watersheds$percentWetland<-watersheds$percentWetland*100
 # lake location, area, and perimeter 
-lakeLocation<-readShapeSpatial(file.path(dir,'LakeLocations/NHLDandBuffLakes_Original_ZJH_Rev1.shp'))
+lakeLocation<-readShapeSpatial(file.path(lakeShedDir,'LakeLocations/NHLDandBuffLakes_Original_ZJH_Rev1.shp'))
 lakeLocation<-data.frame(lakeLocation)
 lakeLocation$Permanent_<-as.character(lakeLocation$Permanent_)
 
 # keeling curve for historic CO2 concentrations 
-keeling<-read.table(file.path(dir,'keelingCurve.txt'),header = F,stringsAsFactors = F)
+atmDir<-'/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/Data/Atm/'
+keeling<-read.table(file.path(atmDir,'keelingCurve.txt'),header = F,stringsAsFactors = F)
 colnames(keeling)<-c('site_code','year','month','day','hour','minute','second','co2','value_unc','nvalue','latitude','longitude','altitude','elevation','intake_height','instrument','qcflag')
 keeling$datetime<-as.Date(paste(keeling$year,keeling$month,keeling$day),format='%Y %m %d')
 keeling$co2<-ifelse(keeling$co2==-999.99,NA,keeling$co2)
@@ -65,7 +67,7 @@ sp.forceCoord<-forceCoord
 coordinates(sp.forceCoord)<- ~Longitude+Latitude
 
 # snow depth on top of ice; which is the same for all lakes 
-snowDepth=read.table(file.path(dir,'Lake_Snow_Depth.txt'),sep = '\t')
+snowDepth=read.table(file.path(dir,'Lake_Snow_Depth_Land_SWE_Depth_Ratio_Correction_CESM1_CAM5.txt'),sep = '\t')
 snowDepth$datetime<-as.Date(paste(snowDepth$V1,snowDepth$V2,snowDepth$V3),format = '%Y %m %d')
 snowDepth=snowDepth[,c('datetime','V4')]
 colnames(snowDepth)[2]<-'snowDepth_m' # m; snow depth on ice 
@@ -100,7 +102,7 @@ GPPexudeR=0.03  # Hanson et al. 2004; DOC exude from phytoplankton that is raclc
 GPPexudeL=0.07 # DOC exude from phytoplankton that is labile 
 Rauto=0.8 	# Hanson et al. 2004; quick respiration of phytoplankton production 
 phytoDeath=0.03 # Hanson et al 2004; fraction of phyto that die; day-1
-phyto_C2Chl=50 # phytoplankton carbon to chlorophyll ratio, [gC gChl-1]; sort of made up/average of observations in paper (e.g. 
+phyto_C2Chl=50 # phytoplankton carbon to chlorophyll ratio, [gC gChl-1]; sort of made up/average of observations in paper (e.g. Geider 1987)
 zmix=2 # initial zmix for model 
 kdSnow=10 #m-1; Perovich 2007 Journal of Glaciology 53:201-210; ranged from 10-30 m-1 for visible range 
 rhoW=1000 #density of water kg m-3
@@ -126,7 +128,7 @@ alpha_sw=0.07 # albedo for sw from Lenters 2005
 alpha_lw=0.03 # albedo for lw from Lenters 2005 
 kelvinZero=273.15 
 hs=7.5 # m; average elevation difference between top of surrounding canopy and lake surface; about average value from Read et al. 2014
-wLoad=2 # wetland load per shoreline length; g C m-1 shoreline year-1 (mean from fitted parameter in Hanson et al. 2014) 
+wLoad=2/365 # wetland load per shoreline length; g C m-1 shoreline year-1 converted to day-1 (mean from fitted parameter in Hanson et al. 2014) 
 sal=0 # salinity set to 0 for all lakes 
 leafLoad=300/12 #mol C m-1 shoreline yr-1; autumn leaf fall; check out Likens 1985 and Gasith and Hasler 1976; Hanson et al 2014; France 1996; France and Peters 1996; 300 g C m-1 shoreline yr-1 is roughly the average for all these studies 
 
@@ -248,7 +250,7 @@ lakeSim<-function(curLakeID){
   t=nObs
   curForce$datetime<<-strftime(strptime(paste(curForce$YYYY,curForce$MM,curForce$DD,curForce$HH),format = '%Y %m %d %H',tz = 'GMT'))
   
-  outDir='/afs/crc.nd.edu/user/j/jzwart/NHLDLakeCarbonModel/Results/C Model Output/20170620'
+  outDir='/afs/crc.nd.edu/user/j/jzwart/NHLD_climate_change/Results/C_model_output/CESM1_CAM5/20171206/Debug/'
 
   out=matrix(NA,nrow=length(t),ncol=length(X))
   #initiallizing states 
@@ -266,6 +268,6 @@ lakeSim<-function(curLakeID){
 }
 
 lakes=as.list(lakes[lakes%in%watersheds$Permanent_])
-lakes=as.list(unlist(lakes)[1601:2400])
+lakes=as.list(unlist(lakes)[1:80])
 
 mclapply(lakes,lakeSim,mc.cores=48)

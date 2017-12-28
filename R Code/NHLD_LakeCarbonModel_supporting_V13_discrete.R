@@ -48,7 +48,7 @@ integratedGPP<-function(day,curForce,curForceDOY,chlCur,SRP,DOC,V,kD,zmix,snowDe
   # adjusting for snow cover during winter 
   intGPP=numeric(length(hourlyPAR))
   for(i in 1:length(intGPP)){
-    intGPP[i]=integrate(f = pointGPP,lower = 0,upper = zmix,PAR=hourlyPAR[i],chlCur=chlCur,SRP=SRP,V=V,kD=kD)$value
+    intGPP[i]=integrate(f = pointGPP,lower = 0,upper = zmix,PAR=hourlyPAR[i],chlCur=chlCur,SRP=SRP,V=V,kD=kD, rel.tol = 1e-15)$value
   }
   GPPout=sum(intGPP)
   return(GPPout)

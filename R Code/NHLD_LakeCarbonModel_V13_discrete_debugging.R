@@ -80,7 +80,7 @@ sp.forceCoord<-forceCoord
 coordinates(sp.forceCoord)<- ~Longitude+Latitude
 
 # starting year/month/day, ending year/mnth/day, & set up force/flux
-startYear=1975
+startYear=1980
 startMonth=6
 startDay=1
 
@@ -93,6 +93,12 @@ lakes<-list.files(lakeFluxDir)
 lakes<-lakes[grep('_DailyLakeFlux.txt',lakes,fixed = T)]
 lakes<-as.character(unlist(strsplit(lakes,split = '_DailyLakeFlux.txt')))
 lakes<-lakes[lakes%in%as.character(lakeLocation$Permanent_)] # only keeping primary near field lakes for given run  
+
+# lakes that ran successfully in parallel compute 
+lakes_good <- list.files('F:/Jake/My Papers/NHLD Climate Change/Results/C_model_output/CESM1_CAM5/20171206/')
+lakes_good<-as.character(unlist(strsplit(lakes_good,split = '_C_model.txt')))
+#lakes that failed in parallel compute 
+lakes_fail<-lakes[!lakes%in%lakes_good] 
 
 # constants for biogeochem model 
 kH=29.41  # Henry's Law constant for CO2 in water [L atm mol-1]  # temperature sensitivity
@@ -138,22 +144,10 @@ wLoad=2 # wetland load per shoreline length; g C m-1 shoreline year-1 (mean from
 sal=0 # salinity set to 0 for all lakes 
 leafLoad=300/12 #mol C m-1 shoreline yr-1; autumn leaf fall; check out Likens 1985 and Gasith and Hasler 1976; Hanson et al 2014; France 1996; France and Peters 1996; 300 g C m-1 shoreline yr-1 is roughly the average for all these studies 
 
-length(lakes)
-ntlLookUp<-data.frame(lakeID=c('AL','BM','CR','SP','TR','TB','CB'),Permanent_=c(69886156,69886284,69886510,69886444,69886228,69886158,123148117))
-lake='CR'
-i=grep(ntlLookUp$Permanent_[ntlLookUp$lakeID==lake],lakes) # Big Musky = 69886284, Sparkling = 69886444, Allequash = , Trout = , Crystal = , Crystal Bog = , Trout Bog = 
+i=grep(lakes_fail[1],lakes) 
 date<-read.table(file.path(dir,'Date_OUT_ALL.txt'),stringsAsFactors = F,header = F,sep='\t')
 datetime<-as.Date(paste(date$V1,date$V2,date$V3),format = '%Y %m %d')
 
-# failing lakes from 20170407 run 
-# failLakes=list.files('/Users/Jake/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/Results/C Model Output/20170408/')
-# failLakes=unlist(strsplit(failLakes,'_C_model.txt',fixed = T))
-# failLakes=lakes[!lakes%in%failLakes]
-# lakesRun=lakes[1:800]
-# failLakes=lakesRun[!lakesRun%in%failLakes]
-# 
-# i=grep(failLakes[3],lakes)
-# i=grep('JAZ_201',lakes) # a small lake that causes problems 
 
 # for(i in 1:length(lakes)){
   print(i)

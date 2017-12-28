@@ -234,7 +234,7 @@ lakeSim<-function(curLakeID){
   k<<-0.5 # m day-1; gas exchange coefficient 
   
   # parameters that are important 
-  params=c(gwIn0=curLakeHydro$GWin,gwOut0=curLakeHydro$GWout,precipDIC=precipDIC,precipDOC=precipDOC,precipP=precipP,streamDIC=streamDIC,
+  params=c(gwIn0=curLakeHydro$GWin[1],gwOut0=curLakeHydro$GWout[1],precipDIC=precipDIC,precipDOC=precipDOC,precipP=precipP,streamDIC=streamDIC,
            streamDOC=streamDOC,streamPOC=streamPOC,streamP=streamP,gwDIC=gwDIC,snowDOC=snowDOC,snowDIC=snowDIC,snowP=snowP,
            gwDOC=gwDOC,gwP=gwP,kH=kH,r2h=curLakeInitGeomorph$r2h,zmix=zmix,rSlow=rSlow,rFast=rFast,fracLabile=fracLabile)
   

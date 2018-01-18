@@ -43,12 +43,12 @@ pointGPP<-function(z,PAR,chlCur,SRP,V,kD){
   return(GPPpoint)
 }
 
-integratedGPP<-function(day,curForce,curForceDOY,chlCur,SRP,DOC,V,kD,zmix,snowDepth){
+integratedGPP<-function(day,curForce,curForceDOY,chlCur,SRP,DOC,V,kD,zmix,snowDepth,rel.tol){
   hourlyPAR=lightAtten(snowDepth,curForce$I0[curForceDOY==day],kdSnow)	# umol m2 sec; SW to PAR based on Read...
   # adjusting for snow cover during winter 
   intGPP=numeric(length(hourlyPAR))
   for(i in 1:length(intGPP)){
-    intGPP[i]=integrate(f = pointGPP,lower = 0,upper = zmix,PAR=hourlyPAR[i],chlCur=chlCur,SRP=SRP,V=V,kD=kD, rel.tol = 1e-15)$value
+    intGPP[i]=integrate(f = pointGPP,lower = 0,upper = zmix,PAR=hourlyPAR[i],chlCur=chlCur,SRP=SRP,V=V,kD=kD,rel.tol = rel.tol)$value
   }
   GPPout=sum(intGPP)
   return(GPPout)
@@ -385,9 +385,13 @@ timeStep<-function(t,out,params){
     # tells if sediment respiration should go into hypo or epi
     sedRespDummy<-as.numeric(zmix<stage) # 1 tells it should go into hypo, 0 into epi 
     
-    GPP=integratedGPP(day=i-1,curForce=curForce,curForceDOY = nObs_hourly,chlCur = chl,SRP = P_epi,
-                      V=Vepi,kD=kD, zmix=zmix,snowDepth=snowDepth)
-    
+    GPP=try(integratedGPP(day=i-1,curForce=curForce,curForceDOY = nObs_hourly,chlCur = chl,SRP = P_epi,
+                      V=Vepi,kD=kD, zmix=zmix,snowDepth=snowDepth,rel.tol=1e-10))
+    if(class(GPP)=='try-error'){
+      GPP = integratedGPP(day=i-1,curForce=curForce,curForceDOY = nObs_hourly,chlCur = chl,SRP = P_epi,
+                          V=Vepi,kD=kD, zmix=zmix,snowDepth=snowDepth,rel.tol=1e-15)
+    }
+
     # carbonate speciation 
     # notes: alkalinity is ANC of filtered water; ANC is ANC of unfiltered water - some people assume ANC = Alkalinity 
     # ANC is in microEq/L; convert to mol / kg of solution by dividing by 1e6 multiplying by 1000 (mol/m3) and dividing by water density (kg/m3) to get to mol/kg

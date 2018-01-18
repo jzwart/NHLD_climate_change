@@ -1,0 +1,7 @@
+Notes on [CO2] for future scenarios 2050s and 2080s 
+
+We used RCP8.5 [CO2] projections: https://tntcat.iiasa.ac.at/RcpDb/dsd?Action=htmlpage&page=download and associated paper https://link.springer.com/article/10.1007/s10584-011-0149-y
+
+These are just average annual concentrations so we added daily values on top of RCP8.5 using the keeling curve historical [CO2] 
+
+look at future_atm_co2.R

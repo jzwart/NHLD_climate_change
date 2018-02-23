@@ -144,7 +144,8 @@ wLoad=2 # wetland load per shoreline length; g C m-1 shoreline year-1 (mean from
 sal=0 # salinity set to 0 for all lakes 
 leafLoad=300/12 #mol C m-1 shoreline yr-1; autumn leaf fall; check out Likens 1985 and Gasith and Hasler 1976; Hanson et al 2014; France 1996; France and Peters 1996; 300 g C m-1 shoreline yr-1 is roughly the average for all these studies 
 
-i=grep(lakes_fail[1],lakes) 
+w = 23
+i=grep(lakes_fail[w],lakes) 
 date<-read.table(file.path(dir,'Date_OUT_ALL.txt'),stringsAsFactors = F,header = F,sep='\t')
 datetime<-as.Date(paste(date$V1,date$V2,date$V3),format = '%Y %m %d')
 

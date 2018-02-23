@@ -1,6 +1,6 @@
 # analysis of condor output; JAZ 2018-01-10 
 
-dir <- 'F:/Jake/My Papers/NHLD Climate Change/Results/C_model_output/'
+dir <- 'D:/Condor_Results/'
 
 scenarios <- list.files(dir)
 
@@ -9,16 +9,16 @@ skip=6*365 # days to skip; first 6 years (spin up)
 watersheds<-read.table('/Users/jzwart/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/Data/C model forcing data/NHLDsheds_20170323.txt',
                        stringsAsFactors = F,header=T,sep = '\t')
 
-condor_lookup <- read.csv('/Users/jzwart/NHLD_climate_change/Condor/allruns_condor_lookup.csv',stringsAsFactors = F)
-
 threshold <- 0.05 # if volume of lake is below X% of original volume, don't include this in analyses because DOC / kD / etc.. were blowing up at low volumes 
 for(i in 1:length(scenarios)){
   print(i)
   
+  condor_lookup <- read.csv('/Users/jzwart/NHLD_climate_change/Condor/allruns_condor_lookup.csv',stringsAsFactors = F)
+  
   sub_dir <- file.path(dir,scenarios[i])
-  folder <- list.files(sub_dir)
-  file_path <- file.path(sub_dir,folder[length(folder)]) # take most recent run (sorted by date)
-  files <- list.files(file_path)
+  # folder <- list.files(sub_dir)
+  # file_path <- file.path(sub_dir,folder[length(folder)]) # take most recent run (sorted by date)
+  files <- list.files(sub_dir)
   if(length(files[grep('adj',files)])>0){
     files <- files[-grep('adj',files)]
   }
@@ -28,7 +28,7 @@ for(i in 1:length(scenarios)){
   for(j in 1:length(files)){ # length(files
     print(c(i,j))
     # cur<-read.table(file.path(dir,files[j]),stringsAsFactors = F,sep='\t',header=T) # when I was reading in .txt files
-    cur <- readRDS(file.path(file_path,files[j]))
+    cur <- readRDS(file.path(sub_dir,files[j]))
     lake<-strsplit(tolower(files[j]),'_c_model.rds',fixed = T)[[1]]
     if(scenarios[i]!='Present'){ # all scenarios other than Present were run on Condor and need Condor lookup table 
       lake <- condor_lookup$currID[condor_lookup$crun==as.numeric(lake)]
@@ -37,7 +37,7 @@ for(i in 1:length(scenarios)){
     if(length(cur$time)<2){
       next
     }
-    lake <- toupper(lake) # making all uppercase 
+    lake <- toupper(lake) # making all uppercase; important for JAZ and ZJH lakes 
     
     cur<-cur[skip:(nrow(cur)-0),3:ncol(cur)] # skipping first X number of days
     cur<-cur[cur$Vol>0,] # only keeping days when there's actually water

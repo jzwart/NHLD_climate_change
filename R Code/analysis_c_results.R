@@ -12,9 +12,12 @@ watersheds<-read.table('/Users/jzwart/Documents/Jake/MyPapers/Regional Lake Carb
                        stringsAsFactors = F,header=T,sep = '\t')
 
 for(i in 1:length(scenarios)){
+  print(i)
+  
   sub_dir <- file.path(dir,scenarios[i])
   folder <- list.files(sub_dir)
-  file_path <- file.path(sub_dir,folder)
+  file_path <- file.path(sub_dir,folder[grep('Feather',folder)])
+  # file_path <- file.path(sub_dir,folder[1])
   files <- list.files(file_path)
   if(length(files[grep('adj',files)])>0){
     files <- files[-grep('adj',files)]
@@ -22,9 +25,12 @@ for(i in 1:length(scenarios)){
   
   sum <- data.frame() # open ice only
   all <- data.frame() 
-  for(j in 1:1000){ # length(files
-    cur<-read.table(file.path(file_path,files[j]),stringsAsFactors = F,sep='\t',header=T)
-    lake<-strsplit(files[j],'_C_model.txt',fixed = T)[[1]]
+  for(j in 1:length(files)){ # length(files
+    print(c(i,j))
+    # cur<-read.table(file.path(file_path,files[j]),stringsAsFactors = F,sep='\t',header=T) # when I was reading in .txt files
+    cur <- feather::read_feather(file.path(file_path,files[j]))
+    # lake<-strsplit(files[j],'_C_model.txt',fixed = T)[[1]]
+    lake<-strsplit(files[j],'_C_model.feather',fixed = T)[[1]]
     cur<-na.omit(cur)
     if(length(cur$time)<2){
       next
@@ -108,12 +114,35 @@ for(i in 1:length(scenarios)){ # keeping only lakes common to every scenario run
   assign(paste(scenarios[i],'all',sep = '_'),value = cur)
   assign(paste(scenarios[i],'sum',sep = '_'),value = curSum)
 }
-read.csv(stringsAsFactors = )
 
-# difference function 
-diff <- function(scenarios,value){
+# fraction change function; calculating the 
+frac_change <- function(present_df, scenarios_df=c(), value=c()){
+  to_rm <- c()
   
+  if(!is.null(present_df)){
+    pres <- eval(parse(text=present_df))
+  }else{
+    stop()
+  }
   
+  if(!is.null(scenarios_df)){
+    scen <- as.list(match.call(scenarios_df))
+    for(i in 1:length(scen)){
+      tmp <- eval(parse(text=scen[i]))
+      assign(paste(scen[i],'tmp', sep=''),temp)
+      to_rm <- rbind(to_rm, paste(scen[i],'tmp',sep=''))
+    }
+  }else{
+    stop()
+  }
+  
+  out <- data.frame()
+  
+  if(!is.null(value)){
+    
+    
+  }
+  rm(list=to_rm)
 }
 
 CESM1_CAM5_all$LakeE/CESM1_CAM5_all$Area - Present_all$LakeE/Present_all$Area
@@ -166,6 +195,21 @@ abline(0,1,lty=2,lwd=2)
 
 plot(log(CESM1_CAM5_all$Emit)~log(Present_all$Emit))
 abline(0,1)
+
+sum(CESM1_CAM5_all$Area)/sum(Present_all$Area) # lake area decreases
+summary((CESM1_CAM5_all$Emit/CESM1_CAM5_all$Area) / (Present_all$Emit/Present_all$Area)) # emissions per lake area increased 
+hist((CESM1_CAM5_all$Emit/CESM1_CAM5_all$Area) / (Present_all$Emit/Present_all$Area)) # emissions per lake area increased 
+
+summary((CESM1_CAM5_all$DOCr_epi+CESM1_CAM5_all$DOCl_epi)/CESM1_CAM5_all$Vepi*12)
+summary((Present_all$DOCr_epi+Present_all$DOCl_epi)/Present_all$Vepi*12)
+
+summary(((CESM1_CAM5_all$DOCr_epi+CESM1_CAM5_all$DOCl_epi)/CESM1_CAM5_all$Vepi)/((Present_all$DOCr_epi+Present_all$DOCl_epi)/Present_all$Vepi))
+
+
+
+
+
+
 
 
 

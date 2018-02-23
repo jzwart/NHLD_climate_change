@@ -80,7 +80,7 @@ sp.forceCoord<-forceCoord
 coordinates(sp.forceCoord)<- ~Longitude+Latitude
 
 # starting year/month/day, ending year/mnth/day, & set up force/flux
-startYear=1975
+startYear=1980
 startMonth=6
 startDay=1
 
@@ -140,11 +140,12 @@ leafLoad=300/12 #mol C m-1 shoreline yr-1; autumn leaf fall; check out Likens 19
 
 length(lakes)
 ntlLookUp<-data.frame(lakeID=c('AL','BM','CR','SP','TR','TB','CB'),Permanent_=c(69886156,69886284,69886510,69886444,69886228,69886158,123148117))
-lake='CR'
+lake='TR'
 i=grep(ntlLookUp$Permanent_[ntlLookUp$lakeID==lake],lakes) # Big Musky = 69886284, Sparkling = 69886444, Allequash = , Trout = , Crystal = , Crystal Bog = , Trout Bog = 
 date<-read.table(file.path(dir,'Date_OUT_ALL.txt'),stringsAsFactors = F,header = F,sep='\t')
 datetime<-as.Date(paste(date$V1,date$V2,date$V3),format = '%Y %m %d')
 
+i=62 # lake with error from Condor run 2018-01-10
 # failing lakes from 20170407 run 
 # failLakes=list.files('/Users/Jake/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/Results/C Model Output/20170408/')
 # failLakes=unlist(strsplit(failLakes,'_C_model.txt',fixed = T))
@@ -305,7 +306,7 @@ datetime<-as.Date(paste(date$V1,date$V2,date$V3),format = '%Y %m %d')
   
   # outDir<-'/Users/Jake/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/Results/C Model Output/20160527/'
 
-  # source('/Users/Jake/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/R Code/NHLD_LakeCarbonModel_supporting_V13_discrete.R')
+  source('/Users/jzwart/NHLD_climate_change/R Code/NHLD_LakeCarbonModel_supporting_V13_discrete.R')
   
   out<-matrix(NA,nrow=length(t),ncol=length(X))
   #initiallizing states 

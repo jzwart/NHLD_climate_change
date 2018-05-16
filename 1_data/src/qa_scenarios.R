@@ -1,0 +1,76 @@
+# checks for all lakes in each scenario 
+
+scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_file, gd_config){
+  # check to see if all lakes are in each scenario
+  
+  scenarios_agg <- readRDS(sc_retrieve(scenarios_ind_file, remake_file = remake_file))
+  
+  retro_agg <- readRDS(sc_retrieve(retro_ind_file, remake_file = remake_file))
+  
+  list_out <- list()
+  
+  dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Condor_Results/'
+  dir_lookup <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/'
+  
+  scenarios <- list.files(dir)
+  scenario_lookup <- read.csv(file.path(dir_lookup,'scenarios.csv'),
+                              stringsAsFactors = F) # 
+  
+  lakes <- c()
+  for(i in 1:length(scenario_lookup$scenario)){
+    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
+    lakes <- c(lakes, cur$Permanent_)
+  }
+  lakes <- lakes[!duplicated(lakes)] # all lakes among sceario runs 
+  
+  for(i in 1:length(scenario_lookup$scenario)){ # lakes common to every scenario run 
+    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
+    lakes <- lakes[lakes%in%cur$Permanent_]
+  }
+  scenario_lookup<-rbind(scenario_lookup,c(12,'Present'))
+  for(i in 1:length(scenario_lookup$scenario)){ # keeping only lakes common to every scenario run 
+    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
+    curSum <- eval(parse(text=paste(scenario_lookup$scenario[i],'sum',sep = '_')))
+    cur <- cur[cur$Permanent_%in%lakes,]
+    curSum <- curSum[curSum$Permanent_%in%lakes,]
+    cur <- cur[sort.list(cur$Permanent_),]
+    curSum  <- curSum[sort.list(curSum$Permanent_),]
+    
+    cur$alk <- ifelse(cur$GWin+cur$Baseflow>0,10^(3.2815*(1-exp(-1.2765*log10(cur$GWin+cur$Baseflow+cur$SWin)/3.2815))),0)
+    curSum$alk <- cur$alk
+    cur$HRT <- cur$Vol/(cur$GWin + cur$SWin + cur$DirectP + cur$Baseflow + cur$IceMelt)
+    cur$HRT_woEvap <- cur$Vol / (cur$GWout + cur$SWout)
+    curSum$HRT <- curSum$Vol / (curSum$GWin + curSum$SWin + curSum$DirectP + curSum$Baseflow + curSum$IceMelt)
+    curSum$HRT_woEvap <- curSum$Vol / (curSum$GWout + curSum$SWout)
+    cur$FracRet <- 1 - (cur$DOC_export / cur$DOC_Load)
+    curSum$FracRet <- 1 - (curSum$DOC_export / curSum$DOC_Load)
+    cur$DIC_load <- cur$GWin * 0.7025 + cur$SWin * 0.9041667 + cur$Baseflow * 0.9041667 + cur$DirectP * 0.0833333 + cur$IceMelt * 0.01360082 # mol C day-1 
+    curSum$DIC_load <- curSum$GWin * 0.7025 + curSum$SWin * 0.9041667 + curSum$Baseflow * 0.9041667 + curSum$DirectP * 0.0833333 + curSum$IceMelt * 0.01360082 # mol C day-1 
+    cur$sed_resp <- cur$Sed_phyto * 0.75 + cur$Sed_tPOC * 0.1 # 75% of phyto C and 10% of tpoc C was converted to co2 
+    curSum$sed_resp <- curSum$Sed_phyto * 0.75 + curSum$Sed_tPOC * 0.1 # 75% of phyto C and 10% of tpoc C was converted to co2 
+    cur$waterIn <- cur$GWin + cur$SWin + cur$DirectP + cur$Baseflow + cur$IceMelt
+    curSum$waterIn <- curSum$GWin + curSum$SWin + curSum$DirectP + curSum$Baseflow + curSum$IceMelt
+    cur$fluvialOut <- cur$GWout + cur$SWout # m3 day-1
+    curSum$fluvialOut <- curSum$GWout + curSum$SWout 
+    cur$dicLoadvResp <- cur$DIC_load / (cur$DOC_Respired + cur$sed_resp)
+    curSum$dicLoadvResp <- curSum$DIC_load / (curSum$DOC_Respired + curSum$sed_resp)
+    cur$percentEvap <- cur$LakeE / (cur$LakeE + cur$GWout + cur$SWout)
+    curSum$percentEvap <- curSum$LakeE / (curSum$LakeE + curSum$GWout + curSum$SWout)
+    cur$Burial_total <- cur$Burial_phyto + cur$Burial_tPOC
+    curSum$Burial_total <- curSum$Burial_phyto + curSum$Burial_tPOC
+    cur$pco2 <- 0.952 * cur$fracCO2 * cur$DIC_epi / cur$Vepi * 1000 * 29.41
+    curSum$pco2 <- 0.952 * curSum$fracCO2 * curSum$DIC_epi / curSum$Vepi * 1000 * 29.41
+    cur$doc_conc <- (cur$DOCr_epi+cur$DOCl_epi+cur$DOCr_hypo+cur$DOCl_hypo)/cur$Vol*12
+    curSum$doc_conc <- (curSum$DOCr_epi+curSum$DOCl_epi+curSum$DOCr_hypo+curSum$DOCl_hypo)/curSum$Vol*12
+    
+    lakeSizeBins <- c(0,0.01,.1,1,10,100)*1e6 # breaks for max cutoff of lake size from Downing et al. 2006
+    cur$lakeSizeBins <- cut(cur$Area, breaks = lakeSizeBins)
+    curSum$lakeSizeBins <- cut(curSum$Area, breaks = lakeSizeBins)
+    
+    assign(paste(scenario_lookup$scenario[i],'all',sep = '_'),value = cur)
+    assign(paste(scenario_lookup$scenario[i],'sum',sep = '_'),value = curSum)
+  }
+  
+}
+
+

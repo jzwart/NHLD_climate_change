@@ -94,14 +94,19 @@ agg_future_scenarios <- function(ind_file, gd_config){
 
 # aggregating the retro model runs 
 
-agg_retro <- function(){
+agg_retro <- function(ind_file, gd_config){
   # for present day results 
+  
+  list_out <- list()
+  
   dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Present/20170819/'
   
   skip=6*365 # days to skip; first 6 years (spin up)
   
-  watersheds<-read.table('/Users/jzwart/Documents/Jake/MyPapers/Regional Lake Carbon Model - ECI/Data/C model forcing data/NHLDsheds_20170323.txt',
-                         stringsAsFactors = F,header=T,sep = '\t')
+  watersheds<-read.table('1_data/in/NHLDsheds_20170323.txt',
+                         stringsAsFactors = F,
+                         header=T,
+                         sep = '\t')
   
   threshold <- 0.05 # if volume of lake is below X% of original volume, don't include this in analyses because DOC / kD / etc.. were blowing up at low volumes 
   
@@ -151,7 +156,15 @@ agg_retro <- function(){
   sum <- merge(sum, watersheds, by='Permanent_')
   all <- merge(all, watersheds, by='Permanent_')
   
-  assign(paste(cur_scenario,'all',sep = '_'),value = all)
-  assign(paste(cur_scenario,'sum',sep = '_'),value = sum)
+  out_name_all = paste(cur_scenario, 'all', sep = '_')
+  out_name_sum = paste(cur_scenario, 'sum', sep = '_') 
+  
+  list_out[[1]] <- all
+  list_out[[2]] <- sum
+  
+  names(list_out)[1:2] <- c(out_name_all, out_name_sum)
+  
+  data_file = as_data_file(ind_file)
+  saveRDS(list_out, data_file)
+  gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
-

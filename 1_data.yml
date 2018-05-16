@@ -9,6 +9,7 @@ file_extensions:
 
 sources:
   - 1_data/src/aggregate_model_runs.R
+  - 1_data/src/qa_scenarios.R
 
 targets:
 
@@ -16,6 +17,8 @@ targets:
     depends:
       - 1_data/out/scenarios.rds.ind
       - 1_data/out/retro.rds.ind
+      - 1_data/out/scenarios.rds
+      - 1_data/out/retro.rds
 
   1_data/out/scenarios.rds.ind:
     command: agg_future_scenarios(
@@ -30,3 +33,12 @@ targets:
       gd_config='lib/cfg/gd_config.yml')
   1_data/out/retro.rds:
     command: gd_get('1_data/out/retro.rds.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/scenarios_qa.rds.ind:
+    command: scenarios_qa(
+      ind_file = target_name,
+      scenarios_ind_file = '1_data/out/scenarios.rds.ind', 
+      retro_ind_file = '1_data/out/retro.rds.ind', 
+      remake_file = '1_data.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+

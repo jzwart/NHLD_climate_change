@@ -1,6 +1,7 @@
-target_default: 1_data
+target_default: 2_anlaysis
 
 include:
   - 1_data.yml
+  - 2_analysis.yml
 
 targets:

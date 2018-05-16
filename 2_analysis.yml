@@ -25,5 +25,6 @@ targets:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
     
   2_analysis/out/doc.rds.ind:
-    command: 
+    command: analysis(
+      ind_file = target_name)
     

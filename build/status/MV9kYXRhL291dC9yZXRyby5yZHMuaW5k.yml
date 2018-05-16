@@ -1,0 +1,12 @@
+version: 0.3.0
+name: 1_data/out/retro.rds.ind
+type: file
+hash: e2e4d829df7ae3b6ba9008ebb15f4f03
+time: 2018-05-16 20:48:07 UTC
+depends:
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: e4b63ab6366dd90941b064a46b2caa21
+code:
+  functions:
+    agg_retro: de77fa958ff67ed783b276171a2c5360
+

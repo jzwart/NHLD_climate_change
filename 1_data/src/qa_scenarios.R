@@ -8,7 +8,9 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
   
   retro_agg <- readRDS(sc_retrieve(retro_ind_file, remake_file = remake_file))
   
-  list_out <- list()
+  scenarios_agg[[25]] <- retro_agg[[1]]
+  scenarios_agg[[26]] <- retro_agg[[2]]
+  names(scenarios_agg)[c(25:26)] <- c('Retro_all', 'Retro_sum')
   
   dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Condor_Results/'
   dir_lookup <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/'
@@ -29,7 +31,7 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
     lakes <- lakes[lakes%in%cur$Permanent_]
   }
   
-  scenario_lookup<-rbind(scenario_lookup,c(12,'Present'))
+  scenario_lookup<-rbind(scenario_lookup,c(12,'Retro'))
   for(i in 1:length(scenario_lookup$scenario)){ # keeping only lakes common to every scenario run 
     q = i + (i-1)
     
@@ -71,11 +73,11 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
     lakeSizeBins <- c(0,0.01,.1,1,10,100)*1e6 # breaks for max cutoff of lake size from Downing et al. 2006
     cur$lakeSizeBins <- cut(cur$Area, breaks = lakeSizeBins)
     curSum$lakeSizeBins <- cut(curSum$Area, breaks = lakeSizeBins)
-    cur$period <- ifelse(scenario_lookup$scenario[i] == 'Present', 
-                         'Present', 
+    cur$period <- ifelse(scenario_lookup$scenario[i] == 'Retro', 
+                         'Retro', 
                          ifelse(length(grep('2080s', scenario_lookup$scenario[i]))>0, '2080s', '2050s'))
-    curSum$period <- ifelse(scenario_lookup$scenario[i] == 'Present', 
-                         'Present', 
+    curSum$period <- ifelse(scenario_lookup$scenario[i] == 'Retro', 
+                         'Retro', 
                          ifelse(length(grep('2080s', scenario_lookup$scenario[i]))>0, '2080s', '2050s'))
 
     out[[q]] <- cur

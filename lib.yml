@@ -8,6 +8,7 @@ packages:
   - LSD
   - maptools
   - Hmisc
+  - purrr
 
 file_extensions:
   - feather

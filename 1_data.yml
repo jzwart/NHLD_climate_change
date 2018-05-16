@@ -1,0 +1,98 @@
+target_default: 1_data
+
+include:
+  - lib.yml
+
+packages:
+  - dataRetrieval
+  - ncdf4
+
+file_extensions:
+  - feather
+  - ind
+
+sources:
+  - 1_data/src/choose_sites.R
+  - 1_data/src/subset_sites.R
+  - 1_data/src/pull_nwis.R
+  - 1_data/src/lookup_comid.R
+  - 1_data/src/subset_nwm.R
+  - 1_data/src/describe_sites.R
+
+targets:
+
+  1_data:
+    depends:
+      - 1_data/out/sites_subset.yml.ind
+      - 1_data/out/comids.tsv.ind
+      - 1_data/out/comids_subset.tsv.ind
+      - 1_data/out/nwis.rds.ind
+
+  nwm:
+    depends:
+      - 1_data/out/nwm_retro.nc.ind
+      - 1_data/out/nwm_med.nc.ind
+      - 1_data/out/nwm_long1.nc.ind
+      - 1_data/out/nwm_long2.nc.ind
+      - 1_data/out/nwm_long3.nc.ind
+      - 1_data/out/nwm_long4.nc.ind
+
+  1_data/out/sites.yml.ind:
+    command: choose_sites(
+      ind_file=target_name,
+      dates_yml='1_data/cfg/dates.yml',
+      params_yml='1_data/cfg/params.yml',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/sites.yml:
+    command: gd_get('1_data/out/sites.yml.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/sites_subset.yml.ind:
+    command: subset_sites(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites.yml',
+      dates_yml='1_data/cfg/dates.yml',
+      params_yml='1_data/cfg/params.yml',
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/sites_subset.yml:
+    command: gd_get('1_data/out/sites_subset.yml.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwis.rds.ind:
+    command: pull_nwis(
+      ind_file=target_name,
+      sites_subset_yml='1_data/out/sites_subset.yml',
+      dates_yml='1_data/cfg/dates.yml',
+      params_yml='1_data/cfg/params.yml',
+      gd_config='lib/cfg/gd_config.yml')
+
+  1_data/in/linked_sites.gpkg.ind:
+    command: gd_confirm_posted('1_data/in/linked_sites.gpkg.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/in/linked_sites.gpkg:
+    command: gd_get('1_data/in/linked_sites.gpkg.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/comids.tsv.ind:
+    command: lookup_comid(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites.yml.ind',
+      site_lookup='1_data/in/linked_sites.gpkg.ind',
+      remake_file=I('1_data.yml'),
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/comids.tsv:
+    command: gd_get('1_data/out/comids.tsv.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/comids_subset.tsv.ind:
+    command: lookup_comid(
+      ind_file=target_name,
+      sites_yml='1_data/out/sites_subset.yml.ind',
+      site_lookup='1_data/in/linked_sites.gpkg.ind',
+      remake_file=I('1_data.yml'),
+      gd_config='lib/cfg/gd_config.yml')
+  1_data/out/comids_subset.tsv:
+    command: gd_get('1_data/out/comids_subset.tsv.ind', config_file='lib/cfg/gd_config.yml')
+
+  1_data/out/nwm_retro.nc.ind:
+    command: subset_nwm(
+      ind_file=target_name,
+      model_configuration=I('http://localhost/thredds/dodsC/nwm_retro'),
+      comids='1_data/out/comids.tsv.ind',
+      remake_file = I('1_data.yml'),
+      gd_config='lib/cfg/gd_config.yml')

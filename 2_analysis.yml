@@ -14,17 +14,16 @@ targets:
 
   1_data_out:
     depends:
-      - 1_data/out/scenarios.rds
-      - 1_data/out/retro.rds
-      
+      - 1_data/out/scenarios_qa.rds
+
   2_analysis:
     depends:
       - 2_analysis/out/doc.rds.ind
       
       
-  1_data/out/scenarios.rds:
-    command: gd_get('1_data/out/scenarios.rds.ind', config_file='lib/cfg/gd_config.yml')
-  1_data/out/retro.rds:
-    command: gd_get('1_data/out/retro.rds.ind', config_file='lib/cfg/gd_config.yml')
+  1_data/out/scenarios_qa.rds:
+    command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
     
+  2_analysis/out/doc.rds.ind:
+    command: 
     

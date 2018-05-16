@@ -19,6 +19,7 @@ targets:
       - 1_data/out/retro.rds.ind
       - 1_data/out/scenarios.rds
       - 1_data/out/retro.rds
+      - 1_data/out/scenarios_qa.rds.ind
 
   1_data/out/scenarios.rds.ind:
     command: agg_future_scenarios(

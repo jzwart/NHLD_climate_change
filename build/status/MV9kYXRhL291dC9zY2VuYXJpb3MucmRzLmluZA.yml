@@ -1,0 +1,12 @@
+version: 0.3.0
+name: 1_data/out/scenarios.rds.ind
+type: file
+hash: 8b78d3f41ced49216e617eadd006df92
+time: 2018-05-16 20:40:37 UTC
+depends:
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: eb1271a0148d26df6c53df92cd6a6a55
+code:
+  functions:
+    agg_future_scenarios: 41c408ad54144e2537c3ebf3f29c1d6a
+

@@ -2,6 +2,7 @@
 
 scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_file, gd_config){
   # check to see if all lakes are in each scenario
+  out = list()
   
   scenarios_agg <- readRDS(sc_retrieve(scenarios_ind_file, remake_file = remake_file))
   
@@ -18,19 +19,23 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
   
   lakes <- c()
   for(i in 1:length(scenario_lookup$scenario)){
-    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
+    cur <- scenarios_agg[[i]]
     lakes <- c(lakes, cur$Permanent_)
   }
   lakes <- lakes[!duplicated(lakes)] # all lakes among sceario runs 
   
   for(i in 1:length(scenario_lookup$scenario)){ # lakes common to every scenario run 
-    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
+    cur <- scenarios_agg[[i]]
     lakes <- lakes[lakes%in%cur$Permanent_]
   }
+  
   scenario_lookup<-rbind(scenario_lookup,c(12,'Present'))
   for(i in 1:length(scenario_lookup$scenario)){ # keeping only lakes common to every scenario run 
-    cur <- eval(parse(text=paste(scenario_lookup$scenario[i],'all',sep = '_')))
-    curSum <- eval(parse(text=paste(scenario_lookup$scenario[i],'sum',sep = '_')))
+    q = i + (i-1)
+    
+    cur <- scenarios_agg[[q]]
+    curSum <- scenarios_agg[[q+1]]
+    
     cur <- cur[cur$Permanent_%in%lakes,]
     curSum <- curSum[curSum$Permanent_%in%lakes,]
     cur <- cur[sort.list(cur$Permanent_),]
@@ -66,11 +71,24 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
     lakeSizeBins <- c(0,0.01,.1,1,10,100)*1e6 # breaks for max cutoff of lake size from Downing et al. 2006
     cur$lakeSizeBins <- cut(cur$Area, breaks = lakeSizeBins)
     curSum$lakeSizeBins <- cut(curSum$Area, breaks = lakeSizeBins)
+    cur$period <- ifelse(scenario_lookup$scenario[i] == 'Present', 
+                         'Present', 
+                         ifelse(length(grep('2080s', scenario_lookup$scenario[i]))>0, '2080s', '2050s'))
+    curSum$period <- ifelse(scenario_lookup$scenario[i] == 'Present', 
+                         'Present', 
+                         ifelse(length(grep('2080s', scenario_lookup$scenario[i]))>0, '2080s', '2050s'))
+
+    out[[q]] <- cur
+    out[[q+1]] <- curSum
     
-    assign(paste(scenario_lookup$scenario[i],'all',sep = '_'),value = cur)
-    assign(paste(scenario_lookup$scenario[i],'sum',sep = '_'),value = curSum)
+    out_name_all = paste(scenario_lookup$scenario[i], 'all', sep = '_')
+    out_name_sum = paste(scenario_lookup$scenario[i], 'sum', sep = '_') 
+    
+    names(out)[q:(q+1)] <- c(out_name_all, out_name_sum)
   }
   
+  data_file = as_data_file(ind_file)
+  saveRDS(out, data_file)
+  gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }
-
 

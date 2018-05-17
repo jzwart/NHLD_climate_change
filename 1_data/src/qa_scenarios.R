@@ -79,6 +79,15 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
     curSum$period <- ifelse(scenario_lookup$scenario[i] == 'Retro', 
                          'Retro', 
                          ifelse(length(grep('2080s', scenario_lookup$scenario[i]))>0, '2080s', '2050s'))
+    cur$season <- 'all'
+    curSum$season <- 'open_water'
+    if(i <= 12){
+      cur$gcm <- strsplit(scenario_lookup$scenario[i], '_2')[[1]][1]
+      curSum$gcm <- strsplit(scenario_lookup$scenario[i], '_2')[[1]][1]
+    }else {
+      cur$gcm <- 'Retro'
+      curSum$gcm <- 'Retro'
+    }
 
     out[[q]] <- cur
     out[[q+1]] <- curSum

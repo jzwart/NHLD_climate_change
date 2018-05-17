@@ -25,6 +25,10 @@ targets:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
     
   2_analysis/out/doc.rds.ind:
-    command: analysis(
-      ind_file = target_name)
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/doc.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
     

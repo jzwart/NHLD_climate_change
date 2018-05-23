@@ -20,6 +20,7 @@ targets:
   2_analysis:
     depends:
       - 2_analysis/out/doc.rds.ind
+      - 2_analysis/out/stage.rds.ind
 
 
   1_data/out/scenarios_qa.rds:

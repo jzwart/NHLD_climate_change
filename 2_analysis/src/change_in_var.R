@@ -8,7 +8,6 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
 
   if(var_cfg$variable == 'doc'){
     out <- all_results %>%
-
       select('Permanent_', 'period', 'season', 'gcm',
              grep(var_cfg$variable, tolower(colnames(.))),
              -grep('respired', tolower(colnames(.))),
@@ -40,6 +39,24 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
              ratio_doc_epi = mean_doc_epi / retro_doc_epi,
              ratio_doc_hypo = mean_doc_hypo / retro_doc_hypo,
              ratio_doc_all = mean_doc_all / retro_doc_all)
+  }else if(var_cfg$variable == 'stage'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             grep(var_cfg$variable, tolower(colnames(.)))) %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_stage = mean(Stage)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_stage = mean_stage)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_stage = mean_stage - retro_stage,
+             ratio_stage = mean_stage / retro_stage)
   }
 
   data_file = as_data_file(ind_file)

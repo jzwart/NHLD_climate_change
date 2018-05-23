@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 2_analysis/out/stage.rds.ind
+type: file
+hash: f7426c0a6eaec75b3367e4303f11b0a6
+time: 2018-05-23 21:40:01 UTC
+depends:
+  1_data/out/scenarios_qa.rds.ind: c915c1213f712bbe57dc402feb26d5a4
+  2_analysis/cfg/stage.yml: 5e47df5238133d8aab91e0e925b663ba
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: d331d3042fc0d1aa21ef1d972f57608c
+code:
+  functions:
+    change_in_var: 24f506d004be714e39bada7c875eff73
+

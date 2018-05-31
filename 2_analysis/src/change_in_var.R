@@ -57,6 +57,43 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_stage = mean_stage - retro_stage,
              ratio_stage = mean_stage / retro_stage)
+  }else if(var_cfg$variable == 'pco2'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             grep(var_cfg$variable, tolower(colnames(.)))) %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_pco2 = mean(pco2)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_pco2 = mean_pco2)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_pco2 = mean_pco2 - retro_pco2,
+             ratio_pco2 = mean_pco2 / retro_pco2)
+  }else if(var_cfg$variable == 'emit_areal'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'Emit', 'Area') %>%
+      mutate(emit_areal = Emit / Area * 12 * 365) %>% # areal emissions in g / m2 / year
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_emit_areal = mean(emit_areal)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_emit_areal = mean_emit_areal)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_emit_areal = mean_emit_areal - retro_emit_areal,
+             ratio_emit_areal = mean_emit_areal / retro_emit_areal)
   }
 
   data_file = as_data_file(ind_file)

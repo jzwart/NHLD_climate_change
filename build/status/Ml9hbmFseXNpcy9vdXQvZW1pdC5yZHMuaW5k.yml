@@ -1,13 +1,13 @@
 version: 0.3.0
-name: 2_analysis/out/emit_areal.rds.ind
+name: 2_analysis/out/emit.rds.ind
 type: file
-hash: 258666f9ab3dafb7b3315cb5321b425c
-time: 2018-06-01 14:05:38 UTC
+hash: bf436c495b46b2ac938baffa2e5a2e18
+time: 2018-06-01 14:05:24 UTC
 depends:
   1_data/out/scenarios_qa.rds.ind: c915c1213f712bbe57dc402feb26d5a4
-  2_analysis/cfg/emit_areal.yml: ebfeffa011feea6813284171a021d5c9
+  2_analysis/cfg/emit.yml: 6855d24f1e12bf45fa0f6c0020af6420
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
-fixed: 6a4d1f7e75bed3537c648460abefc1e0
+fixed: 3396ca736c8b6222b883c1cbd5b347fb
 code:
   functions:
     change_in_var: 85efc1c803914f2b100939392d388286

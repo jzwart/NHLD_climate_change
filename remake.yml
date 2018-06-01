@@ -1,7 +1,8 @@
-target_default: 2_anlaysis
+target_default: 6_plot
 
 include:
   - 1_data.yml
   - 2_analysis.yml
+  - 6_plot.yml
 
 targets:

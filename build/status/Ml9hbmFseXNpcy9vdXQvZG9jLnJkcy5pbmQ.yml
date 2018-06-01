@@ -2,7 +2,7 @@ version: 0.3.0
 name: 2_analysis/out/doc.rds.ind
 type: file
 hash: 68c4e9c9f00955ecafce6e831b5862a5
-time: 2018-05-23 20:55:04 UTC
+time: 2018-06-01 18:01:55 UTC
 depends:
   1_data/out/scenarios_qa.rds.ind: c915c1213f712bbe57dc402feb26d5a4
   2_analysis/cfg/doc.yml: 5fd90f8ab1f76175ac08616b6ce4b8e7
@@ -10,5 +10,5 @@ depends:
 fixed: 031567c3c9710643ba21dd248723b4ed
 code:
   functions:
-    change_in_var: d0353c5bac27c01b88ed125a57571414
+    change_in_var: fdafa3de348b92d46a667f9a2e81717e
 

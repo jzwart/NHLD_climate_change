@@ -2,7 +2,7 @@ version: 0.3.0
 name: 2_analysis/out/area.rds.ind
 type: file
 hash: 6ae7b139ab3512100ae1cde81790c819
-time: 2018-06-01 14:05:00 UTC
+time: 2018-06-01 18:02:13 UTC
 depends:
   1_data/out/scenarios_qa.rds.ind: c915c1213f712bbe57dc402feb26d5a4
   2_analysis/cfg/area.yml: a1844bdc5d436b5d75913fcf0bd58d68
@@ -10,5 +10,5 @@ depends:
 fixed: f20b773e9ab20b58987418d2828d4a93
 code:
   functions:
-    change_in_var: 85efc1c803914f2b100939392d388286
+    change_in_var: fdafa3de348b92d46a667f9a2e81717e
 

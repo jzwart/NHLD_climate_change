@@ -153,8 +153,9 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
     out <- all_results %>%
       select('Permanent_', 'period', 'season', 'gcm',
              'Burial_total') %>%
+      mutate(bury = Burial_total * 12 * 365) %>% # burial in g C / year
       group_by(Permanent_, period, season) %>%
-      summarise(mean_bury = mean(Burial_total)) %>%
+      summarise(mean_bury = mean(bury)) %>%
       ungroup()
 
     retro <- out %>%
@@ -167,6 +168,154 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_bury = mean_bury - retro_bury,
              ratio_bury = mean_bury / retro_bury)
+  }else if(var_cfg$variable == 'bury_areal'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'Burial_total', 'Area') %>%
+      mutate(bury_areal = Burial_total / Area * 12 * 365) %>% # burial in g C / m2/  year
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_bury_areal = mean(bury_areal)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_bury_areal = mean_bury_areal)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_bury_areal = mean_bury_areal - retro_bury_areal,
+             ratio_bury_areal = mean_bury_areal / retro_bury_areal)
+  }else if(var_cfg$variable == 'sw_in'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'SWin', 'Baseflow') %>%
+      mutate(SWin = SWin + Baseflow) %>% # adding baseflow and runoff together
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_sw_in = mean(SWin)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_sw_in = mean_sw_in)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_sw_in = mean_sw_in - retro_sw_in,
+             ratio_sw_in = mean_sw_in / retro_sw_in)
+  }else if(var_cfg$variable == 'gw_in'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'GWin') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_gw_in = mean(GWin)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_gw_in = mean_gw_in)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_gw_in = mean_gw_in - retro_gw_in,
+             ratio_gw_in = mean_gw_in / retro_gw_in)
+  }else if(var_cfg$variable == 'gw_out'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'GWout') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_gw_out = mean(GWout)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_gw_out = mean_gw_out)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_gw_out = mean_gw_out - retro_gw_out,
+             ratio_gw_out = mean_gw_out / retro_gw_out)
+  }else if(var_cfg$variable == 'sw_out'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'SWout') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_sw_out = mean(SWout)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_sw_out = mean_sw_out)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_sw_out = mean_sw_out - retro_sw_out,
+             ratio_sw_out = mean_sw_out / retro_sw_out)
+  }else if(var_cfg$variable == 'precip'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'DirectP', 'Area') %>%
+      mutate(DirectP = DirectP / Area) %>% # precip in m
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_precip_m = mean(DirectP)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_precip_m = mean_precip_m)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_precip_m = mean_precip_m - retro_precip_m,
+             ratio_precip_m = mean_precip_m / retro_precip_m)
+  }else if(var_cfg$variable == 'evap'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'LakeE', 'Area') %>%
+      mutate(LakeE = LakeE / Area) %>% # evap in m
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_evap_m = mean(LakeE)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_evap_m = mean_evap_m)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_evap_m = mean_evap_m - retro_evap_m,
+             ratio_evap_m = mean_evap_m / retro_evap_m)
+  }else if(var_cfg$variable == 'hrt'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'HRT') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_hrt = mean(HRT)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_hrt = mean_hrt)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_hrt = mean_hrt - retro_hrt,
+             ratio_hrt = mean_hrt / retro_hrt)
   }
 
   data_file = as_data_file(ind_file)

@@ -69,6 +69,10 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
     curSum$pco2 <- 0.952 * curSum$fracCO2 * curSum$DIC_epi / curSum$Vepi * 1000 * 29.41
     cur$doc_conc <- (cur$DOCr_epi+cur$DOCl_epi+cur$DOCr_hypo+cur$DOCl_hypo)/cur$Vol*12
     curSum$doc_conc <- (curSum$DOCr_epi+curSum$DOCl_epi+curSum$DOCr_hypo+curSum$DOCl_hypo)/curSum$Vol*12
+    cur$tp_load <- cur$GWin * 0.0007742 + cur$SWin * 0.001612903 +
+      cur$Baseflow * 0.001612903 + cur$DirectP * 0.0003225806 + cur$IceMelt * 0.0003225806 # mol P day-1
+    curSum$tp_load <- curSum$GWin * 0.0007742 + curSum$SWin * 0.001612903 +
+      curSum$Baseflow * 0.001612903 + curSum$DirectP * 0.0003225806 + curSum$IceMelt * 0.0003225806 # mol P day-1
 
     lakeSizeBins <- c(0,0.01,.1,1,10,100)*1e6 # breaks for max cutoff of lake size from Downing et al. 2006
     cur$lakeSizeBins <- cut(cur$Area, breaks = lakeSizeBins)

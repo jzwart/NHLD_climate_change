@@ -384,31 +384,49 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
   }else if(var_cfg$variable == 'tp_loads'){
     out <- all_results %>%
       select('Permanent_', 'period', 'season', 'gcm',
-             'TP_Load', 'waterIn') %>%
-      mutate(doc_conc = DOC_Load / waterIn * 12,
-             DOC_Load = DOC_Load * 12) %>% # mean DOC concentration in load water in g C / m3 ; doc load in g C / day
+             'tp_load', 'waterIn') %>%
+      mutate(tp_conc = tp_load / waterIn * 31 * 1000,
+             tp_load = tp_load * 31 * 1000) %>% # mean TP concentration in load water in mg P / m3 ; tp load in mg P / day
       group_by(Permanent_, period, season) %>%
-      summarise(mean_doc_load = mean(DOC_Load),
+      summarise(mean_tp_load = mean(tp_load),
                 mean_water_load = mean(waterIn),
-                mean_doc_load_conc = mean(doc_conc)) %>%
+                mean_tp_load_conc = mean(tp_conc)) %>%
       ungroup()
 
     retro <- out %>%
       dplyr::filter(period == 'Retro') %>%
       select(-period) %>%
-      rename(retro_doc_load = mean_doc_load,
+      rename(retro_tp_load = mean_tp_load,
              retro_water_load = mean_water_load,
-             retro_doc_load_conc = mean_doc_load_conc)
+             retro_tp_load_conc = mean_tp_load_conc)
 
     scenarios <- out %>%
       dplyr::filter(period != 'Retro') %>%
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
-      mutate(delta_doc_load = mean_doc_load - retro_doc_load,
-             ratio_doc_load = mean_doc_load / retro_doc_load,
+      mutate(delta_tp_load = mean_tp_load - retro_tp_load,
+             ratio_tp_load = mean_tp_load / retro_tp_load,
              delta_water_load = mean_water_load - retro_water_load,
              ratio_water_load = mean_water_load / retro_water_load,
-             delta_doc_load_conc = mean_doc_load_conc - retro_doc_load_conc,
-             ratio_doc_load_conc = mean_doc_load_conc / retro_doc_load_conc)
+             delta_tp_load_conc = mean_tp_load_conc - retro_tp_load_conc,
+             ratio_tp_load_conc = mean_tp_load_conc / retro_tp_load_conc)
+  }else if(var_cfg$variable == 'zmix'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'zmix') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_zmix = mean(zmix)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_zmix = mean_zmix)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_zmix = mean_zmix - retro_zmix,
+             ratio_zmix = mean_zmix / retro_zmix)
   }
 
   data_file = as_data_file(ind_file)

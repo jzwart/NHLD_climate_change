@@ -2,13 +2,13 @@ version: 0.3.0
 name: 2_analysis/out/bury_areal.rds.ind
 type: file
 hash: f60d8d7c0a3d3bf1a76bdfe773c20f0a
-time: 2018-06-01 18:02:29 UTC
+time: 2018-06-04 23:07:33 UTC
 depends:
-  1_data/out/scenarios_qa.rds.ind: c915c1213f712bbe57dc402feb26d5a4
+  1_data/out/scenarios_qa.rds.ind: 85baccd59617495c3aca356aafc56f08
   2_analysis/cfg/bury_areal.yml: 6291d3410a4470bf7885193e4370e93e
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
 fixed: 8b0ec6358addbec3f30b179654faaf63
 code:
   functions:
-    change_in_var: fdafa3de348b92d46a667f9a2e81717e
+    change_in_var: 12a2fb66d214e4dc81e9389e6825ce9d
 

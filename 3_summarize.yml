@@ -1,9 +1,5 @@
 target_default: 2_analysis
 
-packages:
-  - ggplot2
-  - grid
-
 include:
   - lib.yml
 
@@ -12,7 +8,7 @@ file_extensions:
   - ind
 
 sources:
-  - 6_plot/src/fig_delta.R
+  - 3_summarize/src/get_vars.R
 
 targets:
 
@@ -47,15 +43,23 @@ targets:
   2_analysis/out/bury_areal.rds:
     command: gd_get('2_analysis/out/bury_areal.rds.ind', config_file='lib/cfg/gd_config.yml')
 
-  6_plot:
+  3_summarize:
     depends:
-      - 6_plot/out/fig_delta.png.ind
+      - 3_summarize/out/all_changes.rds.ind
+      - 3_summarize/cfg/vars.yml.ind
 
-
-  6_plot/out/fig_delta.png.ind:
-    command: fig_delta(
+  3_summarize/cfg/vars.yml.ind:
+    command: get_vars(
       ind_file = target_name,
-      remake_file = I('6_plot.yml'),
+      vars_loc = '2_analysis/out/',
+      remake_file = I('3_summarize.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  3_summarize/out/all_changes.rds.ind:
+    command: agg_analyses(
+      ind_file = target_name,
+      vars_yml = '3_summarize/cfg/vars.yml',
+      remake_file = I('3_summarize.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
 

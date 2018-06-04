@@ -316,6 +316,99 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_hrt = mean_hrt - retro_hrt,
              ratio_hrt = mean_hrt / retro_hrt)
+  }else if(var_cfg$variable == 'gpp'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'GPP') %>%
+      mutate(GPP = GPP * 12) %>% # converting from mol C / m3 to g C / m3
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_gpp = mean(GPP)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_gpp = mean_gpp)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_gpp = mean_gpp - retro_gpp,
+             ratio_gpp = mean_gpp / retro_gpp)
+  }else if(var_cfg$variable == 'vol_epi'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'Vepi') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_vol_epi = mean(Vepi)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_vol_epi = mean_vol_epi)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_vol_epi = mean_vol_epi - retro_vol_epi,
+             ratio_vol_epi = mean_vol_epi / retro_vol_epi)
+  }else if(var_cfg$variable == 'doc_loads'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'DOC_Load', 'waterIn') %>%
+      mutate(doc_conc = DOC_Load / waterIn * 12,
+             DOC_Load = DOC_Load * 12) %>% # mean DOC concentration in load water in g C / m3 ; doc load in g C / day
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_doc_load = mean(DOC_Load),
+                mean_water_load = mean(waterIn),
+                mean_doc_load_conc = mean(doc_conc)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_doc_load = mean_doc_load,
+             retro_water_load = mean_water_load,
+             retro_doc_load_conc = mean_doc_load_conc)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_doc_load = mean_doc_load - retro_doc_load,
+             ratio_doc_load = mean_doc_load / retro_doc_load,
+             delta_water_load = mean_water_load - retro_water_load,
+             ratio_water_load = mean_water_load / retro_water_load,
+             delta_doc_load_conc = mean_doc_load_conc - retro_doc_load_conc,
+             ratio_doc_load_conc = mean_doc_load_conc / retro_doc_load_conc)
+  }else if(var_cfg$variable == 'tp_loads'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'TP_Load', 'waterIn') %>%
+      mutate(doc_conc = DOC_Load / waterIn * 12,
+             DOC_Load = DOC_Load * 12) %>% # mean DOC concentration in load water in g C / m3 ; doc load in g C / day
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_doc_load = mean(DOC_Load),
+                mean_water_load = mean(waterIn),
+                mean_doc_load_conc = mean(doc_conc)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_doc_load = mean_doc_load,
+             retro_water_load = mean_water_load,
+             retro_doc_load_conc = mean_doc_load_conc)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_doc_load = mean_doc_load - retro_doc_load,
+             ratio_doc_load = mean_doc_load / retro_doc_load,
+             delta_water_load = mean_water_load - retro_water_load,
+             ratio_water_load = mean_water_load / retro_water_load,
+             delta_doc_load_conc = mean_doc_load_conc - retro_doc_load_conc,
+             ratio_doc_load_conc = mean_doc_load_conc / retro_doc_load_conc)
   }
 
   data_file = as_data_file(ind_file)

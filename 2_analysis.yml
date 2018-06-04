@@ -35,6 +35,10 @@ targets:
       - 2_analysis/out/evap.rds.ind
       - 2_analysis/out/precip.rds.ind
       - 2_analysis/out/hrt.rds.ind
+      - 2_analysis/out/gpp.rds.ind
+      - 2_analysis/out/vol_epi.rds.ind
+      - 2_analysis/out/doc_loads.rds.ind
+      - 2_analysis/out/tp_loads.rds.ind
 
   1_data/out/scenarios_qa.rds:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -165,4 +169,36 @@ targets:
       raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
       remake_file = I('2_analysis.yml'),
       var_cfg_file = '2_analysis/cfg/hrt.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/gpp.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/gpp.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/vol_epi.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/vol_epi.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/doc_loads.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/doc_loads.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/tp_loads.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/tp_loads.yml',
       gd_config = 'lib/cfg/gd_config.yml')

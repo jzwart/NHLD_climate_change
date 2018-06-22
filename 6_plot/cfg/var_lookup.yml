@@ -8,6 +8,9 @@ units:
   fhee: 'fraction'
   bury: 'g C year-1'
   bury_areal: 'g C m-2 year-1'
+  doc_loads: 'g C day-1'
+  tp_loads: 'mg P day-1'
+  zmix: 'm'
 
 labs: # axis label
   doc: 'DOC'
@@ -19,6 +22,9 @@ labs: # axis label
   fhee: 'FHEE'
   bury: 'C Burial'
   bury_areal: 'Areal C Burial'
+  doc_loads: 'DOC Load'
+  tp_loads: 'TP Load'
+  zmix: 'Mixed Layer'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -30,3 +36,6 @@ ratio_var: # column name that we want to plot for ratio boxplots
   fhee: 'ratio_fhee'
   bury: 'ratio_bury'
   bury_areal: 'ratio_bury_areal'
+  doc_loads: 'ratio_doc_load'
+  tp_loads: 'ratio_tp_load'
+  zmix: 'ratio_zmix'

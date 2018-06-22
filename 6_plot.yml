@@ -1,4 +1,4 @@
-target_default: 2_analysis
+target_default: 6_plot
 
 packages:
   - ggplot2
@@ -13,6 +13,7 @@ file_extensions:
 
 sources:
   - 6_plot/src/fig_delta.R
+  - 6_plot/src/fig_boxplot_theme.R
 
 targets:
 
@@ -49,14 +50,94 @@ targets:
 
   6_plot:
     depends:
-      - 6_plot/out/fig_delta.png.ind
+      - 6_plot/out/fig_doc_delta.png.ind
+      - 6_plot/out/fig_stage_delta.png.ind
+      - 6_plot/out/fig_pco2_delta.png.ind
+      - 6_plot/out/fig_emit_areal.png.ind
+      - 6_plot/out/fig_emit.png.ind
+      - 6_plot/out/fig_area.png.ind
+      - 6_plot/out/fig_fhee.png.ind
+      - 6_plot/out/fig_bury.png.ind
+      - 6_plot/out/fig_bury_areal.png.ind
 
-
-  6_plot/out/fig_delta.png.ind:
+  6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
-      ind_file = target_name,
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/doc.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+  6_plot/out/fig_stage_delta.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/stage.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
 
+  6_plot/out/fig_pco2_delta.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/pco2.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_emit_areal.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/emit_areal.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_emit.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/emit.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_area.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/area.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_fhee.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/fhee.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_bury.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/bury.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_bury_areal.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/bury_areal.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = '6_plot/cfg/var_lookup.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
 

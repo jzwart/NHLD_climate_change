@@ -1,0 +1,32 @@
+units:
+  doc: 'mg C L-1'
+  stage: 'm'
+  pco2: 'uatm'
+  emit_areal: 'g C m-2 year-1'
+  emit: 'g C year-1'
+  area: 'm2'
+  fhee: 'fraction'
+  bury: 'g C year-1'
+  bury_areal: 'g C m-2 year-1'
+
+labs: # axis label
+  doc: 'DOC'
+  stage: 'Stage'
+  pco2: 'pCO2'
+  emit_areal: 'Areal CO2 Emit'
+  emit: 'CO2 Emit'
+  area: 'Lake Area'
+  fhee: 'FHEE'
+  bury: 'C Burial'
+  bury_areal: 'Areal C Burial'
+
+ratio_var: # column name that we want to plot for ratio boxplots
+  doc: 'ratio_doc_all'
+  stage: 'ratio_stage'
+  pco2: 'ratio_pco2'
+  emit_areal: 'ratio_emit_areal'
+  emit: 'ratio_emit'
+  area: 'ratio_area'
+  fhee: 'ratio_fhee'
+  bury: 'ratio_bury'
+  bury_areal: 'ratio_bury_areal'

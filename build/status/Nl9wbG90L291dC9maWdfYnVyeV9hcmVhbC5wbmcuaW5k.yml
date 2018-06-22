@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 6_plot/out/fig_bury_areal.png.ind
+type: file
+hash: 6696dd27ef2387b11d599362bb05804f
+time: 2018-06-22 20:03:30 UTC
+depends:
+  2_analysis/cfg/bury_areal.yml: 6291d3410a4470bf7885193e4370e93e
+  6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
+  6_plot/cfg/var_lookup.yml: 8cdd700bf5b028051e19952982395f95
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: b95bd5a31a9f3fa5c7e78c32695efd83
+code:
+  functions:
+    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+

@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 6_plot/out/fig_fhee.png.ind
+type: file
+hash: 763465f26d8aa6e6ffa684748da9441a
+time: 2018-06-22 20:03:11 UTC
+depends:
+  2_analysis/cfg/fhee.yml: c912cf248e8c383260fe0e0e856c841d
+  6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
+  6_plot/cfg/var_lookup.yml: 8cdd700bf5b028051e19952982395f95
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: d4a8755600765c7f3bee6d0896d6d946
+code:
+  functions:
+    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+

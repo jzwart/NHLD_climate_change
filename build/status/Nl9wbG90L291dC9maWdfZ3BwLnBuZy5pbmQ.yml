@@ -1,13 +1,13 @@
 version: 0.3.0
-name: 6_plot/out/fig_bury_areal.png.ind
+name: 6_plot/out/fig_gpp.png.ind
 type: file
-hash: 6696dd27ef2387b11d599362bb05804f
-time: 2018-06-22 21:29:20 UTC
+hash: 2da403094ce548d3c7a0994d05d5b7cd
+time: 2018-06-22 21:30:21 UTC
 depends:
-  2_analysis/cfg/bury_areal.yml: 6291d3410a4470bf7885193e4370e93e
+  2_analysis/cfg/gpp.yml: ea2b60ab05d63ffc931c728b2085b90c
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
-fixed: 87aaa3d15f1596455017d8adf86c9a68
+fixed: 3d6f829024cf218b2ba19636ba43f0e7
 code:
   functions:
     fig_delta: 09d114c258771ab10f8c6b4d56c6966d

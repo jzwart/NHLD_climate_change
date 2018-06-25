@@ -1,13 +1,13 @@
 version: 0.3.0
-name: 6_plot/out/fig_bury_areal.png.ind
+name: 6_plot/out/fig_precip.png.ind
 type: file
-hash: 6696dd27ef2387b11d599362bb05804f
-time: 2018-06-22 21:29:20 UTC
+hash: a67591049edeb3d238241621e74d2abe
+time: 2018-06-22 21:30:03 UTC
 depends:
-  2_analysis/cfg/bury_areal.yml: 6291d3410a4470bf7885193e4370e93e
+  2_analysis/cfg/precip.yml: 1eabf1d66d455123677dd1fb8188ca4b
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
-fixed: 87aaa3d15f1596455017d8adf86c9a68
+fixed: 6e9a066c7cdb11cf60b8865866ede71c
 code:
   functions:
     fig_delta: 09d114c258771ab10f8c6b4d56c6966d

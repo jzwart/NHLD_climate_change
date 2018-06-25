@@ -2,13 +2,12 @@ version: 0.3.0
 name: 6_plot/out/fig_bury.png.ind
 type: file
 hash: c62909fbc89b479cd48d0c8a4cc548b8
-time: 2018-06-22 20:03:21 UTC
+time: 2018-06-22 21:29:15 UTC
 depends:
   2_analysis/cfg/bury.yml: fad647d81222acb9e5a7fa3612b45996
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
-  6_plot/cfg/var_lookup.yml: 8cdd700bf5b028051e19952982395f95
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
-fixed: 5506839d3e8a7814fdf265d7c69987e9
+fixed: 0c10ed4f34b6d28b6c29a66f8c2b4418
 code:
   functions:
     fig_delta: 09d114c258771ab10f8c6b4d56c6966d

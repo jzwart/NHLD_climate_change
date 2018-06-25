@@ -576,6 +576,30 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_d_epi = mean_d_epi - retro_d_epi,
              ratio_d_epi = mean_d_epi / retro_d_epi)
+  }else if(var_cfg$variable %in% c('doc_resp', 'doc_resp_vol')){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'DOC_Respired', 'Vol') %>%
+      mutate(DOC_Respired = DOC_Respired * 12,
+             doc_resp_vol = DOC_Respired / Vol) %>% # g C day-1
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_doc_resp = mean(DOC_Respired),
+                mean_doc_resp_vol = mean(doc_resp_vol)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_doc_resp = mean_doc_resp,
+             retro_doc_resp_vol = mean_doc_resp_vol)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_doc_resp = mean_doc_resp - retro_doc_resp,
+             ratio_doc_resp = mean_doc_resp / retro_doc_resp,
+             delta_doc_resp_vol = mean_doc_resp_vol - retro_doc_resp_vol,
+             ratio_doc_resp_vol = mean_doc_resp_vol / retro_doc_resp_vol)
   }
 
   data_file = as_data_file(ind_file)

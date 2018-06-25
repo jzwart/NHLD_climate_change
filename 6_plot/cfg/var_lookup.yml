@@ -28,6 +28,8 @@ units:
   dic_loads: 'g C day-1'
   kd: 'm-1'
   d_epi: 'day-1'
+  doc_resp: 'g C day-1'
+  doc_resp_vol: 'g C m-3 day-1'
 
 labs: # axis label
   doc: 'DOC'
@@ -58,7 +60,9 @@ labs: # axis label
   ice_dur: 'Ice Duration'
   dic_loads: 'DIC Load'
   kd: 'kD'
+  doc_resp: 'DOC Respired'
   d_epi: 'DOC Turnover'
+  doc_resp_vol: 'DOC Resp Vol'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -90,3 +94,5 @@ ratio_var: # column name that we want to plot for ratio boxplots
   dic_loads: 'ratio_dic_load'
   kd: 'ratio_kd'
   d_epi: 'ratio_d_epi'
+  doc_resp: 'ratio_doc_resp'
+  doc_resp_vol: 'ratio_doc_resp_vol'

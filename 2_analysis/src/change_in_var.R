@@ -521,6 +521,61 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_water_out = mean_water_out - retro_water_out,
              ratio_water_out = mean_water_out / retro_water_out)
+  }else if(var_cfg$variable == 'kd'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'kD') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_kd = mean(kD)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_kd = mean_kd)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_kd = mean_kd - retro_kd,
+             ratio_kd = mean_kd / retro_kd)
+  }else if(var_cfg$variable == 'dic_loads'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'DIC_load') %>%
+      mutate(DIC_load = DIC_load * 12) %>% # dic load in g C / day
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_dic_load = mean(DIC_load)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_dic_load = mean_dic_load)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_dic_load = mean_dic_load - retro_dic_load,
+             ratio_dic_load = mean_dic_load / retro_dic_load)
+  }else if(var_cfg$variable == 'd_epi'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'emergent_d_epi') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_d_epi = mean(emergent_d_epi)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_d_epi = mean_d_epi)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_d_epi = mean_d_epi - retro_d_epi,
+             ratio_d_epi = mean_d_epi / retro_d_epi)
   }
 
   data_file = as_data_file(ind_file)

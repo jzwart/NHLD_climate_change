@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 2_analysis/out/dic_loads.rds.ind
+type: file
+hash: f6e699a32980b55a59db1c018e4cdbd0
+time: 2018-06-25 19:08:23 UTC
+depends:
+  1_data/out/scenarios_qa.rds.ind: 85baccd59617495c3aca356aafc56f08
+  2_analysis/cfg/dic_loads.yml: e9956d5c2afa7239ccd94c655f6a0a2f
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: c76b42263852e6b0f503b47b50c2da45
+code:
+  functions:
+    change_in_var: 3e55773fbce433c3cc4871b25c946fd9
+

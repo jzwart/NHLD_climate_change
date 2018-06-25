@@ -45,6 +45,9 @@ targets:
       - 2_analysis/out/water_in.rds.ind
       - 2_analysis/out/water_out.rds.ind
       - 2_analysis/out/vol.rds.ind
+      - 2_analysis/out/kd.rds.ind
+      - 2_analysis/out/d_epi.rds.ind
+      - 2_analysis/out/dic_loads.rds.ind
 
   1_data/out/scenarios_qa.rds:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -256,3 +259,28 @@ targets:
       remake_file = I('2_analysis.yml'),
       var_cfg_file = '2_analysis/cfg/vol.yml',
       gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/kd.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/kd.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/d_epi.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/d_epi.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/dic_loads.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/dic_loads.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+

@@ -25,6 +25,9 @@ units:
   water_in: 'm3 day-1'
   water_out: 'm3 day-1'
   ice_dur: 'days'
+  dic_loads: 'g C day-1'
+  kd: 'm-1'
+  d_epi: 'day-1'
 
 labs: # axis label
   doc: 'DOC'
@@ -53,6 +56,9 @@ labs: # axis label
   water_in: 'Water In'
   water_out: 'Water Out'
   ice_dur: 'Ice Duration'
+  dic_loads: 'DIC Load'
+  kd: 'kD'
+  d_epi: 'DOC Turnover'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -81,3 +87,6 @@ ratio_var: # column name that we want to plot for ratio boxplots
   water_in: 'ratio_water_in'
   water_out: 'ratio_water_out'
   ice_dur: 'ratio_ice_dur'
+  dic_loads: 'ratio_dic_load'
+  kd: 'ratio_kd'
+  d_epi: 'ratio_d_epi'

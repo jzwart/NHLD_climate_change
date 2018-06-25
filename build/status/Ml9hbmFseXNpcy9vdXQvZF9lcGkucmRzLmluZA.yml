@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 2_analysis/out/d_epi.rds.ind
+type: file
+hash: 8b08815e808cc65e628d8c0a067ed45f
+time: 2018-06-25 19:08:58 UTC
+depends:
+  1_data/out/scenarios_qa.rds.ind: 85baccd59617495c3aca356aafc56f08
+  2_analysis/cfg/d_epi.yml: 9dfad4ad8907b43d1eb8e0ecf84e840c
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: 428d3ff6c8090827d9fb64a304a2e719
+code:
+  functions:
+    change_in_var: 3e55773fbce433c3cc4871b25c946fd9
+

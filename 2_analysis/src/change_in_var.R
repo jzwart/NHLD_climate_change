@@ -427,6 +427,100 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_zmix = mean_zmix - retro_zmix,
              ratio_zmix = mean_zmix / retro_zmix)
+  }else if(var_cfg$variable == 'ph'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'pH') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_ph = mean(pH)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_ph = mean_ph)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_ph = mean_ph - retro_ph,
+             ratio_ph = mean_ph / retro_ph)
+  }else if(var_cfg$variable == 'ice_dur'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'ndays_ice', 'ndays_open_ice') %>%
+      mutate(ndays = ndays_ice + ndays_open_ice,
+             nyears = ndays / 365,
+             ice_dur = ndays_ice / nyears) %>%  # days of ice per year (on average)
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_ice_dur = mean(ice_dur)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_ice_dur = mean_ice_dur)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_ice_dur = mean_ice_dur - retro_ice_dur,
+             ratio_ice_dur = mean_ice_dur / retro_ice_dur)
+  }else if(var_cfg$variable == 'vol'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'Vol') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_vol = mean(Vol)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_vol = mean_vol)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_vol = mean_vol - retro_vol,
+             ratio_vol = mean_vol / retro_vol)
+  }else if(var_cfg$variable == 'water_in'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'waterIn') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_water_in = mean(waterIn)) %>% #m3 day-1
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_water_in = mean_water_in)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_water_in = mean_water_in - retro_water_in,
+             ratio_water_in = mean_water_in / retro_water_in)
+  }else if(var_cfg$variable == 'water_out'){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'fluvialOut', 'LakeE') %>%
+      mutate(water_out = fluvialOut + LakeE) %>% # m3 day-1
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_water_out = mean(water_out)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_water_out = mean_water_out)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_water_out = mean_water_out - retro_water_out,
+             ratio_water_out = mean_water_out / retro_water_out)
   }
 
   data_file = as_data_file(ind_file)

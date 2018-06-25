@@ -2,7 +2,7 @@ version: 0.3.0
 name: 2_analysis/out/bury.rds.ind
 type: file
 hash: fb9d572ef81e10fe48509ae8a7d6e44e
-time: 2018-06-04 23:07:29 UTC
+time: 2018-06-25 17:17:31 UTC
 depends:
   1_data/out/scenarios_qa.rds.ind: 85baccd59617495c3aca356aafc56f08
   2_analysis/cfg/bury.yml: fad647d81222acb9e5a7fa3612b45996
@@ -10,5 +10,5 @@ depends:
 fixed: 56e1b6359cbd499a189c69d3f5ab9283
 code:
   functions:
-    change_in_var: 12a2fb66d214e4dc81e9389e6825ce9d
+    change_in_var: 3a2356510aa8db3188b0479fea348d2e
 

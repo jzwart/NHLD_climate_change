@@ -40,6 +40,11 @@ targets:
       - 2_analysis/out/hrt.rds
       - 2_analysis/out/gpp.rds
       - 2_analysis/out/vol_epi.rds
+      - 2_analysis/out/ph.rds
+      - 2_analysis/out/ice_dur.rds
+      - 2_analysis/out/water_in.rds
+      - 2_analysis/out/water_out.rds
+      - 2_analysis/out/vol.rds
 
   2_analysis/out/doc.rds:
     command: gd_get('2_analysis/out/doc.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -81,6 +86,16 @@ targets:
     command: gd_get('2_analysis/out/gpp.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_analysis/out/vol_epi.rds:
     command: gd_get('2_analysis/out/vol_epi.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/ph.rds:
+    command: gd_get('2_analysis/out/ph.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/ice_dur.rds:
+    command: gd_get('2_analysis/out/ice_dur.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/water_in.rds:
+    command: gd_get('2_analysis/out/water_in.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/water_out.rds:
+    command: gd_get('2_analysis/out/water_out.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/vol.rds:
+    command: gd_get('2_analysis/out/vol.rds.ind', config_file='lib/cfg/gd_config.yml')
 
   6_plot:
     depends:
@@ -105,6 +120,11 @@ targets:
       - 6_plot/out/fig_hrt.png.ind
       - 6_plot/out/fig_gpp.png.ind
       - 6_plot/out/fig_vol_epi.png.ind
+      - 6_plot/out/fig_ph.png.ind
+      - 6_plot/out/fig_ice_dur.png.ind
+      - 6_plot/out/fig_vol.png.ind
+      - 6_plot/out/fig_water_in.png.ind
+      - 6_plot/out/fig_water_out.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -290,6 +310,51 @@ targets:
     command: fig_delta(
       fig_ind = target_name,
       var_cfg_file = '2_analysis/cfg/vol_epi.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_ph.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/ph.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_vol.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/vol.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_ice_dur.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/ice_dur.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_water_in.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/water_in.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_water_out.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/water_out.yml',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       remake_file = I('6_plot.yml'),

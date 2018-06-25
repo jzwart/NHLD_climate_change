@@ -20,6 +20,11 @@ units:
   hrt: 'days'
   gpp: 'g C m3 day-1'
   vol_epi: 'm3'
+  vol: 'm3'
+  ph: ''
+  water_in: 'm3 day-1'
+  water_out: 'm3 day-1'
+  ice_dur: 'days'
 
 labs: # axis label
   doc: 'DOC'
@@ -43,6 +48,11 @@ labs: # axis label
   hrt: 'HRT'
   gpp: 'GPP'
   vol_epi: 'Epi Vol'
+  vol: 'Vol'
+  ph: 'pH'
+  water_in: 'Water In'
+  water_out: 'Water Out'
+  ice_dur: 'Ice Duration'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -66,3 +76,8 @@ ratio_var: # column name that we want to plot for ratio boxplots
   hrt: 'ratio_hrt'
   gpp: 'ratio_gpp'
   vol_epi: 'ratio_vol_epi'
+  vol: 'ratio_vol'
+  ph: 'ratio_ph'
+  water_in: 'ratio_water_in'
+  water_out: 'ratio_water_out'
+  ice_dur: 'ratio_ice_dur'

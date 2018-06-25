@@ -2,7 +2,7 @@ version: 0.3.0
 name: 2_analysis/out/sw_out.rds.ind
 type: file
 hash: ab191ec6095ddbb91df7be40301056af
-time: 2018-06-04 23:07:47 UTC
+time: 2018-06-25 17:17:51 UTC
 depends:
   1_data/out/scenarios_qa.rds.ind: 85baccd59617495c3aca356aafc56f08
   2_analysis/cfg/sw_out.yml: 06298f3a49b1a95f0d7ef8469d5e950e
@@ -10,5 +10,5 @@ depends:
 fixed: fd5446d90d4971840154cbc4712646ca
 code:
   functions:
-    change_in_var: 12a2fb66d214e4dc81e9389e6825ce9d
+    change_in_var: 3a2356510aa8db3188b0479fea348d2e
 

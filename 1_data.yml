@@ -27,7 +27,7 @@ targets:
       gd_config='lib/cfg/gd_config.yml')
   1_data/out/scenarios.rds:
     command: gd_get('1_data/out/scenarios.rds.ind', config_file='lib/cfg/gd_config.yml')
-    
+
   1_data/out/retro.rds.ind:
     command: agg_retro(
       ind_file=target_name,
@@ -38,8 +38,10 @@ targets:
   1_data/out/scenarios_qa.rds.ind:
     command: scenarios_qa(
       ind_file = target_name,
-      scenarios_ind_file = '1_data/out/scenarios.rds.ind', 
-      retro_ind_file = '1_data/out/retro.rds.ind', 
+      scenarios_ind_file = '1_data/out/scenarios.rds.ind',
+      var_lims_file = '1_data/cfg/var_lims.yml',
+      retro_ind_file = '1_data/out/retro.rds.ind',
+      retro_paper_data = '1_data/in/retro_paper_data.rds',
       remake_file = '1_data.yml',
       gd_config = 'lib/cfg/gd_config.yml')
 

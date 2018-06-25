@@ -1,8 +1,13 @@
 # checks for all lakes in each scenario
 
-scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_file, gd_config){
+scenarios_qa <- function(ind_file, scenarios_ind_file, var_lims_file, retro_ind_file, retro_paper_data, remake_file, gd_config){
   # check to see if all lakes are in each scenario
   out = data_frame()
+
+  var_lims <- yaml::yaml.load_file(var_lims_file) # variable limits for QA / QC
+
+  # lakes in retro paper
+  retro_paper_lakes <- readRDS(retro_paper_data)
 
   scenarios_agg <- readRDS(sc_retrieve(scenarios_ind_file, remake_file = remake_file))
 
@@ -103,6 +108,18 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, retro_ind_file, remake_fi
 
     out <- bind_rows(out, cur, curSum)
   }
+
+  # QA/QC for variable limits ; lakes to omit
+  lakes_omit <- out %>%
+    dplyr::filter(out$doc_conc<var_lims$doc$min | out$doc_conc>var_lims$doc$max,
+                  out$kD<var_lims$kd$min | out$kD>var_lims$kd$max) %>%
+    select(Permanent_) %>%
+    unique()
+
+  out <- out %>%
+    dplyr::filter(!out$Permanent_ %in% lakes_omit$Permanent_,
+                  out$Permanent_ %in% retro_paper_lakes$Permanent_)
+
 
   data_file = as_data_file(ind_file)
   saveRDS(out, data_file)

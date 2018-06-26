@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_kd.png.ind
 type: file
-hash: d0428b0c49b7c4ba6768a8589937a2ab
-time: 2018-06-25 19:09:25 UTC
+hash: 871a39db5f0a33b6963b0cd2617f8e37
+time: 2018-06-25 21:54:12 UTC
 depends:
   2_analysis/cfg/kd.yml: 7582649213503e9a28e2aa0f598f0061
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: db03422033b3fbfc08da71382dca9bc5
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

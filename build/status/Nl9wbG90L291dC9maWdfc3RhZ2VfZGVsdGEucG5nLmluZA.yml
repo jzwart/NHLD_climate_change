@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_stage_delta.png.ind
 type: file
-hash: c7bc3e5306a99e56c0599a25e537fdaa
-time: 2018-06-22 21:28:53 UTC
+hash: 6bad68aabfe8db119da0e273dc296342
+time: 2018-06-25 21:50:54 UTC
 depends:
   2_analysis/cfg/stage.yml: 5e47df5238133d8aab91e0e925b663ba
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: a84aec81ef717830f059453f3ed8ff0c
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

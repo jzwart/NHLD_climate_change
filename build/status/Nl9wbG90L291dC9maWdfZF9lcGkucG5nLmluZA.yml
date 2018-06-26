@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_d_epi.png.ind
 type: file
-hash: 028145e515fa382f293d06c63d698205
-time: 2018-06-25 19:09:42 UTC
+hash: 20beb4921049eee05ba67fa310859c8e
+time: 2018-06-25 21:54:29 UTC
 depends:
   2_analysis/cfg/d_epi.yml: 9dfad4ad8907b43d1eb8e0ecf84e840c
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: b5aa93ffa9378e239959e27d3738ebd3
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

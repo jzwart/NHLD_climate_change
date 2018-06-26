@@ -50,6 +50,7 @@ targets:
       - 2_analysis/out/d_epi.rds
       - 2_analysis/out/doc_resp.rds
       - 2_analysis/out/doc_resp_vol.rds
+      - 2_analysis/out/dic_v_resp.rds
 
   2_analysis/out/doc.rds:
     command: gd_get('2_analysis/out/doc.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -111,6 +112,8 @@ targets:
     command: gd_get('2_analysis/out/doc_resp.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_analysis/out/doc_resp_vol.rds:
     command: gd_get('2_analysis/out/doc_resp_vol.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/dic_v_resp.rds:
+    command: gd_get('2_analysis/out/dic_v_resp.rds.ind', config_file='lib/cfg/gd_config.yml')
 
   6_plot:
     depends:
@@ -145,6 +148,7 @@ targets:
       - 6_plot/out/fig_d_epi.png.ind
       - 6_plot/out/fig_doc_resp.png.ind
       - 6_plot/out/fig_doc_resp_vol.png.ind
+      - 6_plot/out/fig_dic_v_resp.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -420,6 +424,15 @@ targets:
     command: fig_delta(
       fig_ind = target_name,
       var_cfg_file = '2_analysis/cfg/doc_resp_vol.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_dic_v_resp.png.ind:
+    command: fig_delta(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/dic_v_resp.yml',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       remake_file = I('6_plot.yml'),

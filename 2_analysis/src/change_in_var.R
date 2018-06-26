@@ -600,6 +600,24 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
              ratio_doc_resp = mean_doc_resp / retro_doc_resp,
              delta_doc_resp_vol = mean_doc_resp_vol - retro_doc_resp_vol,
              ratio_doc_resp_vol = mean_doc_resp_vol / retro_doc_resp_vol)
+  }else if(var_cfg$variable %in% c('dic_v_resp')){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'dicLoadvResp') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_dic_v_resp = mean(dicLoadvResp)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_dic_v_resp = mean_dic_v_resp)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_dic_v_resp = mean_dic_v_resp - retro_dic_v_resp,
+             ratio_dic_v_resp = mean_dic_v_resp / retro_dic_v_resp)
   }
 
   data_file = as_data_file(ind_file)

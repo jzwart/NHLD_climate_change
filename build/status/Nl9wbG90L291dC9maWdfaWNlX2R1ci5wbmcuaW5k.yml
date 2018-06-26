@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_ice_dur.png.ind
 type: file
-hash: fabf478b586d9e02b1a232566def75b4
-time: 2018-06-25 17:27:49 UTC
+hash: 4699c54c0ecc740626e1e5e7dda05c84
+time: 2018-06-25 21:53:47 UTC
 depends:
   2_analysis/cfg/ice_dur.yml: 9e6963429d0b34926b4c75098a274558
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: be3f4ee707339aee49610e297414d1a7
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

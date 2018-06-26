@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_vol.png.ind
 type: file
-hash: 75b247e76ec48c1c02c6860c0ac39b66
-time: 2018-06-25 17:27:34 UTC
+hash: 2b65aa6f51cee6edf888ec93a2497421
+time: 2018-06-25 21:53:40 UTC
 depends:
   2_analysis/cfg/vol.yml: 3f558e541b7c0e99958b6aaa0f38f5f9
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: b307097d9d393eb262f9a85e0b186bbd
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

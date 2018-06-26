@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_doc_delta.png.ind
 type: file
-hash: 6277b8b8e122a5dbd200d4629584c7cf
-time: 2018-06-22 21:28:50 UTC
+hash: 7c83641144649fd872152a8fb54b526f
+time: 2018-06-25 21:50:46 UTC
 depends:
   2_analysis/cfg/doc.yml: 5fd90f8ab1f76175ac08616b6ce4b8e7
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: bc73e312584f23956802db9e1b73c907
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

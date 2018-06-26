@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_bury.png.ind
 type: file
-hash: c62909fbc89b479cd48d0c8a4cc548b8
-time: 2018-06-22 21:29:15 UTC
+hash: ed1da7e5f0794f59935f0436cece0486
+time: 2018-06-25 21:51:45 UTC
 depends:
   2_analysis/cfg/bury.yml: fad647d81222acb9e5a7fa3612b45996
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: 0c10ed4f34b6d28b6c29a66f8c2b4418
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

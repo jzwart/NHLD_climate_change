@@ -1,0 +1,10 @@
+variable: 'dic_v_resp'
+
+period:
+  - 'retro'
+  - '2050s'
+  - '2080s'
+
+season:
+  - 'all'
+  - 'open_water'

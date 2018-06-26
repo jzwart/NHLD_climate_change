@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_area.png.ind
 type: file
-hash: e6bee2966dd87c8370fa76d93f49bb7b
-time: 2018-06-22 21:29:08 UTC
+hash: a78c4220e8f2e875dcad445250a023a9
+time: 2018-06-25 21:51:28 UTC
 depends:
   2_analysis/cfg/area.yml: a1844bdc5d436b5d75913fcf0bd58d68
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: 5e9d06742b212f36825b563686ead8b1
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

@@ -1,8 +1,8 @@
 version: 0.3.0
 name: 6_plot/out/fig_doc_loads.png.ind
 type: file
-hash: 0beb2cc91cbf00dc346b7c054fb03ade
-time: 2018-06-22 21:29:24 UTC
+hash: 38cad5955e9103ce731d01bd59700ba0
+time: 2018-06-25 21:52:01 UTC
 depends:
   2_analysis/cfg/doc_loads.yml: ccc35b09f586bc1aee60b55a8159112d
   6_plot/cfg/fig_config.yml: a73d7919e04a73a2e9a434aea2ee2950
@@ -10,5 +10,5 @@ depends:
 fixed: a022ff8cf3534e93023b09ec968e9f98
 code:
   functions:
-    fig_delta: 09d114c258771ab10f8c6b4d56c6966d
+    fig_delta: d9aa8ba747f2bb4932d0dab7ead1d4c2
 

@@ -149,6 +149,7 @@ targets:
       - 6_plot/out/fig_doc_resp.png.ind
       - 6_plot/out/fig_doc_resp_vol.png.ind
       - 6_plot/out/fig_dic_v_resp.png.ind
+      - 6_plot/out/fig_sw_in_month.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -437,3 +438,13 @@ targets:
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_sw_in_month.png.ind:
+    command: fig_monthly_ave(
+      fig_ind = target_name,
+      var_cfg_file = '2_analysis/cfg/sw_in.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+

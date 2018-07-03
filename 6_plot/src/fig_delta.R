@@ -2,8 +2,6 @@ fig_delta <- function(fig_ind, var_cfg_file, fig_cfg_yml, var_lookup_yml, remake
   # read in data and make delta figure; color 2050s and 2080s
   #  make average
 
-  print('')
-
   var_cfg <- yaml::yaml.load_file(var_cfg_file) # indicates which periods, seasons, and variable we want returned
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs

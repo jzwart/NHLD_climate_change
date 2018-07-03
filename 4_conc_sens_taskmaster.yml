@@ -1,0 +1,90 @@
+target_default: 4_conc_sens
+
+include:
+  - lib.yml
+
+file_extensions:
+  - feather
+  - ind
+
+sources:
+  - 4_conc_sens/src/define_model_tasks.R
+  - 4_conc_sens/src/gather_forecasts.R
+
+targets:
+
+  4_conc_sens_taskmaster:
+    depends:
+      - 4_conc_sens/log/4_conc_sens_taskmaster.ind
+
+  # prepare destination folders for intermediate output.
+  # out folder should already be created & git commited.
+  # tmp=temporary folder for holding files to only be created on 1 computer.
+  # out=folder to hold .ind and data files corresponding to shared cache or everybody's local build.
+  # log=folder for the few indicator files that don't correspond to a data file.
+  4_conc_sens/tmp:
+    command: dir.create(target_name, recursive=I(TRUE), showWarnings=I(FALSE))
+  4_conc_sens/log:
+    command: dir.create(target_name, recursive=I(TRUE), showWarnings=I(FALSE))
+  conc_sens_folders:
+    command: list(
+      tmp='4_conc_sens/tmp',
+      log='4_conc_sens/log')
+
+  # create and execute a task plan for running many combinations of input data,
+  # nutrient concentration scenarios, and GCMs
+  forecast_df:
+    command: list_tasks(
+      site_info_ind='1_data/out/site_info.tsv.ind',
+      dates_yml='1_data/cfg/dates.yml',
+      nwm_med_ind='2_munge/out/agg_nwm_med.rds.ind',
+      nwm_long1_ind='2_munge/out/agg_nwm_long1.rds.ind',
+      remake_file = I('3_forecast.yml'))
+  forecast_plan:
+    command: plan_forecasts(
+      tasks_df=forecast_df,
+      folders=forecast_folders,
+      site_info_ind=I('1_data/out/site_info.tsv.ind'),
+      nwis_data_ind=I('2_munge/out/agg_nwis.rds.ind'),
+      nwm_ana_ind=I('2_munge/out/agg_nwm_ana.rds.ind'),
+      nwm_retro_ind=I('2_munge/out/agg_nwm_retro.rds.ind'),
+      nwm_med_ind  =I('2_munge/out/agg_nwm_med.rds.ind'),
+      nwm_long1_ind=I('2_munge/out/agg_nwm_long1.rds.ind'),
+      nwm_long2_ind=I('2_munge/out/agg_nwm_long2.rds.ind'),
+      nwm_long3_ind=I('2_munge/out/agg_nwm_long3.rds.ind'),
+      nwm_long4_ind=I('2_munge/out/agg_nwm_long4.rds.ind'),
+      remake_file=I('3_forecast.yml'))
+  3_forecast_tasks.yml:
+    command: create_forecast_makefile(makefile=target_name, task_plan=forecast_plan, remake_file=I('3_forecast.yml'))
+
+  # run the data pulls
+  # task_subset:
+  #   command: c(I("05465500_long1_20170509"), I("07374000_med_20170509"), I("07374000_long1_20170811"))
+  # step_subset:
+  #   command: c(I("forecast_loadest"), I("forecast_wrtds"))
+  3_forecast/log/3_forecast_tasks.ind:
+    command: loop_tasks(
+      task_plan=forecast_plan,
+      task_makefile='3_forecast_tasks.yml',
+      task_names=NULL,
+      step_names=NULL,
+      num_tries=I(1), sleep_on_error=I(0))
+
+  # gather the data pulls
+  3_forecast/out/preds_loadest.rds.ind:
+    depends: 3_forecast/log/3_forecast_tasks.ind
+    command: gather_forecasts(
+      ind_file=target_name,
+      task_df=forecast_df,
+      task_plan=forecast_plan,
+      load_model=I('loadest'),
+      gd_config='lib/cfg/gd_config.yml')
+
+  3_forecast/out/preds_wrtds.rds.ind:
+    depends: 3_forecast/log/3_forecast_tasks.ind
+    command: gather_forecasts(
+      ind_file=target_name,
+      task_df=forecast_df,
+      task_plan=forecast_plan,
+      load_model=I('wrtds'),
+      gd_config='lib/cfg/gd_config.yml')

@@ -130,6 +130,17 @@ gw_in <- d %>%
             max = max(med_all)) %>%
   ungroup()
 
+doc_load <- d %>%
+  mutate(doc_loads = doc_loads / area) %>% # per lake area
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(doc_loads)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
 d_epi <- d %>%
   group_by(month, period, gcm) %>%
   summarise(med_all = median(d_epi)) %>%
@@ -152,68 +163,86 @@ ph <- d %>%
 
 
 ggplot(swin, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(kd, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(precip, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(area, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(stage, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(evap, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(baseflow, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(emit, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(gpp, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(d_epi, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(ph, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(doc_resp, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
 ggplot(gw_in, aes(x = as.numeric(month), y = med, color = period)) +
-  geom_line(size = 3) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
+ggplot(doc_load, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
 

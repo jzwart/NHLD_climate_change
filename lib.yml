@@ -9,6 +9,7 @@ packages:
   - maptools
   - Hmisc
   - purrr
+  - lazyeval
 
 file_extensions:
   - feather

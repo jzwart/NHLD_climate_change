@@ -1,0 +1,13 @@
+version: 0.3.0
+name: 3_summarize/out/sw_in_month.rds.ind
+type: file
+hash: 5d2b10dcf474afd180de6c01a50412c2
+time: 2018-07-05 00:42:22 UTC
+depends:
+  3_summarize/cfg/monthly_vars.yml: 37ed9401964529f0ef4846b435425003
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: a47eacedbea682fd71d50a1f7e15b2ef
+code:
+  functions:
+    monthly_ave: 16eb8cf609837ecfb153a7edf046e59d
+

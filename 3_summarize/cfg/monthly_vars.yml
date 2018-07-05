@@ -1,0 +1,2 @@
+var: ['stage', 'emit', 'area', 'doc_loads', 'zmix', 'sw_in', 'baseflow', 'gw_out', 'gw_in',
+'sw_out', 'evap', 'precip', 'gpp', 'vol_epi', 'vol', 'ph', 'kd', 'd_epi', 'doc_resp']

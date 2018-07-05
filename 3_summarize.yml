@@ -1,4 +1,4 @@
-target_default: 2_analysis
+target_default: 3_summarize
 
 include:
   - lib.yml
@@ -9,58 +9,18 @@ file_extensions:
 
 sources:
   - 3_summarize/src/get_vars.R
+  - 3_summarize/src/monthly_ave.R
 
 targets:
 
-  2_analysis:
-    depends:
-      - 2_analysis/out/doc.rds
-      - 2_analysis/out/stage.rds
-      - 2_analysis/out/pco2.rds
-      - 2_analysis/out/emit_areal.rds
-      - 2_analysis/out/emit.rds
-      - 2_analysis/out/area.rds
-      - 2_analysis/out/fhee.rds
-      - 2_analysis/out/bury.rds
-      - 2_analysis/out/bury_areal.rds
-
-  2_analysis/out/doc.rds:
-    command: gd_get('2_analysis/out/doc.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/stage.rds:
-    command: gd_get('2_analysis/out/stage.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/pco2.rds:
-    command: gd_get('2_analysis/out/pco2.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/emit_areal.rds:
-    command: gd_get('2_analysis/out/emit_areal.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/emit.rds:
-    command: gd_get('2_analysis/out/emit.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/area.rds:
-    command: gd_get('2_analysis/out/area.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/fhee.rds:
-    command: gd_get('2_analysis/out/fhee.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/bury.rds:
-    command: gd_get('2_analysis/out/bury.rds.ind', config_file='lib/cfg/gd_config.yml')
-  2_analysis/out/bury_areal.rds:
-    command: gd_get('2_analysis/out/bury_areal.rds.ind', config_file='lib/cfg/gd_config.yml')
-
   3_summarize:
     depends:
-      - 3_summarize/out/all_changes.rds.ind
-      - 3_summarize/cfg/vars.yml.ind
+      - 3_summarize/out/sw_in_month.rds.ind
 
-  3_summarize/cfg/vars.yml.ind:
-    command: get_vars(
-      ind_file = target_name,
-      vars_loc = '2_analysis/out/',
-      remake_file = I('3_summarize.yml'),
+  3_summarize/out/sw_in_month.rds.ind:
+    command: monthly_ave(
+      fig_ind = target_name,
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      vars_yml = '3_summarize/cfg/monthly_vars.yml',
+      remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
-
-  3_summarize/out/all_changes.rds.ind:
-    command: agg_analyses(
-      ind_file = target_name,
-      vars_yml = '3_summarize/cfg/vars.yml',
-      remake_file = I('3_summarize.yml'),
-      gd_config = 'lib/cfg/gd_config.yml')
-
-
-

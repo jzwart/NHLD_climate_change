@@ -1,20 +1,13 @@
-fig_monthly_ave <- function(fig_ind, var_cfg_file, fig_cfg_yml, var_lookup_yml, remake_file, gd_config){
+monthly_ave <- function(fig_ind, var_lookup_yml, vars_yml, remake_file, gd_config){
   # read in data and make average response of variable by month; error bars are range of gcms
 
-  var_cfg <- yaml::yaml.load_file(var_cfg_file) # indicates which periods, seasons, and variable we want returned
-
-  fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
+  vars <- yaml::yaml.load_file(vars_yml)$var # indicates which periods, seasons, and variable we want returned
 
   var_lookup <- yaml::yaml.load_file(var_lookup_yml) # contains fig labels and units
 
-  var <- var_cfg$variable
-
-  var_ind_file <- paste('2_analysis/out/', var, '.rds.ind', sep = '')
-
-  y <- noquote(var_lookup$monthly_var[var][[1]]) # what we want to plot
-
-  # read in all time series and average by month ( pull out date and var of interest to cut down on file size )
-  list_out <- list()
+  y <- lapply(vars, function(var){
+    noquote(var_lookup$monthly_var[var][[1]])
+  }) %>% unlist() %>% noquote()
 
   dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Condor_Results/'
   dir_lookup <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/'
@@ -31,7 +24,8 @@ fig_monthly_ave <- function(fig_ind, var_cfg_file, fig_cfg_yml, var_lookup_yml, 
   skip=6*365 # days to skip; first 6 years (spin up)
 
   threshold <- 0.05 # if volume of lake is below X% of original volume, don't include this in analyses because DOC / kD / etc.. were blowing up at low volumes
-  all <- data.frame()
+
+  all <- data_frame()
   for(i in 1:length(scenarios)){
     print(i)
 
@@ -50,7 +44,7 @@ fig_monthly_ave <- function(fig_ind, var_cfg_file, fig_cfg_yml, var_lookup_yml, 
     cur_gcm = strsplit(cur_scenario, '_2')[[1]][1]
     cur_period = substr(cur_scenario, nchar(cur_scenario)-4, nchar(cur_scenario))
 
-    for(j in 1:length(files)){ # length(files
+    for(j in 1:length(files)){
       print(c(i,j))
 
       cur <- readRDS(file.path(sub_dir,files[j])) %>%
@@ -73,19 +67,32 @@ fig_monthly_ave <- function(fig_ind, var_cfg_file, fig_cfg_yml, var_lookup_yml, 
       lake <- toupper(lake) # making all uppercase; important for JAZ and ZJH lakes
 
       # summarizing by month
-      out <- cur %>%
+      cur <- cur %>%
         mutate(Permanent_ = lake,
                gcm = cur_gcm,
-               period = cur_period) %>%
-        group_by(Permanent_, gcm, period, month) %>%
-        summarise(!!var := mean(!!sym(y), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
-        ungroup()
+               period = cur_period)
 
-      all<-rbind(all,out)
+      for(var in 1:length(vars)){
+        if(var == 1){
+          out <- cur %>%
+            group_by(Permanent_, gcm, period, month) %>%
+            summarise(!!vars[var] := mean(!!sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            ungroup()
+        }else{
+          tmp <- cur %>%
+            group_by(Permanent_, gcm, period, month) %>%
+            summarise(!!vars[var] := mean(!!sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            ungroup()
+          out <- out %>%
+            left_join(tmp, by = c('Permanent_','gcm','period','month'))
+        }
+      }
+
+      all <- rbind(all, out)
     }
   }
 
   data_file = as_data_file(ind_file)
-  saveRDS(list_out, data_file)
+  saveRDS(all, data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)
 }

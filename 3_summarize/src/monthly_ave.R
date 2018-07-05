@@ -52,9 +52,26 @@ monthly_ave <- function(fig_ind, var_lookup_yml, vars_yml, remake_file, gd_confi
         dplyr::filter(Vol > 0) %>% # only keeping days when there's actually water
         mutate(vol_frac = Vol / Vol[1]) %>%  # removing outliers based on % of original volume
         dplyr::filter(vol_frac > threshold) %>%
+        mutate(alk = ifelse(GWin+Baseflow>0,10^(3.2815*(1-exp(-1.2765*log10(GWin+Baseflow+SWin)/3.2815))),0),
+               HRT = Vol/(GWin + SWin + DirectP + Baseflow + IceMelt),
+               FracRet = 1 - (DOC_export / DOC_Load),
+               DIC_load = GWin * 0.7025 + SWin * 0.9041667 + Baseflow * 0.9041667 + DirectP * 0.0833333 + IceMelt * 0.01360082, # mol C day-1
+               sed_resp = Sed_phyto * 0.75 + Sed_tPOC * 0.1, # 75% of phyto C and 10% of tpoc C was converted to co2
+               waterIn = GWin + SWin + DirectP + Baseflow + IceMelt,
+               fluvialOut = GWout + SWout, # m3 day-1
+               dicLoadvResp = DIC_load / (DOC_Respired + sed_resp),
+               percentEvap = LakeE / (LakeE + GWout + SWout),
+               Burial_total = Burial_phyto + Burial_tPOC,
+               pco2 = 0.952 * fracCO2 * DIC_epi / Vepi * 1000 * 29.41,
+               doc_conc = (DOCr_epi+DOCl_epi+DOCr_hypo+DOCl_hypo)/Vol*12,
+               tp_load = GWin * 0.0007742 + SWin * 0.001612903 + Baseflow * 0.001612903 + DirectP * 0.0003225806 + IceMelt * 0.0003225806) %>%# mol P day-1
         select(datetime, eval(y)) %>%
         mutate(month = strftime(datetime, '%m', tz ='GMT')) %>%
         select(-datetime)
+
+
+
+
 
       lake<-strsplit(tolower(files[j]),'_c_model.rds',fixed = T)[[1]]
       if(scenarios[i]!='Present'){ # all scenarios other than Present were run on Condor and need Condor lookup table
@@ -76,20 +93,99 @@ monthly_ave <- function(fig_ind, var_lookup_yml, vars_yml, remake_file, gd_confi
         if(var == 1){
           out <- cur %>%
             group_by(Permanent_, gcm, period, month) %>%
-            summarise(!!vars[var] := mean(!!sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
             ungroup()
         }else{
           tmp <- cur %>%
             group_by(Permanent_, gcm, period, month) %>%
-            summarise(!!vars[var] := mean(!!sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
             ungroup()
           out <- out %>%
             left_join(tmp, by = c('Permanent_','gcm','period','month'))
         }
       }
 
+      # adding in HRT because calculating on daily scale was not appropriate
+      out <- out %>%
+        mutate(hrt = vol / (water_in))
+
       all <- rbind(all, out)
     }
+  }
+
+  # for retro results
+  dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Present/20170819/'
+
+  cur_scenario <- 'Present'
+
+  cur_gcm = 'Retro'
+  cur_period = 'Retro'
+
+  files <- list.files(dir)
+  if(length(files[grep('adj',files)])>0){
+    files <- files[-grep('adj',files)]
+  }
+
+  for(j in 1:length(files)){ # length(files
+    print(c('Retro',j))
+
+    cur <- readRDS(file.path(dir,files[j])) %>%
+      slice(skip:nrow(.)) %>% # skipping first X number of days
+      dplyr::filter(Vol > 0) %>% # only keeping days when there's actually water
+      mutate(vol_frac = Vol / Vol[1]) %>%  # removing outliers based on % of original volume
+      dplyr::filter(vol_frac > threshold) %>%
+      mutate(alk = ifelse(GWin+Baseflow>0,10^(3.2815*(1-exp(-1.2765*log10(GWin+Baseflow+SWin)/3.2815))),0),
+             HRT = Vol/(GWin + SWin + DirectP + Baseflow + IceMelt),
+             FracRet = 1 - (DOC_export / DOC_Load),
+             DIC_load = GWin * 0.7025 + SWin * 0.9041667 + Baseflow * 0.9041667 + DirectP * 0.0833333 + IceMelt * 0.01360082, # mol C day-1
+             sed_resp = Sed_phyto * 0.75 + Sed_tPOC * 0.1, # 75% of phyto C and 10% of tpoc C was converted to co2
+             waterIn = GWin + SWin + DirectP + Baseflow + IceMelt,
+             fluvialOut = GWout + SWout, # m3 day-1
+             dicLoadvResp = DIC_load / (DOC_Respired + sed_resp),
+             percentEvap = LakeE / (LakeE + GWout + SWout),
+             Burial_total = Burial_phyto + Burial_tPOC,
+             pco2 = 0.952 * fracCO2 * DIC_epi / Vepi * 1000 * 29.41,
+             doc_conc = (DOCr_epi+DOCl_epi+DOCr_hypo+DOCl_hypo)/Vol*12,
+             tp_load = GWin * 0.0007742 + SWin * 0.001612903 + Baseflow * 0.001612903 + DirectP * 0.0003225806 + IceMelt * 0.0003225806) %>%# mol P day-1
+      select(datetime, eval(y)) %>%
+      mutate(month = strftime(datetime, '%m', tz ='GMT')) %>%
+      select(-datetime)
+
+    lake<-strsplit(tolower(files[j]),'_c_model.rds',fixed = T)[[1]]
+
+    cur<-na.omit(cur)
+    if(nrow(cur)<2){
+      next
+    }
+    lake <- toupper(lake) # making all uppercase; important for JAZ and ZJH lakes
+
+    # summarizing by month
+    cur <- cur %>%
+      mutate(Permanent_ = lake,
+             gcm = cur_gcm,
+             period = cur_period)
+
+    for(var in 1:length(vars)){
+      if(var == 1){
+        out <- cur %>%
+          group_by(Permanent_, gcm, period, month) %>%
+          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+          ungroup()
+      }else{
+        tmp <- cur %>%
+          group_by(Permanent_, gcm, period, month) %>%
+          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+          ungroup()
+        out <- out %>%
+          left_join(tmp, by = c('Permanent_','gcm','period','month'))
+      }
+    }
+
+    # adding in HRT because calculating on daily scale was not appropriate
+    out <- out %>%
+      mutate(hrt = vol / (water_in))
+
+    all <- rbind(all, out)
   }
 
   data_file = as_data_file(ind_file)

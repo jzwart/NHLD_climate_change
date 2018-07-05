@@ -15,12 +15,14 @@ targets:
 
   3_summarize:
     depends:
-      - 3_summarize/out/sw_in_month.rds.ind
+      - 3_summarize/out/monthly_ave.rds.ind
 
-  3_summarize/out/sw_in_month.rds.ind:
+  3_summarize/out/monthly_ave.rds.ind:
     command: monthly_ave(
       fig_ind = target_name,
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       vars_yml = '3_summarize/cfg/monthly_vars.yml',
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
+
+

@@ -56,7 +56,7 @@ area <- d %>%
 
 stage <- d %>%
   group_by(month, period, gcm) %>%
-  summarise(med_all = median(area)) %>%
+  summarise(med_all = median(stage)) %>%
   ungroup() %>%
   group_by(month, period) %>%
   summarise(med = median(med_all),
@@ -97,6 +97,59 @@ emit <- d %>%
             max = max(med_all)) %>%
   ungroup()
 
+gpp <- d %>%
+  mutate(gpp = gpp / area) %>% # per lake area
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(gpp)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+doc_resp <- d %>%
+  mutate(doc_resp = doc_resp / area) %>% # per lake area
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(doc_resp)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+gw_in <- d %>%
+  mutate(gw_in = gw_in / area) %>% # per lake area
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(gw_in)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+d_epi <- d %>%
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(d_epi)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+ph <- d %>%
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(ph)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
 
 ggplot(swin, aes(x = as.numeric(month), y = med, color = period)) +
   geom_line(size = 3) +
@@ -118,6 +171,11 @@ ggplot(area, aes(x = as.numeric(month), y = med, color = period)) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
+ggplot(stage, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
 ggplot(evap, aes(x = as.numeric(month), y = med, color = period)) +
   geom_line(size = 3) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
@@ -132,3 +190,30 @@ ggplot(emit, aes(x = as.numeric(month), y = med, color = period)) +
   geom_line(size = 3) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
+
+ggplot(gpp, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(d_epi, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(ph, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(doc_resp, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(gw_in, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 3) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+

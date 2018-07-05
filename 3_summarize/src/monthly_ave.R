@@ -1,4 +1,4 @@
-monthly_ave <- function(fig_ind, var_lookup_yml, vars_yml, remake_file, gd_config){
+monthly_ave <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_config){
   # read in data and make average response of variable by month; error bars are range of gcms
 
   vars <- yaml::yaml.load_file(vars_yml)$var # indicates which periods, seasons, and variable we want returned

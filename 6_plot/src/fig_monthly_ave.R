@@ -36,6 +36,7 @@ fig_monthly_ave <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_l
            precip_la = precip / area,
            evap_la = evap / area,
            emit_la = emit / area,
+           gpp = gpp * vol_epi,
            gpp_la = gpp / area,
            doc_resp_la = doc_resp / area,
            gw_in_la = gw_in / area,

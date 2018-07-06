@@ -1,3 +1,8 @@
 season:
   all: 'grey'
   open_water: 'white'
+
+period:
+  Retro: 'black'
+  2050s: 'orange'
+  2080s: 'red'

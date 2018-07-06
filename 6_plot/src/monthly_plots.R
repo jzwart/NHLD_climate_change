@@ -1,7 +1,7 @@
 
 library(ggplot2)
 
-d <- readRDS('3_summarize/out/sw_in_month.rds')
+d <- readRDS('3_summarize/out/monthly_ave.rds')
 
 watersheds<-read.table('1_data/in/NHLDsheds_20170323.txt',
                        stringsAsFactors = F,
@@ -161,6 +161,35 @@ ph <- d %>%
             max = max(med_all)) %>%
   ungroup()
 
+fhee <- d %>%
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(fhee)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+water_in <- d %>%
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(water_in)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
+
+dic_v_resp <- d %>%
+  group_by(month, period, gcm) %>%
+  summarise(med_all = median(dic_v_resp)) %>%
+  ungroup() %>%
+  group_by(month, period) %>%
+  summarise(med = median(med_all),
+            min = min(med_all),
+            max = max(med_all)) %>%
+  ungroup()
 
 ggplot(swin, aes(x = as.numeric(month), y = med, color = period)) +
   geom_line(size = 2) +
@@ -246,3 +275,20 @@ ggplot(doc_load, aes(x = as.numeric(month), y = med, color = period)) +
   geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
   theme_classic()
 
+ggplot(fhee, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(dic_v_resp, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()
+
+ggplot(water_in, aes(x = as.numeric(month), y = med, color = period)) +
+  geom_line(size = 2) +
+  geom_point(size= 4) +
+  geom_ribbon(aes(x = as.numeric(month), y = med, ymax = max, ymin = min, color = period, fill = period), alpha = .2) +
+  theme_classic()

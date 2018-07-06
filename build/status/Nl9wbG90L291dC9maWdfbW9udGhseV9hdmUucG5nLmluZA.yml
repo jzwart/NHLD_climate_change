@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 6_plot/out/fig_monthly_ave.png.ind
+type: file
+hash: f356868e8420878d4d53009ca46a5786
+time: 2018-07-06 17:18:36 UTC
+depends:
+  3_summarize/out/monthly_ave.rds.ind: 3ea29a3bb3edf1a7122d3d8b51420e35
+  3_summarize/cfg/monthly_vars.yml: 22e66afcceae4a99f09b5985dfd6da56
+  6_plot/cfg/fig_config.yml: 1bb16de336b8f9b77a9139adeee8bbf0
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: 8b64cf3770a5169e13f2e28600f873f2
+code:
+  functions:
+    fig_monthly_ave: 5bfbaff166c7e5ca85e4479ca25e58d9
+

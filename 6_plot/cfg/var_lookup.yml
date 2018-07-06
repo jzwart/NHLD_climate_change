@@ -44,6 +44,7 @@ units:
   baseflow_la: 'm3 (m2 lake)-1 day-1'
   baseflow_wa: 'm3 (m2 wa)-1 day-1'
   bury: 'mol C day-1'
+  bury_la: 'mol C (m2 lake)-1 day-1'
   d_epi: 'day-1'
   doc_resp_la: 'mol C (m2 lake)-1 day-1'
 

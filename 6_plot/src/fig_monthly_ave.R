@@ -7,7 +7,7 @@ fig_monthly_ave <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_l
 
   vars <- noquote(yaml::yaml.load_file(vars_yml)$var) # indicates which periods, seasons, and variable we want returned
 
-  more_vars <- c('sw_in_wa', 'baseflow_wa',  'sw_in_la', 'baseflow_la', 'precip_la', 'evap_la',
+  more_vars <- c('sw_in_wa', 'baseflow_wa',  'sw_in_la', 'baseflow_la', 'precip_la', 'evap_la', 'bury_la',
     'emit_la', 'gpp_la', 'doc_resp_la', 'gw_in_la', 'doc_loads_la', 'tp_loads_la', 'hrt', 'gw_out_la', 'sw_out_la')
 
   vars <- c(vars, noquote(more_vars))
@@ -41,6 +41,7 @@ fig_monthly_ave <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_l
            gw_in_la = gw_in / area,
            gw_out_la = gw_out / area,
            doc_loads_la = doc_loads / area,
+           bury_la = bury / area,
            tp_loads_la = tp_loads / area) %>%
     select(Permanent_, gcm, period, month, eval(vars)) %>%
     gather(key = 'var', value = 'month_mean', eval(vars)) %>% # turning into long format for plotting

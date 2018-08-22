@@ -1,3 +1,3 @@
-var: ['stage', 'emit', 'area', 'doc_loads', 'zmix', 'sw_in', 'baseflow', 'gw_out', 'gw_in',
+var: ['stage', 'emit', 'area', 'doc_loads', 'doc_export', 'zmix', 'sw_in', 'baseflow', 'gw_out', 'gw_in',
 'sw_out', 'evap', 'precip', 'gpp', 'vol_epi', 'vol', 'ph', 'kd', 'd_epi', 'doc_resp', 'doc', 'pco2',
-'fhee', 'bury', 'tp_loads', 'water_in', 'water_out', 'dic_loads', 'dic_v_resp']
+'fhee', 'bury', 'tp_loads', 'water_in', 'water_out', 'dic_loads', 'dic_v_resp', 'frac_ret', 'epi_temp']

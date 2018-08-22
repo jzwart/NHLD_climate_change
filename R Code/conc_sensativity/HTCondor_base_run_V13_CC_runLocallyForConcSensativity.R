@@ -26,7 +26,7 @@ require(AquaEnv)
 require(marelac)
 require(dplyr)
 
-lakes = readRDS('2_analysis/out/area.rds') %>%
+lakes_to_run = readRDS('2_analysis/out/area.rds') %>%
   distinct(Permanent_) %>%
   sample_n(size = 50) # random draw of 50 lakes for sensativity
 
@@ -38,10 +38,10 @@ scenario <- 'CESM1_CAM5' # most middle of the road GCM - should be representativ
 scenario_id = scenario_lookup$job[scenario_lookup$scenario==paste(scenario, period, sep='_')]
 
 # loop through lakes
-for(ii in 1:length(lakes)){
+for(ii in 18:nrow(lakes_to_run)){
   # now find the current ID for the crun'th run number
   allruns<-read.csv(paste('../rlake/data/allruns_',scenario_id,'.csv',sep = ''), stringsAsFactors=FALSE)
-  currID = as.character(lakes[ii,])
+  currID = as.character(lakes_to_run[ii,])
   crun = allruns$crun[allruns$currID==currID]
   all_scenario <- read.csv('../rlake/data/scenarios.csv', stringsAsFactors = FALSE) # table for matching scenario id to specific scenario (GCM + time period)
   scenario <- all_scenario$scenario[all_scenario$job==scenario_id]
@@ -170,6 +170,7 @@ for(ii in 1:length(lakes)){
 
     theForce = allruns$force[allruns$currID==currID]
 
+    print(c(ii,jj))
     lakeSim<-function(curLakeID, changes){
       # load in current lake hydrology output data
       curLakeHydro<<-read.table(unz(paste(lakeFluxDir,'/input_',crun,'.zip',sep=''),paste(curLakeID,'_DailyLakeFlux.txt',sep='')),header = F, stringsAsFactors = F)

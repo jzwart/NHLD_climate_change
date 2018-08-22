@@ -1,0 +1,12 @@
+version: 0.3.0
+name: 3_summarize/out/ice_dur.rds.ind
+type: file
+hash: 6d8a6116d991f6fc20bc14b6856f6801
+time: 2018-08-17 20:13:48 UTC
+depends:
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: def2b0fd880fa7945e3d93471faa4ddd
+code:
+  functions:
+    ice_dur: 71c30554a50a0ba66120fe5d4510cb8e
+

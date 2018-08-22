@@ -10,12 +10,14 @@ file_extensions:
 sources:
   - 3_summarize/src/get_vars.R
   - 3_summarize/src/monthly_ave.R
+  - 3_summarize/src/ice_dur.R
 
 targets:
 
   3_summarize:
     depends:
       - 3_summarize/out/monthly_ave.rds.ind
+      - 3_summarize/out/ice_dur.rds.ind
 
   3_summarize/out/monthly_ave.rds.ind:
     command: monthly_ave(
@@ -25,4 +27,7 @@ targets:
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
-
+  3_summarize/out/ice_dur.rds.ind:
+    command: ice_dur(
+      ind_file = target_name,
+      gd_config = 'lib/cfg/gd_config.yml')

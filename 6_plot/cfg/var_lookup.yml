@@ -8,6 +8,7 @@ units:
   area: 'm2'
   bury_areal: 'g C m-2 year-1'
   doc_loads: 'mol C day-1'
+  doc_export: 'mol C day-1'
   doc_loads_la: 'mol C (m2 lake)-1 day-1'
   tp_loads: 'mol P day-1'
   tp_loads_la: 'mol P (m2 lake)-1 day-1'
@@ -47,6 +48,8 @@ units:
   bury_la: 'mol C (m2 lake)-1 day-1'
   d_epi: 'day-1'
   doc_resp_la: 'mol C (m2 lake)-1 day-1'
+  epi_temp: 'C'
+  frac_ret: 'fraction'
 
 labs: # axis label
   doc: 'DOC'
@@ -59,6 +62,7 @@ labs: # axis label
   bury: 'C Burial'
   bury_areal: 'Areal C Burial'
   doc_loads: 'DOC Load'
+  doc_export: 'DOC Export'
   tp_loads: 'TP Load'
   zmix: 'Mixed Layer'
   sw_in: 'SWin'
@@ -81,6 +85,8 @@ labs: # axis label
   d_epi: 'DOC Turnover'
   doc_resp_vol: 'DOC Resp Vol'
   dic_v_resp: 'DIC : Respiration'
+  epi_temp: 'Epi Temp'
+  frac_ret: 'Fraction DOC Retained'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -127,6 +133,7 @@ monthly_var: # column name that we want for aggregating to monthly scale
   bury: 'Burial_total'
   bury_areal: ''
   doc_loads: 'DOC_Load'
+  doc_export: 'DOC_export'
   tp_loads: 'tp_load'
   zmix: 'zmix'
   sw_in: 'SWin'
@@ -150,3 +157,5 @@ monthly_var: # column name that we want for aggregating to monthly scale
   doc_resp: 'DOC_Respired'
   doc_resp_vol: ''
   dic_v_resp: 'dicLoadvResp'
+  frac_ret: 'FracRet'
+  epi_temp: 'epiTemp'

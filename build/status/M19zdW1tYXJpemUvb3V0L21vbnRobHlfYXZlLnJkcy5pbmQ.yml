@@ -1,13 +1,13 @@
 version: 0.3.0
 name: 3_summarize/out/monthly_ave.rds.ind
 type: file
-hash: 3ea29a3bb3edf1a7122d3d8b51420e35
-time: 2018-07-06 04:10:28 UTC
+hash: ded72c65ac46acfa00416430e2902dad
+time: 2018-08-18 04:18:26 UTC
 depends:
-  3_summarize/cfg/monthly_vars.yml: 22e66afcceae4a99f09b5985dfd6da56
+  3_summarize/cfg/monthly_vars.yml: 2aea2b2eb8e0f991759a146a4dc1b02b
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
 fixed: 509629af28664560edd4400daeaf05bd
 code:
   functions:
-    monthly_ave: 1ef5ad088c10ba2c16f023aec06a569c
+    monthly_ave: d1860cfb0558d9405ece3f6e28b1c5dd
 

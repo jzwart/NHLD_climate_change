@@ -3,6 +3,8 @@ target_default: 6_plot
 packages:
   - ggplot2
   - grid
+  - dplyr
+  - tidyr
 
 include:
   - lib.yml
@@ -15,6 +17,7 @@ sources:
   - 6_plot/src/fig_delta.R
   - 6_plot/src/fig_boxplot_theme.R
   - 6_plot/src/fig_monthly_ave.R
+  - 6_plot/src/fig_ice_dur.R
 
 targets:
 
@@ -53,6 +56,7 @@ targets:
       - 2_analysis/out/doc_resp_vol.rds
       - 2_analysis/out/dic_v_resp.rds
       - 3_summarize/out/monthly_ave.rds
+      - 3_summarize/out/ice_dur.rds
 
   2_analysis/out/doc.rds:
     command: gd_get('2_analysis/out/doc.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -118,6 +122,8 @@ targets:
     command: gd_get('2_analysis/out/dic_v_resp.rds.ind', config_file='lib/cfg/gd_config.yml')
   3_summarize/out/monthly_ave.rds:
     command: gd_get('3_summarize/out/monthly_ave.rds.ind', config_file = 'lib/cfg/gd_config.yml')
+  3_summarize/out/ice_dur.rds:
+    command: gd_get('3_summarize/out/ice_dur.rds.ind', config_file = 'lib/cfg/gd_config.yml')
 
   6_plot:
     depends:
@@ -154,6 +160,8 @@ targets:
       - 6_plot/out/fig_doc_resp_vol.png.ind
       - 6_plot/out/fig_dic_v_resp.png.ind
       - 6_plot/out/fig_monthly_ave.png.ind
+      - 6_plot/out/fig_month_box.png.ind
+      - 6_plot/out/fig_ice_off.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -450,6 +458,24 @@ targets:
       vars_yml = '3_summarize/cfg/monthly_vars.yml',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_month_box.png.ind:
+    command: fig_month_box(
+      fig_ind = target_name,
+      vars_ind_file = '3_summarize/out/monthly_ave.rds.ind',
+      vars_yml = '6_plot/cfg/fig_month_box_vars.yml',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_ice_off.png.ind:
+    command: fig_ice_dur(
+      fig_ind = target_name,
+      ice_dur_ind_file = '3_summarize/out/ice_dur.rds.ind',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 

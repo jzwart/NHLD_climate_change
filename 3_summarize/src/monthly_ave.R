@@ -6,7 +6,8 @@ monthly_ave <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
   var_lookup <- yaml::yaml.load_file(var_lookup_yml) # contains fig labels and units
 
   y <- lapply(vars, function(var){
-    noquote(var_lookup$monthly_var[var][[1]])
+    cur = noquote(var_lookup$monthly_var[var][[1]])
+    cur = noquote(ifelse(nchar(cur) == 0, 'remove', cur))
   }) %>% unlist() %>% noquote()
 
   dir <- 'D:/MyPapers/NHLD Climate Change/Results/C_model_output/Condor_Results/'
@@ -70,9 +71,6 @@ monthly_ave <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
         select(-datetime)
 
 
-
-
-
       lake<-strsplit(tolower(files[j]),'_c_model.rds',fixed = T)[[1]]
       if(scenarios[i]!='Present'){ # all scenarios other than Present were run on Condor and need Condor lookup table
         lake <- condor_lookup$currID[condor_lookup$crun==as.numeric(lake)]
@@ -105,9 +103,10 @@ monthly_ave <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
         }
       }
 
-      # adding in HRT because calculating on daily scale was not appropriate
+      # adding in HRT and Frac_Ret because calculating on daily scale was not appropriate
       out <- out %>%
-        mutate(hrt = vol / (water_in))
+        mutate(hrt = vol / (water_in),
+               frac_ret = 1 - (doc_export / doc_loads))
 
       all <- rbind(all, out)
     }
@@ -183,7 +182,8 @@ monthly_ave <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
 
     # adding in HRT because calculating on daily scale was not appropriate
     out <- out %>%
-      mutate(hrt = vol / (water_in))
+      mutate(hrt = vol / (water_in),
+             frac_ret = 1 - (doc_export / doc_loads))
 
     all <- rbind(all, out)
   }

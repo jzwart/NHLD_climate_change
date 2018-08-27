@@ -1,0 +1,14 @@
+version: 0.3.0
+name: 2_analysis/out/frac_ret.rds.ind
+type: file
+hash: 09a6008cacde461abe2a29e805a4a614
+time: 2018-08-27 18:37:05 UTC
+depends:
+  1_data/out/scenarios_qa.rds.ind: f64345e1ae959af1280235e1f18fad93
+  2_analysis/cfg/frac_ret.yml: 06c4d3767ed67c4dfdad1e064b065e21
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: 8808826fb747d833b2ce445361a4b517
+code:
+  functions:
+    change_in_var: c9440adb64efe6e5aa233ac7ae2990d6
+

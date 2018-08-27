@@ -5,6 +5,7 @@ packages:
   - grid
   - dplyr
   - tidyr
+  - cowplot
 
 include:
   - lib.yml
@@ -55,6 +56,7 @@ targets:
       - 2_analysis/out/doc_resp.rds
       - 2_analysis/out/doc_resp_vol.rds
       - 2_analysis/out/dic_v_resp.rds
+      - 2_analysis/out/frac_ret.rds
       - 3_summarize/out/monthly_ave.rds
       - 3_summarize/out/ice_dur.rds
 
@@ -120,6 +122,8 @@ targets:
     command: gd_get('2_analysis/out/doc_resp_vol.rds.ind', config_file='lib/cfg/gd_config.yml')
   2_analysis/out/dic_v_resp.rds:
     command: gd_get('2_analysis/out/dic_v_resp.rds.ind', config_file='lib/cfg/gd_config.yml')
+  2_analysis/out/frac_ret.rds:
+    command: gd_get('2_analysis/out/frac_ret.rds.ind', config_file='lib/cfg/gd_config.yml')
   3_summarize/out/monthly_ave.rds:
     command: gd_get('3_summarize/out/monthly_ave.rds.ind', config_file = 'lib/cfg/gd_config.yml')
   3_summarize/out/ice_dur.rds:

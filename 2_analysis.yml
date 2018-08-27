@@ -51,6 +51,7 @@ targets:
       - 2_analysis/out/doc_resp.rds.ind
       - 2_analysis/out/doc_resp_vol.rds.ind
       - 2_analysis/out/dic_v_resp.rds.ind
+      - 2_analysis/out/frac_ret.rds.ind
 
   1_data/out/scenarios_qa.rds:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -310,3 +311,12 @@ targets:
       remake_file = I('2_analysis.yml'),
       var_cfg_file = '2_analysis/cfg/dic_v_resp.yml',
       gd_config = 'lib/cfg/gd_config.yml')
+
+  2_analysis/out/frac_ret.rds.ind:
+    command: change_in_var(
+      ind_file = target_name,
+      raw_ind_file = '1_data/out/scenarios_qa.rds.ind',
+      remake_file = I('2_analysis.yml'),
+      var_cfg_file = '2_analysis/cfg/frac_ret.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+

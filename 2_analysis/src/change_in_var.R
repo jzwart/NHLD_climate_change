@@ -618,6 +618,24 @@ change_in_var <- function(ind_file, raw_ind_file, remake_file, var_cfg_file, gd_
       left_join(y = retro, by = c('Permanent_', 'season')) %>%
       mutate(delta_dic_v_resp = mean_dic_v_resp - retro_dic_v_resp,
              ratio_dic_v_resp = mean_dic_v_resp / retro_dic_v_resp)
+  }else if(var_cfg$variable %in% c('frac_ret')){
+    out <- all_results %>%
+      select('Permanent_', 'period', 'season', 'gcm',
+             'FracRet') %>%
+      group_by(Permanent_, period, season) %>%
+      summarise(mean_frac_ret = mean(FracRet)) %>%
+      ungroup()
+
+    retro <- out %>%
+      dplyr::filter(period == 'Retro') %>%
+      select(-period) %>%
+      rename(retro_frac_ret = mean_frac_ret)
+
+    scenarios <- out %>%
+      dplyr::filter(period != 'Retro') %>%
+      left_join(y = retro, by = c('Permanent_', 'season')) %>%
+      mutate(delta_frac_ret = mean_frac_ret - retro_frac_ret,
+             ratio_frac_ret = mean_frac_ret / retro_frac_ret)
   }
 
   data_file = as_data_file(ind_file)

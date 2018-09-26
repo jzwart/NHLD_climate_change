@@ -50,6 +50,7 @@ units:
   doc_resp_la: 'mol C (m2 lake)-1 day-1'
   epi_temp: 'C'
   frac_ret: 'fraction'
+  snow_depth: 'm'
 
 labs: # axis label
   doc: 'DOC'
@@ -87,6 +88,7 @@ labs: # axis label
   dic_v_resp: 'DIC : Respiration'
   epi_temp: 'Epi Temp'
   frac_ret: 'Fraction DOC Retained'
+  snow_depth: 'Snow Depth'
 
 ratio_var: # column name that we want to plot for ratio boxplots
   doc: 'ratio_doc_all'
@@ -159,3 +161,4 @@ monthly_var: # column name that we want for aggregating to monthly scale
   dic_v_resp: 'dicLoadvResp'
   frac_ret: 'FracRet'
   epi_temp: 'epiTemp'
+  snow_depth: ''

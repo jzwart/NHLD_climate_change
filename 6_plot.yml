@@ -21,6 +21,7 @@ sources:
   - 6_plot/src/fig_month_box.R
   - 6_plot/src/fig_ice_dur.R
   - 6_plot/src/plot_utils.R
+  - 6_plot/src/fig_total_c_flux.R
 
 targets:
 
@@ -61,6 +62,7 @@ targets:
       - 2_analysis/out/frac_ret.rds
       - 3_summarize/out/monthly_ave.rds
       - 3_summarize/out/ice_dur.rds
+      - 1_data/out/scenarios_qa.rds
 
   2_analysis/out/doc.rds:
     command: gd_get('2_analysis/out/doc.rds.ind', config_file='lib/cfg/gd_config.yml')
@@ -130,6 +132,8 @@ targets:
     command: gd_get('3_summarize/out/monthly_ave.rds.ind', config_file = 'lib/cfg/gd_config.yml')
   3_summarize/out/ice_dur.rds:
     command: gd_get('3_summarize/out/ice_dur.rds.ind', config_file = 'lib/cfg/gd_config.yml')
+  1_data/out/scenarios_qa.rds:
+    command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file = 'lib/cfg/gd_config.yml')
 
   6_plot:
     depends:
@@ -168,6 +172,7 @@ targets:
       - 6_plot/out/fig_monthly_ave.png.ind
       - 6_plot/out/fig_month_box.png.ind
       - 6_plot/out/fig_ice_off.png.ind
+      - 6_plot/out/fig_total_c_flux.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -486,3 +491,11 @@ targets:
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+  6_plot/out/fig_total_c_flux.png.ind:
+    command: fig_total_c_flux(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')

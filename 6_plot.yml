@@ -18,7 +18,9 @@ sources:
   - 6_plot/src/fig_delta.R
   - 6_plot/src/fig_boxplot_theme.R
   - 6_plot/src/fig_monthly_ave.R
+  - 6_plot/src/fig_month_box.R
   - 6_plot/src/fig_ice_dur.R
+  - 6_plot/src/plot_utils.R
 
 targets:
 
@@ -478,6 +480,7 @@ targets:
   6_plot/out/fig_ice_off.png.ind:
     command: fig_ice_dur(
       fig_ind = target_name,
+      transparent = I(60),
       ice_dur_ind_file = '3_summarize/out/ice_dur.rds.ind',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       remake_file = I('6_plot.yml'),

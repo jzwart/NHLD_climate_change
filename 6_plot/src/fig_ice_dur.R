@@ -1,4 +1,4 @@
-fig_ice_dur <- function(fig_ind, fig_cfg_yml, ice_dur_ind_file, remake_file, gd_config){
+fig_ice_dur <- function(fig_ind, transparent, fig_cfg_yml, ice_dur_ind_file, remake_file, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -59,65 +59,6 @@ fig_ice_dur <- function(fig_ind, fig_cfg_yml, ice_dur_ind_file, remake_file, gd_
 
   water_day_to_date = data.frame(water_day = ice_data$water_day[1:365], date = strftime(ice_data$datetime[1:365], format = '%b %d'))
 
-  # years = unique(paste(ice$gcm,ice$period,ice$wy))
-  # alpha_base = 0.1
-  # alpha_border = 0.2
-  # jitter = 0.1
-  # jitter_future = jitter / 6
-  # ymax = jitter * sum(grepl('Retro', years)) * 2 + jitter_future * (length(years) - sum(grepl('Retro', years))) * 2
-  #
-  # ice_on = ice_data %>% dplyr::filter(ice_on == 1)
-  # ggplot(ice_data, aes(x = water_day, y= ice_on, group = period)) +
-  #   geom_violin()
-
-  # fig_file = as_data_file(fig_ind)
-  # png(fig_file, width = 10, height = 6, units = 'in', res = 300)
-
-  # plot(ice_data$water_day, seq(0,ymax,length.out = nrow(ice_data)), cex = 0, xlim = c(40,260), xlab = '', xaxt = 'n', yaxt= 'n', ylab = '', bty = 'n')
-  # axis(1, at = c(1, 62, 124, 183, 244, 300, 360), labels = water_day_to_date$date[water_day_to_date$water_day %in% c(1, 62, 124, 183, 244, 300, 360)])
-  # count_retro = 0
-  # mid_retro = sum(grepl('Retro', years)) * jitter
-  # count_2050s = 0
-  # mid_2050s = sum(grepl('2050s', years)) * jitter_future + sum(grepl('Retro', years)) * 2 * jitter
-  # count_2080s = 0
-  # mid_2080s = sum(grepl('2080s', years)) * jitter_future + sum(grepl('Retro', years)) * 2 * jitter + sum(grepl('2050s', years)) * 2 * jitter_future
-  # for(year in years){
-  #   cur = ice[paste(ice$gcm,ice$period,ice$wy) == year,]
-  #   if(is.na(cur$water_day[1])){
-  #     next
-  #   }
-  #   x = sort(cur$water_day)
-  #   if(cur$period[1] == 'Retro'){
-  #     count_retro = count_retro + 1
-  #     ymin = mid_retro - count_retro * jitter
-  #     ymax = mid_retro + count_retro * jitter
-  #     y = c(ymin, ymax, ymax, ymin)
-  #     alpha = alpha_base
-  #     color = grDevices::adjustcolor(fig_config$period$Retro, alpha.f = alpha)
-  #     b_color = grDevices::adjustcolor(fig_config$period$Retro, alpha.f = alpha_border)
-  #   }else if(cur$period[1] == '2050s'){
-  #     count_2050s = count_2050s + 1
-  #     ymin = mid_2050s - count_2050s * jitter_future
-  #     ymax = mid_2050s + count_2050s * jitter_future
-  #     y = c(ymin, ymax, ymax, ymin)
-  #     alpha = alpha_base / 6
-  #     color = grDevices::adjustcolor(fig_config$period$`2050s`, alpha.f = alpha)
-  #     b_color = grDevices::adjustcolor(fig_config$period$`2050s`, alpha.f = alpha_border)
-  #   }else if(cur$period[1] == '2080s'){
-  #     count_2080s = count_2080s + 1
-  #     ymin = mid_2080s - count_2080s * jitter_future
-  #     ymax = mid_2080s + count_2080s * jitter_future
-  #     y = c(ymin, ymax, ymax, ymin)
-  #     alpha = alpha_base / 6
-  #     color = grDevices::adjustcolor(fig_config$period$`2080s`, alpha.f = alpha)
-  #     b_color = grDevices::adjustcolor(fig_config$period$`2080s`, alpha.f = alpha_border)
-  #   }
-  #
-  #   polygon(x = x, y = y, col = color, border = b_color)
-  # }
-  # text(x = c(240,240,240), y = c(mid_retro, mid_2050s, mid_2080s), labels = c('Historic', '2050s', '2080s'), cex = 1.5, pos = 4)
-
-
   ice_summaries <- ice %>%
     group_by(period) %>%
     mutate(shortest_ice_on = ice_on_water_day[which(min(ice_dur_days,na.rm=T) == ice_dur_days)],
@@ -143,41 +84,88 @@ fig_ice_dur <- function(fig_ind, fig_cfg_yml, ice_dur_ind_file, remake_file, gd_
 
   min_max_ice = ice %>% group_by(period) %>%
     summarise(min_ice_on = min(ice_on_water_day, na.rm = T),
-              max_ice_off = max(ice_off_water_day, na.rm = T)) %>% ungroup()
+              max_ice_on = max(ice_on_water_day, na.rm = T),
+              min_ice_off = min(ice_off_water_day, na.rm = T),
+              max_ice_off = max(ice_off_water_day, na.rm = T)) %>%
+    ungroup()
 
-  # calculating density of ice on days
-  dens <- ice_days %>%
+  ice_ends <- min_max_ice %>%
     group_by(period) %>%
-    do(data.frame(loc = density(.$water_day)$x,
-                  dens = density(.$water_day)$y)) %>%
-    mutate(dens = (dens - min(dens)) / (max(dens)-min(dens)), # normalizing to make all same width
-           loc = round(loc)) %>%
-    dplyr::filter(!duplicated(loc)) %>%
+    gather(key = 'ice_on', value = 'loc_on', contains('_on')) %>%
+    gather(key = 'ice_off', value = 'loc_off', contains('_off')) %>%
+    ungroup() %>%
+    mutate(dens_on = 0,
+           dens_off = 0) %>%
+    select(period, loc_on, dens_on, loc_off, dens_off)
+
+  # calculating density of ice on /off days
+  dens_ice_on <- ice %>%
+    dplyr::filter(!is.na(ice_on_water_day), !is.na(ice_off_water_day)) %>% # getting rid of years without ice
+    group_by(period) %>%
+    do(data.frame(loc_on = density(.$ice_on_water_day)$x,
+                  dens_on = density(.$ice_on_water_day)$y)) %>%
+    bind_rows(select(ice_ends, period, loc_on, dens_on)) %>%
+    mutate(dens_on = (dens_on - min(dens_on)) / (max(dens_on)-min(dens_on)), # normalizing to make all same width
+           loc_on = round(loc_on)) %>%
+    ungroup()%>%
+    group_by(period, loc_on) %>%
+    summarise(dens_on = mean(dens_on)) %>%
     ungroup() %>%
     mutate(min_ice_on = case_when(period == 'Retro' ~ min_max_ice$min_ice_on[min_max_ice$period=='Retro'],
                                   period == '2050s' ~ min_max_ice$min_ice_on[min_max_ice$period=='2050s'],
                                   period == '2080s' ~ min_max_ice$min_ice_on[min_max_ice$period=='2080s']),
+           max_ice_on = case_when(period == 'Retro' ~ min_max_ice$max_ice_on[min_max_ice$period=='Retro'],
+                                  period == '2050s' ~ min_max_ice$max_ice_on[min_max_ice$period=='2050s'],
+                                  period == '2080s' ~ min_max_ice$max_ice_on[min_max_ice$period=='2080s'])) %>%
+    group_by(period) %>%
+    dplyr::filter(loc_on >= min_ice_on,
+                  loc_on <= max_ice_on) %>%
+    mutate(dens_on = case_when(loc_on <= min_ice_on ~ 0,
+                               loc_on >= max_ice_on ~ 0,
+                               TRUE ~ dens_on)) %>%
+    ungroup() %>%
+    mutate(dens_on = case_when(period == '2050s' ~ dens_on + 2,
+                            period == '2080s' ~ dens_on + 4,
+                            period == 'Retro' ~ dens_on + 0))
+
+  dens_ice_off <- ice %>%
+    dplyr::filter(!is.na(ice_on_water_day), !is.na(ice_off_water_day)) %>% # getting rid of years without ice
+    group_by(period) %>%
+    do(data.frame(loc_off = density(.$ice_off_water_day)$x,
+                  dens_off = density(.$ice_off_water_day)$y)) %>%
+    bind_rows(select(ice_ends, period, loc_off, dens_off)) %>%
+    mutate(dens_off = (dens_off - min(dens_off)) / (max(dens_off)-min(dens_off)), # normalizing to make all same width
+           loc_off = round(loc_off)) %>%
+    ungroup()%>%
+    group_by(period, loc_off) %>%
+    summarise(dens_off = mean(dens_off)) %>%
+    ungroup() %>%
+    mutate(min_ice_off = case_when(period == 'Retro' ~ min_max_ice$min_ice_off[min_max_ice$period=='Retro'],
+                                  period == '2050s' ~ min_max_ice$min_ice_off[min_max_ice$period=='2050s'],
+                                  period == '2080s' ~ min_max_ice$min_ice_off[min_max_ice$period=='2080s']),
            max_ice_off = case_when(period == 'Retro' ~ min_max_ice$max_ice_off[min_max_ice$period=='Retro'],
                                   period == '2050s' ~ min_max_ice$max_ice_off[min_max_ice$period=='2050s'],
                                   period == '2080s' ~ min_max_ice$max_ice_off[min_max_ice$period=='2080s'])) %>%
     group_by(period) %>%
-    dplyr::filter(loc >= min_ice_on, loc <= max_ice_off) %>%
-    mutate(dens = case_when(loc == min_ice_on ~ 0,
-                            loc == max_ice_off ~ 0,
-                            TRUE ~ dens)) %>%
+    dplyr::filter(loc_off >= min_ice_off,
+                  loc_off <= max_ice_off) %>%
+    mutate(dens_off = case_when(loc_off <= min_ice_off ~ 0,
+                               loc_off >= max_ice_off ~ 0,
+                               TRUE ~ dens_off)) %>%
     ungroup() %>%
-    mutate(dens = case_when(period == '2050s' ~ dens + 2,
-                            period == '2080s' ~ dens + 4,
-                            period == 'Retro' ~ dens + 0))
-
+    mutate(dens_off = case_when(period == '2050s' ~ dens_off + 2,
+                               period == '2080s' ~ dens_off + 4,
+                               period == 'Retro' ~ dens_off + 0))
 
   date_breaks = c(32, 93, 152, 213, 274, 360)
   shortest_loc = c(-.6, 1.4, 3.4)
   longest_loc = c(-.2, 1.8, 3.8)
   ave_loc = c(-.4, 1.6, 3.6)
+  # transparent = 60 # transparency for fill
 
-  g = ggplot(dens, aes(dens, loc, group = period)) +
-    geom_polygon(color = 'grey', show.legend = F, fill = 'grey') +
+  g = ggplot(dens_ice_on, aes(dens_on, loc_on, group = period)) +
+    geom_polygon(aes(color = period, fill = period), show.legend = F) +
+    geom_polygon(data = dens_ice_off, aes(dens_off, loc_off, group = period, color=period, fill =period), show.legend = F) +
     geom_segment(data = ice_summaries, aes(y = shortest_ice_on, yend = shortest_ice_off,
                                            x = shortest_loc, xend = shortest_loc),
                  size = 1.2,
@@ -215,10 +203,16 @@ fig_ice_dur <- function(fig_ind, fig_cfg_yml, ice_dur_ind_file, remake_file, gd_
           axis.line.y = element_blank(),
           legend.title = element_blank(),
           legend.position = c(.9,.3)) +
-    # scale_fill_manual(breaks=c('2080s','2050s','Retro'),
-    #                   values=c('2080s' = fig_config$period$`2080s`,
-    #                            '2050s' = fig_config$period$`2050s`,
-    #                            'Retro' = fig_config$period$Retro)) +
+    scale_fill_manual(name = 'period',
+                      breaks=c('2080s','2050s','Retro'),
+                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
+                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
+                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
+    scale_color_manual(name = 'period',
+                      breaks=c('2080s','2050s','Retro'),
+                      values=c('2080s' = fig_config$period$`2080s`,
+                               '2050s' = fig_config$period$`2050s`,
+                               'Retro' = fig_config$period$Retro)) +
     scale_y_continuous(breaks = date_breaks,
                        labels = water_day_to_date$date[water_day_to_date$water_day %in% date_breaks])
   g

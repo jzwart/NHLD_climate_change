@@ -57,39 +57,202 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
       dplyr::filter(!var %in% c('ratio_doc_epi','ratio_doc_hypo'))
   }
 
-  g = ggplot(monthly_ave, aes(x = month, y = med, color = period, size = period, linetype = period)) +
-    geom_line() +
-    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro'),
+
+  month_doc = ggplot(dplyr::filter(monthly_ave, var == 'doc'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'doc'),
                 aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
                 alpha = .2, size = .5, show.legend = F) +
+    geom_line() +
     theme_classic() +
-    ylab(NULL) +
-    facet_wrap(~var, scales = 'free_y', labeller = labeller(var = units),
-               strip.position = 'left') +
-    theme(strip.background = element_blank(),
-          strip.placement = 'outside') +
+    ylab(bquote(atop(DOC,(mg~C~L^-1)))) +
+    theme(legend.title = element_blank(),
+          axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16),
+          legend.position = c(.15,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 10)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
                                   'Retro' = fig_config$period$Retro),
-                       labels = c('2050s', '2080s', 'Retro')) +
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_fill_manual(name = 'period',
                       values = c('2050s' = fig_config$period$`2050s`,
                                  '2080s' = fig_config$period$`2080s`,
                                  'Retro' = fig_config$period$Retro),
-                      labels = c('2050s', '2080s', 'Retro')) +
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_size_manual(name = 'period',
-                      values = c('2050s' = 2,
-                                 '2080s' = 2,
-                                 'Retro' = 1.1),
-                      labels = c('2050s', '2080s', 'Retro')) +
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_linetype_manual(name = 'period',
                           values = c('2050s' = 'solid',
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
-                          labels = c('2050s', '2080s', 'Retro')) +
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))
 
+  month_bury = ggplot(dplyr::filter(monthly_ave, var == 'bury'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'bury'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(bquote(atop(C~Burial,(mol~C~day^-1)))) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
+
+  month_emit = ggplot(dplyr::filter(monthly_ave, var == 'emit'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'emit'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(bquote(atop(CO[2]~Emissions,(mol~C~day^-1)))) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
+
+  month_d_epi = ggplot(dplyr::filter(monthly_ave, var == 'd_epi'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'd_epi'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(bquote(atop(DOC~Turnover,(day^-1)))) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
+
+  month_dic_v_resp = ggplot(dplyr::filter(monthly_ave, var == 'dic_v_resp'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'dic_v_resp'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(bquote(DIC~Load~to~DIC~Produced)) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
+
+  month_frac_ret = ggplot(dplyr::filter(monthly_ave, var == 'frac_ret'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'frac_ret'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(expression(Fraction~C~Mineralized)) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
 
   box_doc = ggplot(dplyr::filter(box_plot_data, var == 'ratio_doc_all'), aes(x = period, y = ratio, fill = period)) +
     geom_boxplot(outlier.shape = NA, show.legend = F, size = 1) +
@@ -175,14 +338,29 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
           axis.text.x = element_blank(),
           axis.line.x = element_blank())
 
-  ggdraw() +
-    draw_plot(g, x = 0, y = 0, width = 1, height = 1) +
-    draw_plot(box_doc, x= .1, y= .2, width = .2, height = .2)
+  g = ggdraw() +
+    draw_plot(month_doc, x = 0, y = .66, width = .3, height = .3) +
+    draw_plot(box_doc, x= .3, y= .7, width = .2, height = .2) +
+    draw_plot(month_d_epi, x = .5, y = .66, width = .3, height = .3) +
+    draw_plot(box_d, x= .8, y= .7, width = .2, height = .2) +
+    draw_plot(month_bury, x = 0, y = .33, width = .3, height = .3) +
+    draw_plot(box_bury, x= .3, y= .37, width = .2, height = .2) +
+    draw_plot(month_emit, x = .5, y = .33, width = .3, height = .3) +
+    draw_plot(box_emit, x= .8, y= .37, width = .2, height = .2) +
+    draw_plot(month_dic_v_resp, x = 0, y = 0, width = .3, height = .3) +
+    draw_plot(box_dic_v_resp, x= .3, y= 0.04, width = .2, height = .2) +
+    draw_plot(month_frac_ret, x = .5, y = 0, width = .3, height = .3) +
+    draw_plot(box_frac_ret, x= .8, y= 0.04, width = .2, height = .2)
 
+  # emit
+  # bury
+  # dic load to produced
+  # fraction C minearlized
+  #
 
 
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 18, height = 11)
+  ggsave(fig_file, plot=g, width = 14, height = 12)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

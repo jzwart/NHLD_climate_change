@@ -1,0 +1,15 @@
+version: 0.3.0
+name: 6_plot/out/fig_month_box.png.ind
+type: file
+hash: e20c7fbd022522bbad2f337f986d3c09
+time: 2018-08-29 15:18:37 UTC
+depends:
+  3_summarize/out/monthly_ave.rds.ind: ded72c65ac46acfa00416430e2902dad
+  6_plot/cfg/fig_month_box_vars.yml: ed271792d28c20c1ccabeeff27fda690
+  6_plot/cfg/fig_config.yml: 89ac044e302d4060738e733dd0a59e8c
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: d22cccf37c753f96a7d1ee4eb2023ed3
+code:
+  functions:
+    fig_month_box: 78314de4089e1a2959cba663d274b2fd
+

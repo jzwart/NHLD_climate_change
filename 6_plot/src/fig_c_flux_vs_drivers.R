@@ -2,6 +2,8 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, fig_cfg_yml, remak
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
+  drivers <- readRDS(drivers_file) # meteo drivers for period / gcm
+
   all <- readRDS(scenarios) %>%
     dplyr::filter(season == 'all') %>%
     mutate(Emit = Emit * 12 * 365, # emissions in g C / year

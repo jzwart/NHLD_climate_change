@@ -7,9 +7,15 @@ file_extensions:
   - feather
   - ind
 
+packages:
+  - dplyr
+  - rlang
+  - magrittr
+
 sources:
   - 1_data/src/aggregate_model_runs.R
   - 1_data/src/qa_scenarios.R
+  - 1_data/src/gather_monthly_drivers.R
 
 targets:
 
@@ -43,5 +49,10 @@ targets:
       retro_ind_file = '1_data/out/retro.rds.ind',
       retro_paper_data = '1_data/in/retro_paper_data.rds',
       remake_file = '1_data.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  1_data/out/monthly_drivers_nhld.rds.ind:
+    command: gather_monthly_drivers(
+      ind_file = target_name,
       gd_config = 'lib/cfg/gd_config.yml')
 

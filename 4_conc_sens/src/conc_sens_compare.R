@@ -29,3 +29,7 @@ g = ggplot(all, aes(y = log(Emit), group = scenario)) +
 
 g
 
+
+# would we expect a uniform increase / decrease in concentration change across all the NHLD? probably not...
+#  we could sample each lake from the 9 scenarios, re-calculate total emissions, and do this 10,000 times to create a distribution;
+#  should be OK since all lakes are run independently of each other

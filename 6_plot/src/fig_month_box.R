@@ -64,7 +64,7 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
                 alpha = .2, size = .5, show.legend = F) +
     geom_line() +
     theme_classic() +
-    ylab(bquote(atop(DOC,(mg~C~L^-1)))) +
+    ylab(bquote(DOC~(mg~C~L^-1))) +
     theme(legend.title = element_blank(),
           axis.text = element_text(size=16),
           axis.title.x = element_blank(),
@@ -100,7 +100,7 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
                 alpha = .2, size = .5, show.legend = F) +
     geom_line(show.legend = F) +
     theme_classic() +
-    ylab(bquote(atop(C~Burial,(mol~C~day^-1)))) +
+    ylab(bquote(C~Burial~(mol~C~day^-1))) +
     theme(axis.text = element_text(size=16),
           axis.title.x = element_blank(),
           axis.title.y = element_text(size = 16)) +
@@ -132,7 +132,7 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
                 alpha = .2, size = .5, show.legend = F) +
     geom_line(show.legend = F) +
     theme_classic() +
-    ylab(bquote(atop(CO[2]~Emissions,(mol~C~day^-1)))) +
+    ylab(bquote(CO[2]~Emissions~(mol~C~day^-1))) +
     theme(axis.text = element_text(size=16),
           axis.title.x = element_blank(),
           axis.title.y = element_text(size = 16)) +
@@ -164,7 +164,7 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
                 alpha = .2, size = .5, show.legend = F) +
     geom_line(show.legend = F) +
     theme_classic() +
-    ylab(bquote(atop(DOC~Turnover,(day^-1)))) +
+    ylab(bquote(DOC~Turnover~(day^-1))) +
     theme(axis.text = element_text(size=16),
           axis.title.x = element_blank(),
           axis.title.y = element_text(size = 16)) +
@@ -339,26 +339,24 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
           axis.line.x = element_blank())
 
   g = ggdraw() +
-    draw_plot(month_doc, x = 0, y = .66, width = .3, height = .3) +
-    draw_plot(box_doc, x= .3, y= .7, width = .2, height = .2) +
-    draw_plot(month_d_epi, x = .5, y = .66, width = .3, height = .3) +
-    draw_plot(box_d, x= .8, y= .7, width = .2, height = .2) +
-    draw_plot(month_bury, x = 0, y = .33, width = .3, height = .3) +
-    draw_plot(box_bury, x= .3, y= .37, width = .2, height = .2) +
-    draw_plot(month_emit, x = .5, y = .33, width = .3, height = .3) +
-    draw_plot(box_emit, x= .8, y= .37, width = .2, height = .2) +
-    draw_plot(month_dic_v_resp, x = 0, y = 0, width = .3, height = .3) +
-    draw_plot(box_dic_v_resp, x= .3, y= 0.04, width = .2, height = .2) +
-    draw_plot(month_frac_ret, x = .5, y = 0, width = .3, height = .3) +
-    draw_plot(box_frac_ret, x= .8, y= 0.04, width = .2, height = .2)
+    draw_plot(month_emit, x = 0, y = .66, width = .3, height = .3) +
+    draw_plot(box_emit, x= .3, y= .7, width = .2, height = .2) +
+    draw_plot(month_bury, x = .5, y = .66, width = .3, height = .3) +
+    draw_plot(box_bury, x= .8, y= .7, width = .2, height = .2) +
+    draw_plot(month_dic_v_resp, x = 0, y = .33, width = .3, height = .3) +
+    draw_plot(box_dic_v_resp, x= .3, y= .37, width = .2, height = .2) +
+    draw_plot(month_frac_ret, x = .5, y = .33, width = .3, height = .3) +
+    draw_plot(box_frac_ret, x= .8, y= .37, width = .2, height = .2) +
+    draw_plot(month_d_epi, x = 0, y = 0, width = .3, height = .3) +
+    draw_plot(box_d, x= .3, y= 0.04, width = .2, height = .2) +
+    draw_plot(month_doc, x = .5, y = 0, width = .3, height = .3) +
+    draw_plot(box_doc, x= .8, y= 0.04, width = .2, height = .2)
 
   # emit
   # bury
   # dic load to produced
   # fraction C minearlized
   #
-
-
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width = 14, height = 12)

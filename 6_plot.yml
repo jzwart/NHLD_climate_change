@@ -22,6 +22,7 @@ sources:
   - 6_plot/src/fig_ice_dur.R
   - 6_plot/src/plot_utils.R
   - 6_plot/src/fig_total_c_flux.R
+  - 6_plot/src/fig_drivers_monthly.R
 
 targets:
 
@@ -173,6 +174,7 @@ targets:
       - 6_plot/out/fig_month_box.png.ind
       - 6_plot/out/fig_ice_off.png.ind
       - 6_plot/out/fig_total_c_flux.png.ind
+      - 6_plot/out/fig_drivers_monthly.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -496,6 +498,15 @@ targets:
       fig_ind = target_name,
       transparent = I(60),
       scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_drivers_monthly.png.ind:
+    command: fig_drivers_monthly(
+      fig_ind = target_name,
+      transparent = I(60),
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       gd_config = 'lib/cfg/gd_config.yml')

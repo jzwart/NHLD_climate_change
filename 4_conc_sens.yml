@@ -23,4 +23,7 @@ targets:
       gd_config = 'lib/cfg/gd_config.yml')
 
   4_conc_sens/out/conc_sens_compare.rds.ind:
-    command:
+    command: conc_sens_compare(
+      ind_file = target_name,
+      n_draws = I(100),
+      gd_config = 'lib/cfg/gd_config.yml')

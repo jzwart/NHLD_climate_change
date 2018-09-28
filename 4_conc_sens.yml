@@ -9,6 +9,7 @@ file_extensions:
 
 sources:
   - 4_conc_sens/src/conc_sens_summary.R
+  - 4_conc_sens/src/conc_sens_compare.R
 
 targets:
 
@@ -25,5 +26,5 @@ targets:
   4_conc_sens/out/conc_sens_compare.rds.ind:
     command: conc_sens_compare(
       ind_file = target_name,
-      n_draws = I(100),
+      n_draws = I(10000),
       gd_config = 'lib/cfg/gd_config.yml')

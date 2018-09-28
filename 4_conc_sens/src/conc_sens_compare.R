@@ -33,13 +33,14 @@ conc_sens_compare <- function(ind_file, n_draws, gd_config){
 
   total_mcmc <- data.frame()
   for(i in 1:n_draws){
+    print(i)
 
-    cur_lake_sample = data.frame()
-    for(j in 1:length(lakes)){
-      print(c(i,j))
-      cur = dplyr::filter(all, Permanent_ == lakes[j]) %>% dplyr::slice(sample(1:9, size = 1)) # randomly selecting row for each lake
-      cur_lake_sample <- bind_rows(cur_lake_sample, cur)
-    }
+    cur_lake_sample <- all %>%
+      group_by(Permanent_) %>%
+      mutate(random_id = sample(1:9,size = 9,replace = F)) %>%
+      ungroup() %>%
+      dplyr::filter(random_id == 1) %>%
+      select(-random_id)
 
     cur_total <- cur_lake_sample %>%
       summarise(Emit = sum(Emit * 12 * 365),
@@ -47,9 +48,6 @@ conc_sens_compare <- function(ind_file, n_draws, gd_config){
 
     total_mcmc <- bind_rows(total_mcmc, cur_total)
   }
-
-
-  # total_mcmc
 
   data_file <- as_data_file(ind_file)
   saveRDS(total_mcmc, data_file)

@@ -38,10 +38,9 @@ scenarios_qa <- function(ind_file, scenarios_ind_file, var_lims_file, retro_ind_
 
   scenario_lookup<-rbind(scenario_lookup,c(12,'Retro'))
   for(i in 1:length(scenario_lookup$scenario)){ # keeping only lakes common to every scenario run
-    q = i + (i-1)
 
-    cur <- scenarios_agg[[q]]
-    curSum <- scenarios_agg[[q+1]]
+    cur <- scenarios_agg[[which(names(scenarios_agg)==paste0(scenario_lookup$scenario[i],'_all'))]]
+    curSum <- scenarios_agg[[which(names(scenarios_agg)==paste0(scenario_lookup$scenario[i],'_all'))]]
 
     cur <- cur[cur$Permanent_%in%lakes,]
     curSum <- curSum[curSum$Permanent_%in%lakes,]

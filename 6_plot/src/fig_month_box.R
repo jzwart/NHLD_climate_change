@@ -62,16 +62,12 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
     geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'doc'),
                 aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
                 alpha = .2, size = .5, show.legend = F) +
-    geom_line() +
+    geom_line(show.legend = F) +
     theme_classic() +
     ylab(bquote(DOC~(mg~C~L^-1))) +
-    theme(legend.title = element_blank(),
-          axis.text = element_text(size=16),
+    theme(axis.text = element_text(size=16),
           axis.title.x = element_blank(),
-          axis.title.y = element_text(size = 16),
-          legend.position = c(.15,.9),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          axis.title.y = element_text(size = 16)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -130,12 +126,16 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
     geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'emit'),
                 aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
                 alpha = .2, size = .5, show.legend = F) +
-    geom_line(show.legend = F) +
+    geom_line() +
     theme_classic() +
     ylab(bquote(CO[2]~Emissions~(mol~C~day^-1))) +
     theme(axis.text = element_text(size=16),
           axis.title.x = element_blank(),
-          axis.title.y = element_text(size = 16)) +
+          axis.title.y = element_text(size = 16),
+          legend.position = c(.75,.9),
+          legend.background = element_blank(),
+          legend.title = element_blank(),
+          legend.text = element_text(size = 10)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,

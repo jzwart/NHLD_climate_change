@@ -40,6 +40,16 @@ gather_monthly_drivers <- function(ind_file, gd_config){
     out <- bind_rows(out, cur)
   }
 
+  # baseflow + runoff
+  r <- out %>% dplyr::filter(var =='Runoff')
+  b <- out %>% dplyr::filter(var == 'Baseflow')
+  r_b <- left_join(r, b, by = c('period' = 'period', 'gcm'='gcm', 'month'='month')) %>%
+    mutate(var = 'Runoff_and_baseflow',
+           var_value = var_value.x + var_value.y) %>%
+    select(period, gcm, month, var, var_value)
+
+  out <- bind_rows(out, r_b)
+
   data_file = as_data_file(ind_file)
   saveRDS(out, data_file)
   gd_put(remote_ind = ind_file, local_source = data_file, config_file = gd_config)

@@ -26,7 +26,7 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_
               DOC_load = mean(DOC_load),
               Precip_lake = mean(Precip_lake),
               Water_in = sum(waterIn),
-              R_B = median(R_B, na.rm = T),
+              # R_B = median(R_B, na.rm = T),
               ndays_ice = mean(ndays_ice),
               epiTemp = median(epiTemp),
               HRT = median(HRT),
@@ -35,134 +35,122 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_
 
   ave_drivers <- drivers %>%
     group_by(period, gcm, var) %>%
-    dplyr::summarise(var_value = mean(var_value)) %>%
+    dplyr::summarise(var_value = sum(var_value)) %>%
     ungroup() %>%
     spread(key = 'var', value = 'var_value')
 
   c_and_drivers <- left_join(total, ave_drivers, by = c('period' = 'period', 'gcm' = 'gcm')) %>%
     mutate(period = factor(period, levels = c('Retro', '2050s', '2080s')))
 
-  r_b_emit = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Emit / 10^9, fill = period, color = period)) +  # converting to gigagrams
+  r_b_emit = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Emit / 10^9, color = period, size =period, shape = period)) +  # converting to gigagrams
+    geom_point() +
+    theme_classic() +
+    ylab(expression(Total~Emissions~(Gg~C~year^-1))) +
+    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                      values = c('2050s' = 16,
+                                 '2080s' = 16,
+                                 'Retro' = 16),
+                      labels = c('Historic','2050\'s', '2080\'s'))
+
+  r_b_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Bury / 10^9, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
     theme_classic() +
-    ylab(expression(Total~Emissions)) +
+    ylab(expression(Total~C~Burial~(Gg~C~year^-1))) +
+    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
+          axis.title = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
     scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16,
+                                  'Retro' = 16),
+                       labels = c('Historic','2050\'s', '2080\'s'))
 
-  precip_emit = ggplot(c_and_drivers, aes(x = Precip, y = Emit / 10^9, fill = period, color = period)) +  # converting to gigagrams
+  r_b_emit_to_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Emit / Bury, fill = period, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
     theme_classic() +
-    ylab(expression(Total~Emissions)) +
+    ylab(expression(Emissions~to~Burial~(C:C))) +
+    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
+          axis.title = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
     scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16,
+                                  'Retro' = 16),
+                       labels = c('Historic','2050\'s', '2080\'s'))
 
-  r_b_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Bury / 10^9, fill = period, color = period)) +  # converting to gigagrams
+  r_b_emit_minus_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = (Emit - Bury)/10^9, fill = period, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
     theme_classic() +
-    ylab(expression(Total~Emissions)) +
+    ylab(expression(Emissions~minus~Burial~(Gg~C~year^-1))) +
+    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
+          axis.title = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
     scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16,
+                                  'Retro' = 16),
+                       labels = c('Historic','2050\'s', '2080\'s'))
 
-  precip_bury = ggplot(c_and_drivers, aes(x = Precip, y = Bury / 10^9, fill = period, color = period)) +  # converting to gigagrams
-    geom_point(size = 8, shape = 16, show.legend = F) +
-    theme_classic() +
-    ylab(expression(Total~Emissions)) +
-    theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
-    scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
-
-
-  r_b_emit_to_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Emit/Bury, fill = period, color = period)) +  # converting to gigagrams
-    geom_point(size = 8, shape = 16, show.legend = F) +
-    theme_classic() +
-    ylab(expression(Total~Emissions)) +
-    theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
-    scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
-
-
-
-  ggplot(c_and_drivers, aes(x = Temp, y = Emit / 10^9, fill = period, color = period)) +  # converting to gigagrams
-    geom_point(size = 8, shape = 16, show.legend = F) +
-    theme_classic() +
-    theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
-    scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
-
-  ggplot(c_and_drivers, aes(x = R_B, y = Emit, fill = period, color = period)) +  # converting to gigagrams
-    geom_point(size = 8, shape = 16, show.legend = F) +
-    theme_classic() +
-    theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16)) +
-    scale_fill_manual(name = 'period',
-                      breaks=c('2080s','2050s','Retro'),
-                      values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
-                               '2050s' = t_col(fig_config$period$`2050s`, transparent),
-                               'Retro' = t_col(fig_config$period$Retro, transparent))) +
-    scale_color_manual(name = 'period',
-                       breaks=c('2080s','2050s','Retro'),
-                       values=c('2080s' = fig_config$period$`2080s`,
-                                '2050s' = fig_config$period$`2050s`,
-                                'Retro' = fig_config$period$Retro))
-
-
+  g = ggdraw() +
+    draw_plot(r_b_emit, x = 0, y = .5, width = .5, height = .5) +
+    draw_plot(r_b_bury, x= .5, y= .5, width = .5, height = .5) +
+    draw_plot(r_b_emit_to_bury, x = 0, y = 0, width = .5, height = .5) +
+    draw_plot(r_b_emit_minus_bury, x= .5, y= 0, width = .5, height = .5)
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width = 7, height = 6)

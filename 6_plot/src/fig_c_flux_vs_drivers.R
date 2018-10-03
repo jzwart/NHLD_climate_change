@@ -1,4 +1,4 @@
-fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_yml, remake_file, gd_config){
+fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_yml, remake_file, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -46,9 +46,10 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     geom_point() +
     theme_classic() +
     ylab(expression(Total~Emissions~(Gg~C~year^-1))) +
-    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
+    # xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_blank(),
           legend.position = c(.15,.8),
           legend.text = element_text(size = 12)) +
@@ -72,9 +73,10 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     geom_point(size = 8, shape = 16, show.legend = F) +
     theme_classic() +
     ylab(expression(Total~C~Burial~(Gg~C~year^-1))) +
-    xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
+    # xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_blank(),
           legend.position = c(.15,.8),
           legend.text = element_text(size = 12)) +
@@ -153,6 +155,6 @@ fig_total_c_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     draw_plot(r_b_emit_minus_bury, x= .5, y= 0, width = .5, height = .5)
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 7, height = 6)
+  ggsave(fig_file, plot=g, width = 11, height = 10)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

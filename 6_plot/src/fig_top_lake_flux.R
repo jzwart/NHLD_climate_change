@@ -74,21 +74,27 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
   top_bury <- all %>%
     group_by(period, gcm) %>%
     arrange(Bury, .by_group = T) %>%
-    mutate(cumsum_bury = cumsum(Bury) / sum(Bury)) %>%
+    mutate(cumsum_bury = cumsum(Bury),
+           cumsum_frac_bury = cumsum_bury / sum(Bury)) %>%
     arrange(desc(Bury), .by_group = T) %>%
-    mutate(top_bury = case_when(cumsum_bury >= top_frac ~ 'top',
+    mutate(top_bury = case_when(cumsum_frac_bury >= top_frac ~ 'top',
                                 TRUE ~ 'bottom'),
            top_bury = factor(top_bury, levels = c('top','bottom')),
-           bins = cut(cumsum_bury, breaks = bins)) %>%
-    ungroup()
+           cumsum_frac_bury_bins = cut(cumsum_frac_bury, breaks = bins)) %>%
+    ungroup() %>%
+    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm'))
 
   top_bury_retro <- top_bury %>%
     dplyr::filter(gcm == 'Retro')
 
   top_bury_future <- top_bury %>%
     dplyr::filter(gcm != 'Retro') %>%
-    left_join(top_bury_retro, by = 'Permanent_', suffix = c('_future','_retro'))
-
+    left_join(top_bury_retro, by = 'Permanent_', suffix = c('_future','_retro')) %>%
+    mutate(bury_diff = Bury_future - Bury_retro) %>%
+    group_by(period_future, gcm_future) %>%
+    arrange(Bury_retro, .by_group = T) %>%
+    mutate(cumsum_bury_diff = cumsum(bury_diff)) %>%
+    ungroup()
 
   # cumulative fraction plotted against total emissions diff; make this colored by runoff + baseflow
   emit = ggplot(top_emit_future, aes(x = cumsum_frac_emit_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
@@ -105,21 +111,38 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
           legend.text = element_text(size = 14))+
     geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-      low = 'lightblue',high = 'darkblue') #+
-    # scale_linetype_manual(name = 'period_future',
-    #                       values = c('2050s' = 'dotted',
-    #                                  '2080s' = 'solid'),
-    #                       labels = c('2050\'s', '2080\'s'))
+      low = 'lightblue',high = 'darkblue') +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
 
-  emit
+  bury = ggplot(top_bury_future, aes(x = cumsum_frac_bury_retro, y = cumsum_bury_diff/10^9, linetype = period_future,
+                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 2) +
+    theme_classic() +
+    ylab(expression(Cumulative~Burial~Difference~(Gg~C~year^-1))) +
+    xlab(expression(Fraction~of~Total~Burial))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
+                           low = 'lightblue',high = 'darkblue') +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
 
-  g = ggdraw() +
-    draw_plot(r_b_emit, x = 0, y = .5, width = .5, height = .5) +
-    draw_plot(r_b_bury, x= .5, y= .5, width = .5, height = .5) +
-    draw_plot(r_b_emit_to_bury, x = 0, y = 0, width = .5, height = .5) +
-    draw_plot(r_b_emit_minus_bury, x= .5, y= 0, width = .5, height = .5)
+  g = plot_grid(emit, bury, labels = c('A', 'B'), align = 'h')
+
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 11, height = 10)
+  ggsave(fig_file, plot=g, width = 14, height = 8)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

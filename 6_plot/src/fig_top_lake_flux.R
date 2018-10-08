@@ -96,6 +96,32 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
     mutate(cumsum_bury_diff = cumsum(bury_diff)) %>%
     ungroup()
 
+  emit_minus_bury <- all %>%
+    mutate(emit_minus_bury = Emit - Bury) %>%
+    group_by(period, gcm) %>%
+    arrange(emit_minus_bury, .by_group = T) %>%
+    mutate(cumsum_emit_minus_bury = cumsum(emit_minus_bury),
+           cumsum_frac_emit_minus_bury = cumsum_emit_minus_bury / sum(emit_minus_bury)) %>%
+    arrange(desc(emit_minus_bury), .by_group = T) %>%
+    mutate(top_emit_minus_bury = case_when(cumsum_frac_emit_minus_bury >= top_frac ~ 'top',
+                                TRUE ~ 'bottom'),
+           top_emit_minus_bury = factor(top_emit_minus_bury, levels = c('top','bottom')),
+           cumsum_frac_emit_minus_bury_bins = cut(cumsum_frac_emit_minus_bury, breaks = bins)) %>%
+    ungroup() %>%
+    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm'))
+
+  emit_minus_bury_retro <- emit_minus_bury %>%
+    dplyr::filter(gcm == 'Retro')
+
+  emit_minus_bury_future <- emit_minus_bury %>%
+    dplyr::filter(gcm != 'Retro') %>%
+    left_join(emit_minus_bury_retro, by = 'Permanent_', suffix = c('_future','_retro')) %>%
+    mutate(emit_minus_bury_diff = emit_minus_bury_future - emit_minus_bury_retro) %>%
+    group_by(period_future, gcm_future) %>%
+    arrange(emit_minus_bury_retro, .by_group = T) %>%
+    mutate(cumsum_emit_minus_bury_diff = cumsum(emit_minus_bury_diff)) %>%
+    ungroup()
+
   # cumulative fraction plotted against total emissions diff; make this colored by runoff + baseflow
   emit = ggplot(top_emit_future, aes(x = cumsum_frac_emit_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
               group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
@@ -139,10 +165,32 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
                           labels = c('2050\'s', '2080\'s'),
                           guide = guide_legend(title = expression(Period)))
 
+  emit_minus_bury = ggplot(emit_minus_bury_future, aes(x = cumsum_frac_emit_minus_bury_retro,
+                                                       y = cumsum_emit_minus_bury_diff/10^9, linetype = period_future,
+                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 2) +
+    theme_classic() +
+    ylab(expression(Cumulative~Emit-Burial~Difference~(Gg~C~year^-1))) +
+    xlab(expression(Fraction~of~Total~Emit-Burial))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
+                           low = 'lightblue',high = 'darkblue') +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
   g = plot_grid(emit, bury, labels = c('A', 'B'), align = 'h')
 
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 14, height = 8)
+  ggsave(fig_file, plot=g, width = 14, height = 7)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

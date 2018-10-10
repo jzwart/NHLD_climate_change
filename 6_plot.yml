@@ -485,6 +485,7 @@ targets:
       fig_ind = target_name,
       vars_ind_file = '3_summarize/out/monthly_ave.rds.ind',
       vars_yml = '6_plot/cfg/fig_month_box_vars.yml',
+      scenarios = '1_data/out/scenarios_qa.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       remake_file = I('6_plot.yml'),

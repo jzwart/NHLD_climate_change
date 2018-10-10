@@ -67,7 +67,11 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                       values = c('2050s' = 16,
                                  '2080s' = 16,
                                  'Retro' = 16),
-                      labels = c('Historic','2050\'s', '2080\'s'))
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    geom_smooth(aes(x = Runoff_and_baseflow, y = Emit / 10^9), method = 'lm', se = F, color = 'grey60',
+                inherit.aes = F, size = 2, linetype = 'dashed')
+
+  r_b_emit
 
   r_b_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Bury / 10^9, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
@@ -94,7 +98,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16,
                                   'Retro' = 16),
-                       labels = c('Historic','2050\'s', '2080\'s'))
+                       labels = c('Historic','2050\'s', '2080\'s'))+
+    geom_smooth(aes(x = Runoff_and_baseflow, y = Bury / 10^9), method = 'lm', se = F, color = 'grey60',
+                inherit.aes = F, size = 2, linetype = 'dashed')
 
   r_b_emit_to_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = Emit / Bury, fill = period, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
@@ -120,7 +126,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16,
                                   'Retro' = 16),
-                       labels = c('Historic','2050\'s', '2080\'s'))
+                       labels = c('Historic','2050\'s', '2080\'s'))+
+    geom_smooth(aes(x = Runoff_and_baseflow, y = Emit / Bury), method = 'lm', se = F, color = 'grey60',
+                inherit.aes = F, size = 2, linetype = 'dashed')
 
   r_b_emit_minus_bury = ggplot(c_and_drivers, aes(x = Runoff_and_baseflow, y = (Emit - Bury)/10^9, fill = period, color = period)) +  # converting to gigagrams
     geom_point(size = 8, shape = 16, show.legend = F) +
@@ -146,7 +154,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16,
                                   'Retro' = 16),
-                       labels = c('Historic','2050\'s', '2080\'s'))
+                       labels = c('Historic','2050\'s', '2080\'s'))+
+    geom_smooth(aes(x = Runoff_and_baseflow, y = (Emit - Bury) / 10^9), method = 'lm', se = F, color = 'grey60',
+                inherit.aes = F, size = 2, linetype = 'dashed')
 
   g = ggdraw() +
     draw_plot(r_b_emit, x = 0, y = .5, width = .5, height = .5) +

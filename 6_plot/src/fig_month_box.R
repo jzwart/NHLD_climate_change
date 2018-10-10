@@ -1,4 +1,4 @@
-fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_lookup_yml, remake_file, gd_config){
+fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, scenarios, var_lookup_yml, remake_file, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -56,6 +56,54 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
     box_plot_data <- box_plot_data %>%
       dplyr::filter(!var %in% c('ratio_doc_epi','ratio_doc_hypo'))
   }
+
+
+  all <- readRDS(scenarios) %>%
+    dplyr::filter(season == 'all') %>%
+    select(Permanent_, period, gcm, Emit, Burial_total, Area, Stage, DOC_Load, HRT, Vol,FracRet, DOC_export, DOCl_epi, DOCr_epi,
+           waterIn, fluvialOut, epiTemp, emergent_d_epi, doc_conc, dicLoadvResp, Vepi, DOC_Respired, sed_resp, DIC_load)
+
+  retro <- all %>%
+    dplyr::filter(gcm == 'Retro')
+
+  merged <- dplyr::filter(all, gcm != 'Retro') %>%
+    left_join(retro, by = 'Permanent_', suffix = c('_future', '_retro'))
+
+  retro_total <- all %>%
+    group_by(period, gcm) %>%
+    dplyr::summarise(Emit = sum(Emit),
+                     Bury = sum(Burial_total),
+                     Area = sum(Area),
+                     Water_in = sum(waterIn),
+                     Vol = sum(Vol),
+                     FracRet = sum(DOC_Load * FracRet) / sum(DOC_Load),
+                     DOC_Load = sum(DOC_Load),
+                     DOC_Export = sum(DOC_export),
+                     DOC_Conc = sum(DOCl_epi,DOCr_epi) / sum(Vepi) * 12,
+                     DICLoad_v_Resp = sum(DIC_load) / sum(DOC_Respired, sed_resp),
+                     D_epi = sum(emergent_d_epi * Vepi) / sum(Vepi)) %>%
+    ungroup() %>%
+    dplyr::filter(gcm == 'Retro') %>%
+    mutate(tmp = 'a')
+
+  merged_total <- all %>%
+    group_by(period, gcm) %>%
+    dplyr::summarise(Emit = sum(Emit),
+                     Bury = sum(Burial_total),
+                     Area = sum(Area),
+                     Water_in = sum(waterIn),
+                     Vol = sum(Vol),
+                     FracRet = sum(DOC_Load * FracRet) / sum(DOC_Load),
+                     DOC_Load = sum(DOC_Load),
+                     DOC_Export = sum(DOC_export),
+                     DOC_Conc = sum(DOCl_epi,DOCr_epi) / sum(Vepi) * 12,
+                     DICLoad_v_Resp = sum(DIC_load) / sum(DOC_Respired, sed_resp),
+                     D_epi = sum(emergent_d_epi * Vepi) / sum(Vepi)) %>%
+    ungroup() %>%
+    dplyr::filter(gcm != 'Retro') %>%
+    mutate(tmp = 'a') %>%
+    left_join(retro_total, by = 'tmp', suffix = c('_future','_retro')) %>%
+    select(-tmp,-period_retro, -gcm_retro)
 
 
   month_doc = ggplot(dplyr::filter(monthly_ave, var == 'doc'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
@@ -268,6 +316,205 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
           axis.text.x = element_blank(),
           axis.line.x = element_blank())
 
+  emit_ratio = ggplot(merged, aes(x = period_future, y = Emit_future/Emit_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    geom_violin(show.legend = F) +
+    geom_point(data = merged_total, aes(x = period_future, y = Emit_future/Emit_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    theme(axis.text = element_text(size=16),
+          axis.title = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
+  bury_ratio = ggplot(merged, aes(x = period_future, y = Burial_total_future/Burial_total_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    geom_violin(show.legend = F) +
+    geom_point(data = merged_total, aes(x = period_future, y = Bury_future/Bury_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    ylim(c(0,2.3)) +
+    theme(axis.text = element_text(size=16),
+          axis.title = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
+  dic_v_resp_ratio = ggplot(merged, aes(x = period_future, y = dicLoadvResp_future/dicLoadvResp_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    geom_violin(show.legend = F) +
+    geom_point(data = merged_total, aes(x = period_future, y = DICLoad_v_Resp_future/DICLoad_v_Resp_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    ylim(c(0.2,4)) +
+    theme(axis.text = element_text(size=16),
+          axis.title.y = element_text(size = 16),
+          axis.title.x = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
+  frac_ret_ratio = ggplot(merged, aes(x = period_future, y = FracRet_future/FracRet_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    geom_violin(show.legend = F) +
+    geom_point(data = merged_total, aes(x = period_future, y = FracRet_future/FracRet_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    ylim(c(0,2)) +
+    theme(axis.text = element_text(size=16),
+          axis.title = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
+  d_ratio = ggplot(merged, aes(x = period_future, y = emergent_d_epi_future/emergent_d_epi_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    geom_violin(show.legend = F) +
+    geom_point(data = merged_total, aes(x = period_future, y = D_epi_future/D_epi_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    # ylim(c(0,2.3)) +
+    theme(axis.text = element_text(size=16),
+          axis.title = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
+  doc_ratio = ggplot(merged, aes(x = period_future, y = doc_conc_future/doc_conc_retro, color = period_future, fill = period_future,
+                                  size =period_future, shape = period_future)) +
+    geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
+    # geom_violin(show.legend = F) +
+    geom_boxplot(outlier.shape = NA, show.legend = F, size = 1) +
+    geom_point(data = merged_total, aes(x = period_future, y = DOC_Conc_future/DOC_Conc_retro), show.legend = F, size = 3,
+               position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+    theme_classic() +
+    ylim(c(0.85,1.5)) +
+    theme(axis.text = element_text(size=16),
+          axis.title = element_blank(),
+          legend.title = element_blank(),
+          legend.position = c(.15,.85),
+          legend.text = element_text(size = 12),
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.line.x = element_blank()) +
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
+                                  '2080s' = t_col(fig_config$period$`2080s`, 0)),
+                       labels = c('2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period_future',
+                      values = c('2050s' = t_col(fig_config$period$`2050s`, 80),
+                                 '2080s' = t_col(fig_config$period$`2080s`, 80)),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period_future',
+                      values = c('2050s' = 2,
+                                 '2080s' = 2),
+                      labels = c('2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period_future',
+                       values = c('2050s' = 16,
+                                  '2080s' = 16),
+                       labels = c('2050\'s', '2080\'s'))
+
   box_d = ggplot(dplyr::filter(box_plot_data, var == 'ratio_d_epi'), aes(x = period, y = ratio, fill = period)) +
     geom_boxplot(outlier.shape = NA, show.legend = F, size = 1) +
     scale_y_continuous(limits = c(0.95, 1.2)) +
@@ -340,17 +587,17 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, var_loo
 
   g = ggdraw() +
     draw_plot(month_emit, x = 0, y = .66, width = .3, height = .3) +
-    draw_plot(box_emit, x= .3, y= .7, width = .2, height = .2) +
+    draw_plot(emit_ratio, x= .3, y= .7, width = .2, height = .2) +
     draw_plot(month_bury, x = .5, y = .66, width = .3, height = .3) +
-    draw_plot(box_bury, x= .8, y= .7, width = .2, height = .2) +
+    draw_plot(bury_ratio, x= .8, y= .7, width = .2, height = .2) +
     draw_plot(month_dic_v_resp, x = 0, y = .33, width = .3, height = .3) +
-    draw_plot(box_dic_v_resp, x= .3, y= .37, width = .2, height = .2) +
+    draw_plot(dic_v_resp_ratio, x= .3, y= .37, width = .2, height = .2) +
     draw_plot(month_frac_ret, x = .5, y = .33, width = .3, height = .3) +
-    draw_plot(box_frac_ret, x= .8, y= .37, width = .2, height = .2) +
+    draw_plot(frac_ret_ratio, x= .8, y= .37, width = .2, height = .2) +
     draw_plot(month_d_epi, x = 0, y = 0, width = .3, height = .3) +
-    draw_plot(box_d, x= .3, y= 0.04, width = .2, height = .2) +
+    draw_plot(d_ratio, x= .3, y= 0.04, width = .2, height = .2) +
     draw_plot(month_doc, x = .5, y = 0, width = .3, height = .3) +
-    draw_plot(box_doc, x= .8, y= 0.04, width = .2, height = .2)
+    draw_plot(doc_ratio, x= .8, y= 0.04, width = .2, height = .2)
 
   # emit
   # bury

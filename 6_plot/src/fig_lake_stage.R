@@ -140,6 +140,27 @@ fig_lake_stage <- function(fig_ind, transparent, scenarios, drivers_file, fig_cf
 
   stage_doc_ratio
 
+  ggplot(stage_future,
+         aes(y = Emit_future/Emit_retro, x = percentEvap_retro, color = (Precip_future - Evap_future))) +
+    geom_point(pch =16, alpha =.05, size = 2) +
+    theme_classic() +
+    ylab(expression(Emissions~Ratio~(Future:Historic))) +
+    xlab(expression(Historic~FHEE))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.15,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                           low = 'lightblue',high = 'darkblue') +
+    geom_smooth(aes(y = Emit_future/Emit_retro, x = percentEvap_retro, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
+                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid') +
+    geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
+    ylim(c(.3,2))+
+    geom_histogram(aes(x = ))
+
+
   g = plot_grid(stage_fhee, stage_doc_ratio, labels = c('A', 'B', 'C'), align = 'h')
 
 

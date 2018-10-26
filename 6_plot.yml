@@ -30,6 +30,7 @@ sources:
   - 6_plot/src/fig_lake_stage.R
   - 6_plot/src/fig_drivers_monthly_cumsum.R
   - 6_plot/src/fig_drivers_ice.R
+  - 6_plot/src/fig_flux_vs_fhee.R
 
 targets:
 
@@ -189,6 +190,7 @@ targets:
       - 6_plot/out/fig_lake_stage.png.ind
       - 6_plot/out/fig_drivers_monthly_cumsum.png.ind
       - 6_plot/out/fig_month_drivers_ice.png.ind
+      - 6_plot/out/fig_flux_vs_fhee.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -591,4 +593,14 @@ targets:
       remake_file = I('6_plot.yml'),
       drivers_file = '1_data/out/monthly_drivers_nhld.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_flux_vs_fhee.png.ind:
+    command: fig_flux_vs_fhee(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')

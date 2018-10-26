@@ -103,9 +103,10 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
   gpp_doc_ratio = ggplot(dplyr::filter(merged, doc_conc_retro <=40), aes(x = doc_change, y = GPP_future/GPP_retro, color = doc_conc_retro)) +
     geom_point() +
     ylim(c(0,4)) +
+    xlim(c(.5,3)) +
     theme_classic() +
-    xlab(expression(DOC~Ratio~(Future:Historic))) +
-    ylab(expression(GPP~Ratio~(Future:Historic)))+
+    xlab(expression(Delta~DOC~(Future:Historic))) +
+    ylab(expression(Delta~GPP~(Future:Historic)))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
           legend.title = element_text(size =14),
@@ -119,10 +120,11 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
 
   gpp_doc_ratio
 
-  g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('A', 'B'), align = 'h')
+  # g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('A', 'B'), align = 'h')
 
+  g = gpp_doc_ratio
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 14, height = 7)
+  ggsave(fig_file, plot=g, width = 7, height = 7)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

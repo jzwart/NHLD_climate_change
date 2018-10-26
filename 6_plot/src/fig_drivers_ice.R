@@ -76,7 +76,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_x_date(labels = scales::date_format('%b'))
+    scale_x_date(labels = scales::date_format('%b')) +
+    labs(tag = 'A')
 
   month_precip = ggplot(dplyr::filter(drivers, var == 'Precip'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Precip'),
@@ -112,7 +113,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_x_date(labels = scales::date_format('%b'))
+    scale_x_date(labels = scales::date_format('%b'))+
+    labs(tag = 'C')
 
   month_evap = ggplot(dplyr::filter(drivers, var == 'Evap'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Evap'),
@@ -148,7 +150,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_x_date(labels = scales::date_format('%b'))
+    scale_x_date(labels = scales::date_format('%b'))+
+    labs(tag = 'E')
 
   month_runoff = ggplot(dplyr::filter(drivers, var == 'Runoff'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Runoff'),
@@ -192,7 +195,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                 alpha = .2, size = .5, show.legend = F) +
     geom_line(show.legend = F) +
     theme_classic() +
-    ylab(bquote(Baseflow~+~Runoff~(mm))) +
+    ylab(bquote(Streamflow~(mm))) +
     theme(legend.title = element_blank(),
           axis.text = element_text(size=16),
           axis.title.x = element_blank(),
@@ -220,7 +223,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_x_date(labels = scales::date_format('%b'))
+    scale_x_date(labels = scales::date_format('%b'))+
+    labs(tag = 'G')
 
   temp_diff = ggplot(drivers_future, aes(x = period, y = Temp_future - Temp_retro, color = period, fill = period,
                                   size =period, shape = period)) +
@@ -249,7 +253,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     scale_shape_manual(name = 'period_future',
                        values = c('2050s' = 16,
                                   '2080s' = 16),
-                       labels = c('2050\'s', '2080\'s'))
+                       labels = c('2050\'s', '2080\'s'))+
+    labs(tag = 'B')
 
   temp_diff
 
@@ -280,7 +285,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     scale_shape_manual(name = 'period_future',
                        values = c('2050s' = 16,
                                   '2080s' = 16),
-                       labels = c('2050\'s', '2080\'s'))
+                       labels = c('2050\'s', '2080\'s'))+
+    labs(tag = 'D')
 
   precip_diff
 
@@ -311,7 +317,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     scale_shape_manual(name = 'period_future',
                        values = c('2050s' = 16,
                                   '2080s' = 16),
-                       labels = c('2050\'s', '2080\'s'))
+                       labels = c('2050\'s', '2080\'s'))+
+    labs(tag = 'F')
 
   evap_diff
 
@@ -320,7 +327,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     geom_hline(yintercept = 1, linetype = 'dashed', size = 1) +
     geom_point(show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Runoff+Baseflow~(mm)))+
+    ylab(expression(Delta~Streamflow~(mm)))+
     theme(axis.text = element_text(size=16),
           axis.title.y = element_text(size = 16),
           axis.title.x = element_blank(),
@@ -342,7 +349,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     scale_shape_manual(name = 'period_future',
                        values = c('2050s' = 16,
                                   '2080s' = 16),
-                       labels = c('2050\'s', '2080\'s'))
+                       labels = c('2050\'s', '2080\'s'))+
+    labs(tag = 'H')
 
   r_b_diff
 
@@ -510,7 +518,52 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
   ave_loc = c(-.4, 1.6, 3.6)
   # transparent = 60 # transparency for fill
 
+  water_day = ice_data %>%
+    dplyr::filter(year == 2001, gcm == 'CESM1_CAM5', period =='2050s') %>%
+    select(datetime, month_day, water_day) %>%
+    mutate(month = as.Date(datetime))
+
+  snow = dplyr::filter(drivers, var == 'Snow_Depth') %>%
+    left_join(water_day, by = c('month' = 'month')) %>%
+    mutate(mean = mean / 100,
+           min = min / 100,
+           max = max / 100) %>%
+    mutate(mean = case_when(period == '2050s' ~ mean + 2,
+                            period == '2080s' ~ mean + 4,
+                            TRUE ~ mean),
+           max = case_when(period == '2050s' ~ max + 2,
+                           period == '2080s' ~ max + 4,
+                           TRUE ~ max),
+           min = case_when(period == '2050s' ~ min + 2,
+                           period == '2080s' ~ min + 4,
+                           TRUE ~ min)) %>%
+    arrange(water_day)
+
+  max_snow = snow %>%
+    group_by(period) %>%
+    summarise(max_snow = max(max),
+              max_min_snow = max(min)) %>%
+    mutate(max_snow_date = snow$water_day[snow$max == max_snow],
+           max_min_snow_date = snow$water_day[snow$min == max_min_snow]) %>%
+    ungroup() %>%
+    mutate(max_label = case_when(period == '2050s' ~ max_snow - 2,
+                                  period == '2080s' ~ max_snow - 4,
+                                  TRUE ~ max_snow),
+           max_min_label = case_when(period == '2050s' ~ max_min_snow - 2,
+                                 period == '2080s' ~ max_min_snow - 4,
+                                 TRUE ~ max_min_snow))
+
+  snow = snow %>%
+    mutate(temp_max = case_when(period == '2050s' ~ max - 2,
+                                 period == '2080s' ~ max - 4,
+                                 TRUE ~ max)) %>%
+    dplyr::filter(temp_max > 0) %>%
+    select(-temp_max)
+
   ice_panel = ggplot(dens_ice_on, aes(dens_on, loc_on, group = period)) +
+    geom_polygon(data = snow, aes(x = mean, y = water_day, group = period), fill = 'grey', alpha = .3)+
+    geom_polygon(data = snow, aes(x = max, y = water_day, group = period), fill = 'grey', alpha = .3)+
+    geom_polygon(data = snow, aes(x = min, y = water_day, group = period), fill = 'grey', alpha = .3)+
     geom_polygon(aes(color = period, fill = period), show.legend = F) +
     geom_polygon(data = dens_ice_off, aes(dens_off, loc_off, group = period, color=period, fill =period), show.legend = F) +
     geom_segment(data = ice_summaries, aes(y = shortest_ice_on, yend = shortest_ice_off,
@@ -529,14 +582,15 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
              x = c(-.2,-.4,-.6), y = c(242,220,200), hjust = 0,
              label = c('Longest Ice Duration', 'Average Ice Duration', 'Shortest Ice Duration')) +
     annotate(geom = 'text',
+             size = 5,
              x = c(2.5, 4.5), y = c(220,220), hjust = 0,
              label = c(paste(ice_summaries$no_ice_years[ice_summaries$period=='2050s'],'Ice-Free Year'),
                        paste(ice_summaries$no_ice_years[ice_summaries$period=='2080s'],'Ice-Free Years'))) +
     annotate(geom = 'text',
-             x = c(0, 2, 4), y = c(20,20,20), hjust = .5, angle = 90, size = 7,
+             x = c(0, 2, 4), y = c(20,20,20), hjust = .5, angle = 90, size = 6,
              label = c('Historic','2050s','2080s')) +
-    geom_point(data = ice, aes(x = mid_plot, y = ice_on_water_day, group = period, shape = 'ice_on')) +
-    geom_point(data = ice, aes(x = mid_plot, y = ice_off_water_day, group = period, shape = 'ice_off'), size = 2) +
+    geom_point(data = ice, aes(x = mid_plot, y = ice_on_water_day, group = period, shape = 'ice_on'),size = 2) +
+    geom_point(data = ice, aes(x = mid_plot, y = ice_off_water_day, group = period, shape = 'ice_off'), size = 3) +
     scale_shape_manual(breaks = c('ice_on', 'ice_off'),
                        values = c(4, 16),
                        labels = c('Ice On' ,'Ice Off')) +
@@ -549,7 +603,10 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.text.x = element_text(size = 16),
           axis.line.y = element_blank(),
           legend.title = element_blank(),
-          legend.position = c(.9,.3)) +
+          legend.position = c(.9,.3),
+          legend.text = element_text(size = 16),
+          plot.tag = element_text(size = 16),
+          plot.tag.position = c(.12,.93)) +
     scale_fill_manual(name = 'period',
                       breaks=c('2080s','2050s','Retro'),
                       values=c('2080s' = t_col(fig_config$period$`2080s`, transparent),
@@ -561,8 +618,24 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                 '2050s' = fig_config$period$`2050s`,
                                 'Retro' = fig_config$period$Retro)) +
     scale_y_continuous(breaks = date_breaks,
-                       labels = strftime(as.Date(water_day_to_date$date[water_day_to_date$water_day %in% date_breaks], format = '%b %d'), format = '%b'))
+                       labels = strftime(as.Date(water_day_to_date$date[water_day_to_date$water_day %in% date_breaks], format = '%b %d'), format = '%b'))+
+    labs(tag = 'I') +
+    ggrepel::geom_text_repel(data = max_snow,
+                             aes(x = max_snow, y = max_snow_date, label = paste('Max Snow:',round(max_label, digits = 2), 'm')),
+                             segment.size  = 1,
+                             nudge_y = 20,
+                             nudge_x = .3,
+                             segment.color = "grey50",
+                             direction     = "both") +
+    ggrepel::geom_text_repel(data = dplyr::filter(max_snow, period !='Retro'),
+                             aes(x = max_min_snow, y = max_min_snow_date, label = paste('Min Snow:',round(max_min_label, digits = 2), 'm')),
+                             segment.size  = 1,
+                             nudge_y = -20,
+                             nudge_x = .4,
+                             segment.color = "grey50",
+                             direction     = "both")
 
+  # ice_panel
 
   g = ggdraw() +
     draw_plot(month_temp, x = 0, y = .75, width = .3, height = .25) +
@@ -573,11 +646,11 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     draw_plot(precip_diff, x = .8 , y = .8, width = .15, height = .15) +
     draw_plot(evap_diff, x = .3, y = .5, width = .15, height = .15) +
     draw_plot(r_b_diff, x = .8, y = .5, width = .15, height = .15) +
-    draw_plot(ice_panel, x = .1, y = 0, width = .8, height = .45)
+    draw_plot(ice_panel, x = 0, y = 0, width = 1, height = .45)
 
   g
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 16, height = 16)
+  ggsave(fig_file, plot=g, width = 16, height = 18)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

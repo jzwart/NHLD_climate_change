@@ -6,14 +6,14 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, scenari
 
   vars <- noquote(yaml::yaml.load_file(vars_yml)$var) # indicates which periods, seasons, and variable we want returned
 
-  monthly_ave <- readRDS(sc_retrieve(vars_ind_file, remake_file = remake_file))
+  month <- readRDS(sc_retrieve(vars_ind_file, remake_file = remake_file))
 
   watersheds<-read.table('1_data/in/NHLDsheds_20170323.txt',
                          stringsAsFactors = F,
                          header=T,
                          sep = '\t')
 
-  monthly_ave <- monthly_ave %>%
+  monthly_ave <- month %>%
     left_join(watersheds, by = 'Permanent_') %>%
     dplyr::filter(!is.na(Area_m2))
 
@@ -60,14 +60,9 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, scenari
 
   all <- readRDS(scenarios) %>%
     dplyr::filter(season == 'all') %>%
-    select(Permanent_, period, gcm, Emit, Burial_total, Area, Stage, DOC_Load, HRT, Vol,FracRet, DOC_export, DOCl_epi, DOCr_epi,
-           waterIn, fluvialOut, epiTemp, emergent_d_epi, doc_conc, dicLoadvResp, Vepi, DOC_Respired, sed_resp, DIC_load)
-
-  retro <- all %>%
-    dplyr::filter(gcm == 'Retro')
-
-  merged <- dplyr::filter(all, gcm != 'Retro') %>%
-    left_join(retro, by = 'Permanent_', suffix = c('_future', '_retro'))
+    select(Permanent_, period, gcm, Emit, Burial_total, Area, Stage, DOC_Load, HRT, Vol,FracRet, DOC_export, DOCl_epi, DOCr_epi, GPP,
+           waterIn, fluvialOut, epiTemp, emergent_d_epi, doc_conc, dicLoadvResp, Vepi, DOC_Respired, sed_resp, DIC_load)# %>%
+    #mutate(GPP = GPP * 12 * Vepi / Area)
 
   retro_total <- all %>%
     group_by(period, gcm) %>%
@@ -301,6 +296,39 @@ fig_month_box <- function(fig_ind, vars_ind_file, vars_yml, fig_cfg_yml, scenari
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))
+
+  ggplot(dplyr::filter(monthly_ave, var == 'gpp'), aes(x = month, y = med, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(monthly_ave, period != 'Retro', var == 'gpp'),
+                aes(x = month, y = med, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(expression(Fraction~C~Mineralized)) +
+    theme(axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))
+
 
   box_doc = ggplot(dplyr::filter(box_plot_data, var == 'ratio_doc_all'), aes(x = period, y = ratio, fill = period)) +
     geom_boxplot(outlier.shape = NA, show.legend = F, size = 1) +

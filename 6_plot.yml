@@ -26,6 +26,10 @@ sources:
   - 6_plot/src/fig_c_flux_vs_drivers.R
   - 6_plot/src/fig_frac_increase.R
   - 6_plot/src/fig_top_lake_flux.R
+  - 6_plot/src/fig_doc_gpp.R
+  - 6_plot/src/fig_lake_stage.R
+  - 6_plot/src/fig_drivers_monthly_cumsum.R
+  - 6_plot/src/fig_drivers_ice.R
 
 targets:
 
@@ -181,6 +185,10 @@ targets:
       - 6_plot/out/fig_drivers_monthly.png.ind
       - 6_plot/out/fig_frac_increase.png.ind
       - 6_plot/out/fig_top_lake_flux.png.ind
+      - 6_plot/out/fig_doc_gpp.png.ind
+      - 6_plot/out/fig_lake_stage.png.ind
+      - 6_plot/out/fig_drivers_monthly_cumsum.png.ind
+      - 6_plot/out/fig_month_drivers_ice.png.ind
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -527,6 +535,14 @@ targets:
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       gd_config = 'lib/cfg/gd_config.yml')
 
+  6_plot/out/fig_drivers_monthly_cumsum.png.ind:
+    command: fig_drivers_monthly(
+      fig_ind = target_name,
+      transparent = I(60),
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      gd_config = 'lib/cfg/gd_config.yml')
+
   6_plot/out/fig_frac_increase.png.ind:
     command: fig_frac_increase(
       fig_ind = target_name,
@@ -545,4 +561,34 @@ targets:
       drivers_file = '1_data/out/monthly_drivers_nhld.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_doc_gpp.png.ind:
+    command: fig_doc_gpp(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_lake_stage.png.ind:
+    command: fig_lake_stage(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_month_drivers_ice.png.ind:
+    command: fig_drivers_ice(
+      fig_ind = target_name,
+      transparent = I(60),
+      ice_dur_ind_file = '3_summarize/out/ice_dur.rds.ind',
+      remake_file = I('6_plot.yml'),
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       gd_config = 'lib/cfg/gd_config.yml')

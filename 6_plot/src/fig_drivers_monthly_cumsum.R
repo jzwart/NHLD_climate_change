@@ -1,4 +1,4 @@
-fig_drivers_monthly <- function(fig_ind, transparent, drivers_file, fig_cfg_yml, gd_config){
+fig_drivers_monthly_cumsum <- function(fig_ind, transparent, drivers_file, fig_cfg_yml, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -16,6 +16,11 @@ fig_drivers_monthly <- function(fig_ind, transparent, drivers_file, fig_cfg_yml,
     mutate(cumsum = cumsum(var_value)) %>%
     ungroup() %>%
     mutate(month = as.Date(paste('2001-',month,'-01', sep =''), format = '%Y-%m-%d'))
+
+  drivers_sum_retro = dplyr::filter(drivers_sum, period =='Retro')
+
+  drivers_sum_future = dplyr::filter(drivers_sum, period != 'Retro') %>%
+    left_join(drivers_sum_retro, by = c('month'='month','var'='var'), suffix = c('_future','_retro'))
 
 
   vars = c('Temp', 'Precip', 'Evap', 'Runoff', 'Baseflow', 'Runoff_and_baseflow')
@@ -78,11 +83,9 @@ fig_drivers_monthly <- function(fig_ind, transparent, drivers_file, fig_cfg_yml,
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))
 
-  month_precip = ggplot(dplyr::filter(drivers, var == 'Precip'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
-    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Precip'),
-                aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
-                alpha = .2, size = .5, show.legend = F) +
-    geom_line(show.legend = F) +
+  month_precip = ggplot(dplyr::filter(drivers_sum, var == 'Precip'),
+                        aes(x = month, y = cumsum, color = period, size = period, linetype = period, group = interaction(period, gcm))) +
+    geom_line(show.legend = F, alpha = .6) +
     theme_classic() +
     ylab(bquote(Precipitation~(mm))) +
     theme(legend.title = element_blank(),
@@ -114,11 +117,9 @@ fig_drivers_monthly <- function(fig_ind, transparent, drivers_file, fig_cfg_yml,
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))
 
-  month_evap = ggplot(dplyr::filter(drivers, var == 'Evap'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
-    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Evap'),
-                aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
-                alpha = .2, size = .5, show.legend = F) +
-    geom_line(show.legend = F) +
+  month_evap = ggplot(dplyr::filter(drivers_sum, var == 'Evap'),
+                      aes(x = month, y = cumsum, color = period, size = period, group= interaction(period,gcm),linetype = period)) +
+    geom_line(show.legend = F,alpha = .5) +
     theme_classic() +
     ylab(bquote(Evapotranspiration~(mm))) +
     theme(legend.title = element_blank(),
@@ -150,47 +151,10 @@ fig_drivers_monthly <- function(fig_ind, transparent, drivers_file, fig_cfg_yml,
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))
 
-  month_runoff = ggplot(dplyr::filter(drivers, var == 'Runoff'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
-    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Runoff'),
-                aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
-                alpha = .2, size = .5, show.legend = F) +
-    geom_line(show.legend = F) +
-    theme_classic() +
-    ylab(bquote(Runoff~(mm))) +
-    theme(legend.title = element_blank(),
-          axis.text = element_text(size=16),
-          axis.title.x = element_blank(),
-          axis.title.y = element_text(size = 16),
-          legend.position = c(.15,.9),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
-    scale_color_manual(name = 'period',
-                       values = c('2050s' = fig_config$period$`2050s`,
-                                  '2080s' = fig_config$period$`2080s`,
-                                  'Retro' = fig_config$period$Retro),
-                       labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_fill_manual(name = 'period',
-                      values = c('2050s' = fig_config$period$`2050s`,
-                                 '2080s' = fig_config$period$`2080s`,
-                                 'Retro' = fig_config$period$Retro),
-                      labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_size_manual(name = 'period',
-                      values = c('2050s' = 3,
-                                 '2080s' = 3,
-                                 'Retro' = 2),
-                      labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_linetype_manual(name = 'period',
-                          values = c('2050s' = 'solid',
-                                     '2080s' = 'solid',
-                                     'Retro' = 'dashed'),
-                          labels = c('2050\'s', '2080\'s', 'Historic')) +
-    scale_x_date(labels = scales::date_format('%b'))
 
-  month_r_b = ggplot(dplyr::filter(drivers, var == 'Runoff_and_baseflow'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
-    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Runoff_and_baseflow'),
-                aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
-                alpha = .2, size = .5, show.legend = F) +
-    geom_line(show.legend = F) +
+  month_r_b = ggplot(dplyr::filter(drivers_sum, var == 'Runoff_and_baseflow'),
+                     aes(x = month, y = cumsum, color = period, size = period, linetype = period, group = interaction(period, gcm))) +
+    geom_line(show.legend = F, alpha = transparent) +
     theme_classic() +
     ylab(bquote(Baseflow~+~Runoff~(mm))) +
     theme(legend.title = element_blank(),

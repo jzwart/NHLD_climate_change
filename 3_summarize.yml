@@ -3,6 +3,11 @@ target_default: 3_summarize
 include:
   - lib.yml
 
+packages:
+  - dplyr
+  - tidyr
+  - yaml
+
 file_extensions:
   - feather
   - ind
@@ -35,4 +40,9 @@ targets:
       gd_config = 'lib/cfg/gd_config.yml')
 
   3_summarize/out/monthly_sum.rds.ind:
-    command:
+    command: monthly_sum(
+      ind_file = target_name,
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      vars_yml = '3_summarize/cfg/monthly_vars.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')

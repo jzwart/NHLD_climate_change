@@ -14,7 +14,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
            DOC_load = DOC_Load / Area,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
-    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,emergent_d_epi,
+    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,emergent_d_epi,pH,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, dicLoadvResp, FracRet)
 
   total <- all %>%
@@ -211,6 +211,29 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                 method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)
 
   stage = ggExtra::ggMarginal(stage, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
+
+
+  ph=ggplot(stage_future,
+            aes(y = pH_future - pH_retro, x = percentEvap_future,
+                color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
+    geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    theme_classic() +
+    ylab(expression(Delta~pH~(Future-Historic))) +
+    xlab(expression(FHEE))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.2,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                           low = 'lightblue',high = 'darkblue') +
+    geom_smooth(aes(y = pH_future - pH_retro, x = percentEvap_future,
+                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
+                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)+
+    ylim(c(-.5,.5))
+  ph=ggExtra::ggMarginal(ph, type = 'density', margins = 'y',groupColour = T, size = 6, aes(size = 2))
 
   # frac_ret = ggplot(stage_future,
   #              aes(y = FracRet_future/FracRet_retro, x = percentEvap_future,

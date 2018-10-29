@@ -161,4 +161,4 @@ monthly_var: # column name that we want for aggregating to monthly scale
   dic_v_resp: 'dicLoadvResp'
   frac_ret: 'FracRet'
   epi_temp: 'epiTemp'
-  snow_depth: ''
+  snow_depth: 'snowDepth_m'

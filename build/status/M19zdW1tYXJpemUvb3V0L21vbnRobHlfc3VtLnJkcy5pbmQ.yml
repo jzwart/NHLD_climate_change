@@ -1,0 +1,13 @@
+version: 0.3.0
+name: 3_summarize/out/monthly_sum.rds.ind
+type: file
+hash: 95e98fed364b63a6348dfcf23856c312
+time: 2018-10-27 19:59:48 UTC
+depends:
+  3_summarize/cfg/monthly_vars.yml: d7e5207feed8622ea25ea684f0a541b2
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: 76eee2412a975fa30e4ee8631cb13604
+code:
+  functions:
+    monthly_sum: 4d3f4e9454b0cc499a4dac312c60c892
+

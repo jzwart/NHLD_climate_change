@@ -17,6 +17,7 @@ sources:
   - 3_summarize/src/monthly_ave.R
   - 3_summarize/src/ice_dur.R
   - 3_summarize/src/monthly_sum.R
+  - 3_summarize/src/snow_sum.R
 
 targets:
 
@@ -25,6 +26,7 @@ targets:
       - 3_summarize/out/monthly_ave.rds.ind
       - 3_summarize/out/ice_dur.rds.ind
       - 3_summarize/out/monthly_sum.rds.ind
+      - 3_summarize/out/snow.rds.ind
 
   3_summarize/out/monthly_ave.rds.ind:
     command: monthly_ave(
@@ -41,6 +43,14 @@ targets:
 
   3_summarize/out/monthly_sum.rds.ind:
     command: monthly_sum(
+      ind_file = target_name,
+      var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
+      vars_yml = '3_summarize/cfg/monthly_vars.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  3_summarize/out/snow.rds.ind:
+    command: snow_sum(
       ind_file = target_name,
       var_lookup_yml = I('6_plot/cfg/var_lookup.yml'),
       vars_yml = '3_summarize/cfg/monthly_vars.yml',

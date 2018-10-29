@@ -592,6 +592,7 @@ targets:
       ice_dur_ind_file = '3_summarize/out/ice_dur.rds.ind',
       remake_file = I('6_plot.yml'),
       drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      snow_file = '3_summarize/out/snow.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
       gd_config = 'lib/cfg/gd_config.yml')
 

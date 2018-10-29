@@ -1,0 +1,13 @@
+version: 0.3.0
+name: 3_summarize/out/snow.rds.ind
+type: file
+hash: 21c92e79f60e2077fa682bc04451e6ca
+time: 2018-10-29 12:53:04 UTC
+depends:
+  3_summarize/cfg/monthly_vars.yml: d7e5207feed8622ea25ea684f0a541b2
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: aaac68b6f63ce129d0631483c9715161
+code:
+  functions:
+    snow_sum: dd8722aa744578f0f7d37b230d700fc9
+

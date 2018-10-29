@@ -1,4 +1,4 @@
-fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file, drivers_file, fig_cfg_yml, gd_config){
+fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file, drivers_file, snow_file, fig_cfg_yml, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -41,6 +41,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     left_join(drivers_retro, by = 'tmp', suffix = c('_future', '_retro')) %>%
     select(-tmp)
 
+  snow <- readRDS(snow_file)
 
   month_temp = ggplot(dplyr::filter(drivers, var == 'Temp'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Temp'),
@@ -523,11 +524,14 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     select(datetime, month_day, water_day) %>%
     mutate(month = as.Date(datetime))
 
-  snow = dplyr::filter(drivers, var == 'Snow_Depth') %>%
-    left_join(water_day, by = c('month' = 'month')) %>%
-    mutate(mean = mean / 100,
-           min = min / 100,
-           max = max / 100) %>%
+  snow_plot <- snow %>%
+    mutate(datetime = as.Date(strptime(paste('2001-', doy, sep=''), format = '%Y-%j', tz = 'GMT'))) %>%
+    left_join(water_day, by = 'datetime') %>%
+    group_by(period, water_day) %>%
+    summarise(mean = mean(snow_depth),
+              max = max(snow_depth),
+              min = min(snow_depth)) %>%
+    ungroup() %>%
     mutate(mean = case_when(period == '2050s' ~ mean + 2,
                             period == '2080s' ~ mean + 4,
                             TRUE ~ mean),
@@ -539,12 +543,12 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                            TRUE ~ min)) %>%
     arrange(water_day)
 
-  max_snow = snow %>%
+  max_snow = snow_plot %>%
     group_by(period) %>%
     summarise(max_snow = max(max),
               max_min_snow = max(min)) %>%
-    mutate(max_snow_date = snow$water_day[snow$max == max_snow],
-           max_min_snow_date = snow$water_day[snow$min == max_min_snow]) %>%
+    mutate(max_snow_date = snow_plot$water_day[snow_plot$max == max_snow],
+           max_min_snow_date = snow_plot$water_day[snow_plot$min == max_min_snow]) %>%
     ungroup() %>%
     mutate(max_label = case_when(period == '2050s' ~ max_snow - 2,
                                   period == '2080s' ~ max_snow - 4,
@@ -553,7 +557,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                  period == '2080s' ~ max_min_snow - 4,
                                  TRUE ~ max_min_snow))
 
-  snow = snow %>%
+  snow_plot = snow_plot %>%
     mutate(temp_max = case_when(period == '2050s' ~ max - 2,
                                  period == '2080s' ~ max - 4,
                                  TRUE ~ max)) %>%
@@ -561,9 +565,9 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     select(-temp_max)
 
   ice_panel = ggplot(dens_ice_on, aes(dens_on, loc_on, group = period)) +
-    geom_polygon(data = snow, aes(x = mean, y = water_day, group = period), fill = 'grey', alpha = .3)+
-    geom_polygon(data = snow, aes(x = max, y = water_day, group = period), fill = 'grey', alpha = .3)+
-    geom_polygon(data = snow, aes(x = min, y = water_day, group = period), fill = 'grey', alpha = .3)+
+    geom_polygon(data = snow_plot, aes(x = mean, y = water_day, group = period), fill = 'grey', alpha = .3)+
+    geom_polygon(data = snow_plot, aes(x = max, y = water_day, group = period), fill = 'grey', alpha = .3)+
+    geom_polygon(data = snow_plot, aes(x = min, y = water_day, group = period), fill = 'grey', alpha = .3)+
     geom_polygon(aes(color = period, fill = period), show.legend = F) +
     geom_polygon(data = dens_ice_off, aes(dens_off, loc_off, group = period, color=period, fill =period), show.legend = F) +
     geom_segment(data = ice_summaries, aes(y = shortest_ice_on, yend = shortest_ice_off,
@@ -623,15 +627,15 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     ggrepel::geom_text_repel(data = max_snow,
                              aes(x = max_snow, y = max_snow_date, label = paste('Max Snow:',round(max_label, digits = 2), 'm')),
                              segment.size  = 1,
-                             nudge_y = 20,
-                             nudge_x = .3,
+                             nudge_y = c(20,-20,-20),
+                             nudge_x = c(.2,.3,.2),
                              segment.color = "grey50",
                              direction     = "both") +
     ggrepel::geom_text_repel(data = dplyr::filter(max_snow, period !='Retro'),
                              aes(x = max_min_snow, y = max_min_snow_date, label = paste('Min Snow:',round(max_min_label, digits = 2), 'm')),
                              segment.size  = 1,
-                             nudge_y = -20,
-                             nudge_x = .4,
+                             nudge_y = c(-20,-30),
+                             nudge_x = c(.25,.4),
                              segment.color = "grey50",
                              direction     = "both")
 

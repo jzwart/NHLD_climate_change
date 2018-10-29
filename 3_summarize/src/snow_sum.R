@@ -1,4 +1,4 @@
-monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_config){
+snow_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_config){
   # read in data and make average response of variable by month; error bars are range of gcms
 
   vars <- yaml::yaml.load_file(vars_yml)$var # indicates which periods, seasons, and variable we want returned
@@ -10,8 +10,7 @@ monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
     cur = noquote(ifelse(nchar(cur) == 0, 'remove', cur))
   }) %>% unlist() %>% noquote()
 
-  sum_var_list <-  c('Emit','DOC_Load', 'DOC_export','SWin','Baseflow','GWout','GWin','SWout',
-                     'LakeE','DirectP','GPP','DOC_Respired','Burial_total','tp_load','waterIn','fluvialOut','DIC_load', 'snowDepth_m')
+  sum_var_list <-  c('snowDepth_m')
 
   vars <- vars[y %in% sum_var_list]
   y = y[y %in% sum_var_list]
@@ -51,7 +50,7 @@ monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
     cur_gcm = strsplit(cur_scenario, '_2')[[1]][1]
     cur_period = substr(cur_scenario, nchar(cur_scenario)-4, nchar(cur_scenario))
 
-    for(j in 1:length(files)){
+    for(j in 1:20){
       print(c(i,j))
 
       cur <- readRDS(file.path(sub_dir,files[j])) %>%
@@ -100,30 +99,19 @@ monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
         if(var == 1){
           out <- cur %>%
             group_by(Permanent_, gcm, period, doy) %>%
-            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T),
-                      month = median(as.numeric(month))) %>% # summarizing by variable and renaming to variable we want to name
-            ungroup() %>%
-            group_by(Permanent_, gcm, period, month) %>%
-            summarise(!!vars[var] := sum(!!rlang::sym(vars[var]), na.rm = T)) %>%
-            ungroup() %>%
-            arrange(month) %>%
-            mutate(!!vars_sum[var] := cumsum(!!rlang::sym(vars[var])))
+            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            ungroup()
         }else{
           tmp <- cur %>%
             group_by(Permanent_, gcm, period, doy) %>%
-            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T),
-                      month = median(as.numeric(month))) %>% # summarizing by variable and renaming to variable we want to name
-            ungroup() %>%
-            group_by(Permanent_, gcm, period, month) %>%
-            summarise(!!vars[var] := sum(!!rlang::sym(vars[var]), na.rm = T)) %>%
-            ungroup() %>%
-            arrange(month) %>%
-            mutate(!!vars_sum[var] := cumsum(!!rlang::sym(vars[var])))
+            summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+            ungroup()
           out <- out %>%
-            left_join(tmp, by = c('Permanent_','gcm','period','month'))
+            left_join(tmp, by = c('Permanent_','gcm','period','doy'))
         }
       }
 
+      out <- dplyr::filter(out, doy < 366)
 
       all <- rbind(all, out)
     }
@@ -142,7 +130,7 @@ monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
     files <- files[-grep('adj',files)]
   }
 
-  for(j in 1:length(files)){ # length(files
+  for(j in 1:20){ # length(files
     print(c('Retro',j))
 
     cur <- readRDS(file.path(dir,files[j])) %>%
@@ -188,29 +176,19 @@ monthly_sum <- function(ind_file, var_lookup_yml, vars_yml, remake_file, gd_conf
       if(var == 1){
         out <- cur %>%
           group_by(Permanent_, gcm, period, doy) %>%
-          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T),
-                    month = median(as.numeric(month))) %>% # summarizing by variable and renaming to variable we want to name
-          ungroup() %>%
-          group_by(Permanent_, gcm, period, month) %>%
-          summarise(!!vars[var] := sum(!!rlang::sym(vars[var]), na.rm = T)) %>%
-          ungroup() %>%
-          arrange(month) %>%
-          mutate(!!vars_sum[var] := cumsum(!!rlang::sym(vars[var])))
+          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+          ungroup()
       }else{
         tmp <- cur %>%
           group_by(Permanent_, gcm, period, doy) %>%
-          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T),
-                    month = median(as.numeric(month))) %>% # summarizing by variable and renaming to variable we want to name
-          ungroup() %>%
-          group_by(Permanent_, gcm, period, month) %>%
-          summarise(!!vars[var] := sum(!!rlang::sym(vars[var]), na.rm = T)) %>%
-          ungroup() %>%
-          arrange(month) %>%
-          mutate(!!vars_sum[var] := cumsum(!!rlang::sym(vars[var])))
+          summarise(!!vars[var] := mean(!!rlang::sym(y[var]), na.rm = T)) %>% # summarizing by variable and renaming to variable we want to name
+          ungroup()
         out <- out %>%
-          left_join(tmp, by = c('Permanent_','gcm','period','month'))
+          left_join(tmp, by = c('Permanent_','gcm','period','doy'))
       }
     }
+
+    out <- dplyr::filter(out, doy <366)
 
     all <- rbind(all, out)
   }

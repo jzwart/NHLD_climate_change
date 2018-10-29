@@ -184,7 +184,33 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
 #                           labels = c('2050\'s', '2080\'s'),
 #                           guide = guide_legend(title = expression(Period)))
 
-    ggplot(top_emit_future, aes(x = cumsum_frac_emit_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
+  breaks = seq(0,1,length.out = 11)
+  area_breaks = c(0,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10)
+
+  lake_summary <- top_emit_future %>%
+    mutate(frac_bins = cut(frac_lakes_retro, breaks = breaks),
+           area_bins =cut(Area_future, breaks = area_breaks)) %>%
+    group_by(frac_bins) %>%
+    summarise(area = min(Area_retro),
+              hrt = mean(HRT_retro),
+              emit_areal = max(Emit_areal_retro),
+              doc = mean(doc_conc_retro),
+              frac_evap = mean(percentEvap_retro)) %>%
+    ungroup()
+
+  lake_summary
+
+  ggplot(lake_summary, aes(x = frac_lakes_retro, y = Area_retro/ 10000)) +
+    geom_point() +
+    scale_y_log10() +
+    geom_point(aes(x=frac_lakes_retro, y= Emit_areal_retro), color= 'blue') +
+    geom_smooth(aes(x=frac_lakes_retro, y= Emit_areal_retro), method = 'lm')
+
+  ggplot(lake_summary, aes(x = area_bins, y = Emit_areal_future)) +
+    geom_boxplot() +
+    scale_y_log10()
+
+    ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
                                 group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
       geom_line(size = 2) +
       theme_classic() +
@@ -203,9 +229,9 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
                             values = c('2050s' = 'twodash',
                                        '2080s' = 'solid'),
                             labels = c('2050\'s', '2080\'s'),
-                            guide = guide_legend(title = expression(Period))) +
-      geom_vline(xintercept = top_emit_future$cumsum_frac_emit_retro[which(round(top_emit_future$frac_lakes_retro,digits = 4) %in% c(.9))],
-                 linetype = 'dashed')
+                            guide = guide_legend(title = expression(Period)))
+      # geom_vline(xintercept = top_emit_future$cumsum_frac_emit_retro[which(round(top_emit_future$frac_lakes_retro,digits = 4) %in% c(.9))],
+      #            linetype = 'dashed')
 
 
   bury = ggplot(top_bury_future, aes(x = cumsum_frac_bury_retro, y = cumsum_bury_diff/10^9, linetype = period_future,

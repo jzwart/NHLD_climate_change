@@ -15,7 +15,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,emergent_d_epi,pH,
-           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, dicLoadvResp, FracRet)
+           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, dicLoadvResp, FracRet, fracCO2)
 
   total <- all %>%
     group_by(period, gcm) %>%
@@ -83,33 +83,40 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
   merged$doc_change = merged$doc_conc_future/merged$doc_conc_retro
 
   emit = ggplot(stage_future,
-         aes(y = Emit_future/Emit_retro, x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
+         aes(y = abs(Emit_future-Emit_retro)/Emit_retro*100 * ifelse(Emit_future > Emit_retro, 1, -1),
+             x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Emissions~(Future:Historic))) +
+    ylab(expression(Delta~Emissions~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
-    geom_smooth(aes(y = Emit_future/Emit_retro, x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F) +
-    ylim(c(.3,1.7))
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    geom_smooth(aes(y = abs(Emit_future-Emit_retro)/Emit_retro*100 * ifelse(Emit_future > Emit_retro, 1, -1),
+                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2,  show.legend = F) +
+    ylim(c(-60,60))
+    # ylim(c(.3,1.7))
   emit = ggExtra::ggMarginal(emit, type = 'density', groupColour = T, size = 6, aes(size = 2))
 
   bury = ggplot(stage_future,
-                aes(y = Bury_future/Bury_retro, x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
+                aes(y = abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future > Bury_retro,1,-1),
+                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Burial~(Future:Historic))) +
+    ylab(expression(Delta~Burial~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
@@ -117,17 +124,21 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
     geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
-    geom_smooth(aes(y = Bury_future/Bury_retro, x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F) +
-    ylim(c(.2,2))
+    geom_smooth(aes(y = abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future > Bury_retro,1,-1),
+                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2, show.legend = F) +
+    ylim(c(-60,60))
+    # ylim(c(.2,2))
   bury = ggExtra::ggMarginal(bury, type = 'density', groupColour = T, size = 6, aes(size = 2))
 
   dic_v_resp = ggplot(stage_future,
-                aes(y = dicLoadvResp_future/dicLoadvResp_retro, x = percentEvap_future,
+                aes(y = abs(dicLoadvResp_future-dicLoadvResp_retro)/dicLoadvResp_retro*100*ifelse(dicLoadvResp_future>dicLoadvResp_retro,1,-1),
+                    x = percentEvap_future,
                     color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~DIC~Load~to~DIC~Produced~(Future:Historic))) +
+    ylab(expression(Delta~DIC~Load~to~DIC~Produced~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -138,77 +149,90 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
     geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
-    geom_smooth(aes(y = dicLoadvResp_future/dicLoadvResp_retro, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F) +
-    ylim(c(.4,1.7))
+    geom_smooth(aes(y = abs(dicLoadvResp_future-dicLoadvResp_retro)/dicLoadvResp_retro*100*ifelse(dicLoadvResp_future>dicLoadvResp_retro,1,-1),
+                    x = percentEvap_future,
+                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2, show.legend = F) +
+    ylim(c(-50,50))
+    # ylim(c(.4,1.7))
   dic_v_resp = ggExtra::ggMarginal(dic_v_resp, type = 'density', margins = 'y',groupColour = T, size = 6, aes(size = 2))
 
-  doc = ggplot(stage_future,
-                aes(y = doc_conc_future/doc_conc_retro, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
-    geom_point(pch =16, alpha =.08, size = 2) +
-    theme_classic() +
-    ylab(expression(Delta~DOC~(Future:Historic))) +
-    xlab(expression(FHEE))+
-    theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.35,.7),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 14))+
-    scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
-                           low = 'lightblue',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1)+
-    geom_smooth(aes(y = doc_conc_future/doc_conc_retro, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid') +
-    ylim(c(.5,3))
-
-  doc = ggExtra::ggMarginal(doc, type = 'density', margins = 'y',groupColour = T, size = 6, aes(size = 2))
+  # doc = ggplot(stage_future,
+  #               aes(y = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1),
+  #                   x = percentEvap_future,
+  #                   color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
+  #   geom_point(pch =16, alpha =.08, size = 2) +
+  #   theme_classic() +
+  #   ylab(expression(Delta~DOC~('%'))) +
+  #   xlab(expression(FHEE))+
+  #   theme(axis.text = element_text(size=16),
+  #         axis.title = element_text(size = 16),
+  #         legend.title = element_text(size =14),
+  #         legend.position = c(.35,.7),
+  #         legend.background = element_blank(),
+  #         legend.text = element_text(size = 14))+
+  #   scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+  #                          low = 'lightblue',high = 'darkblue') +
+  #   geom_hline(yintercept = 1, linetype = 'dashed', size =1)+
+  #   geom_smooth(aes(y = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1),
+  #                   x = percentEvap_future,
+  #                   color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+  #                   linetype = period_future),
+  #               method = 'loess', se = F, inherit.aes = F, size = 2) +
+  #   ylim(c(-50,150))
+  #   # ylim(c(.5,3))
+  #
+  # doc = ggExtra::ggMarginal(doc, type = 'density', margins = 'y',groupColour = T, size = 6, aes(size = 2))
 
   hrt = ggplot(stage_future,
-               aes(y = HRT_future/HRT_retro, x = percentEvap_future,
+               aes(y = abs(HRT_future-HRT_retro)/HRT_retro*100*ifelse(HRT_future>HRT_retro,1,-1), x = percentEvap_future,
                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
     theme_classic() +
-    ylab(expression(Delta~HRT~(Future:Historic))) +
+    ylab(expression(Delta~HRT~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
-    geom_smooth(aes(y = HRT_future/HRT_retro, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F) +
-    ylim(c(.3,1.8))
+    geom_smooth(aes(y = abs(HRT_future-HRT_retro)/HRT_retro*100*ifelse(HRT_future>HRT_retro,1,-1), x = percentEvap_future,
+                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2,  show.legend = F) +
+    ylim(c(-50,80))
+    # ylim(c(.3,1.8))
 
   hrt = ggExtra::ggMarginal(hrt, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
 
   stage = ggplot(stage_future,
-               aes(y = stage_ratio, x = percentEvap_future,
+               aes(y = abs(Stage_future-Stage_retro)/Stage_retro*100*ifelse(Stage_future>Stage_retro,1,-1), x = percentEvap_future,
                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
     theme_classic() +
-    ylab(expression(Delta~Stage~(Future:Historic))) +
+    ylab(expression(Delta~Stage~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
-    geom_smooth(aes(y = stage_ratio, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)
+    geom_smooth(aes(y = abs(Stage_future-Stage_retro)/Stage_retro*100*ifelse(Stage_future>Stage_retro,1,-1), x = percentEvap_future,
+                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2, show.legend = F)+
+    ylim(c(-40,30))
 
   stage = ggExtra::ggMarginal(stage, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
 
@@ -216,7 +240,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
   ph=ggplot(stage_future,
             aes(y = pH_future - pH_retro, x = percentEvap_future,
                 color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
-    geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
+    geom_point(pch =16, alpha =.08, size = 2) +
     geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     theme_classic() +
     ylab(expression(Delta~pH~(Future-Historic))) +
@@ -224,15 +248,19 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
           legend.title = element_text(size =14),
-          legend.position = c(.2,.9),
+          legend.position = c(.7,.8),
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                            low = 'lightblue',high = 'darkblue') +
     geom_smooth(aes(y = pH_future - pH_retro, x = percentEvap_future,
-                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future)),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)+
-    ylim(c(-.5,.5))
+                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2)+
+    ylim(c(-.5,.5)) +
+    scale_linetype_discrete(name='',
+                            labels = c('2050\'s', '2080\'s'))
+
   ph=ggExtra::ggMarginal(ph, type = 'density', margins = 'y',groupColour = T, size = 6, aes(size = 2))
 
   # frac_ret = ggplot(stage_future,
@@ -259,25 +287,25 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
   # hrt = ggExtra::ggMarginal(hrt, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
 
 
-  gpp_doc_ratio = ggplot(dplyr::filter(stage_future, doc_conc_retro <=40),
-                         aes(x = doc_conc_future/doc_conc_retro, y = GPP_future/GPP_retro,
-                             color = doc_conc_retro, group =(Precip_future - Evap_future))) +
-    geom_point() +
-    ylim(c(0,4)) +
-    xlim(c(.5,3)) +
-    theme_classic() +
-    xlab(expression(Delta~DOC~(Future:Historic))) +
-    ylab(expression(Delta~GPP~(Future:Historic)))+
-    theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.85,.8),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 14))+
-    scale_color_continuous(guide = guide_colorbar(title = expression(Historic~DOC~(mg~L^-1))),
-                           low = 'orange',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
-    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+  # gpp_doc_ratio = ggplot(dplyr::filter(stage_future, doc_conc_retro <=40),
+  #                        aes(x = doc_conc_future/doc_conc_retro, y = GPP_future/GPP_retro,
+  #                            color = doc_conc_retro, group =(Precip_future - Evap_future))) +
+  #   geom_point() +
+  #   ylim(c(0,4)) +
+  #   xlim(c(.5,3)) +
+  #   theme_classic() +
+  #   xlab(expression(Delta~DOC~(Future:Historic))) +
+  #   ylab(expression(Delta~GPP~(Future:Historic)))+
+  #   theme(axis.text = element_text(size=16),
+  #         axis.title = element_text(size = 16),
+  #         legend.title = element_text(size =14),
+  #         legend.position = c(.85,.8),
+  #         legend.background = element_blank(),
+  #         legend.text = element_text(size = 14))+
+  #   scale_color_continuous(guide = guide_colorbar(title = expression(Historic~DOC~(mg~L^-1))),
+  #                          low = 'orange',high = 'darkblue') +
+  #   geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
+  #   geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
 
   # d = ggplot(stage_future,
   #            aes(y = emergent_d_epi_future/emergent_d_epi_retro, x = percentEvap_future,
@@ -302,7 +330,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
   #
   # d = ggExtra::ggMarginal(d, type = 'density', groupColour = T, size = 6, aes(size = 2))
 
-  g = plot_grid(emit, bury, hrt, stage, dic_v_resp, doc,
+  g = plot_grid(emit, bury, hrt, stage, dic_v_resp, ph,
                 labels = c('A', 'B', 'C', 'D','E','F'), align = 'hv',nrow = 3)
 
   fig_file = as_data_file(fig_ind)

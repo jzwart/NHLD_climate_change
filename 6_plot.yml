@@ -6,6 +6,10 @@ packages:
   - dplyr
   - tidyr
   - cowplot
+  - ggmap
+  - maps
+  - mapdata
+  - sf
 
 include:
   - lib.yml
@@ -31,6 +35,9 @@ sources:
   - 6_plot/src/fig_drivers_monthly_cumsum.R
   - 6_plot/src/fig_drivers_ice.R
   - 6_plot/src/fig_flux_vs_fhee.R
+  - 6_plot/src/map_utils.R
+  - 6_plot/src/prep_basemap_fun.R
+  - 6_plot/src/fetch_river_geometry.R
 
 targets:
 
@@ -191,6 +198,11 @@ targets:
       - 6_plot/out/fig_drivers_monthly_cumsum.png.ind
       - 6_plot/out/fig_month_drivers_ice.png.ind
       - 6_plot/out/fig_flux_vs_fhee.png.ind
+      - 6_plot/out/view_polygon.rds
+      - 6_plot/out/secondary_geoms.rds
+      - 6_plot/out/focus_geoms.rds
+      - 6_plot/out/waterbodies.rds
+
 
   6_plot/out/fig_doc_delta.png.ind:
     command: fig_delta(
@@ -585,6 +597,56 @@ targets:
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+  # -- read config --
+  map_config:
+    command: yaml.load_file('map_config.yml')
+
+  # -- get spatial extent and data --
+  view_config:
+    command: map_config[I(c('bbox', 'projection', 'width', 'height'))]
+
+  6_plot/out/view_polygon.rds.ind:
+    command: post_view_polygon(target_name, view_config)
+  6_plot/out/view_polygon.rds:
+    command: gd_get('6_plot/out/view_polygon.rds.ind')
+  view_polygon:
+    command: get_view_polygon('6_plot/out/view_polygon.rds.ind', '6_plot.yml')
+
+  secondary_geoms_config:
+    command: map_config[I('secondary_geoms')]
+  6_plot/out/secondary_geoms.rds.ind:
+    command: fetch_geoms(target_name, secondary_geoms_config, within = view_polygon)
+  6_plot/out/secondary_geoms.rds:
+    command: gd_get('6_plot/out/secondary_geoms.rds.ind')
+
+  focus_geoms_config:
+    command: map_config[I('focus_geoms')]
+  6_plot/out/focus_geoms.rds.ind:
+    command: fetch_geoms(target_name, focus_geoms_config, within = view_polygon)
+  6_plot/out/focus_geoms.rds:
+    command: gd_get('6_plot/out/focus_geoms.rds.ind')
+
+  # -- get waterbodies -- #
+#  fetch_waterbody_areasqkm:
+#    command: map_config[I('fetch_waterbody_areasqkm')]
+#
+#  6_plot/out/waterbodies.rds.ind:
+#    command: fetch_waterbody_geoms(ind_file=target_name,
+#                                   view_polygon=view_polygon,
+#                                   fetch_waterbody_areasqkm=fetch_waterbody_areasqkm)
+#  6_plot/out/waterbodies.rds:
+#    command: gd_get('6_plot/out/waterbodies.rds.ind')
+#    waterbodies_ind = '6_plot/out/waterbodies.rds.ind',
+
+  basemap_fun:
+    command: prep_basemap_fun(
+      focus_geoms_ind = '6_plot/out/focus_geoms.rds.ind',
+      secondary_geoms_ind = '6_plot/out/secondary_geoms.rds.ind',
+      lakes_loc = 'Data/GIS/LakeLocations/NHLDandBuffLakes_Original_ZJH_Rev1.shp',
+      polygon = view_polygon,
+      scenarios = '1_data/out/scenarios_qa.rds',
+      remake_file = '6_plot.yml')
+
   6_plot/out/fig_month_drivers_ice.png.ind:
     command: fig_drivers_ice(
       fig_ind = target_name,
@@ -594,6 +656,7 @@ targets:
       drivers_file = '1_data/out/monthly_drivers_nhld.rds',
       snow_file = '3_summarize/out/snow.rds',
       fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      basemap = basemap_fun,
       gd_config = 'lib/cfg/gd_config.yml')
 
   6_plot/out/fig_flux_vs_fhee.png.ind:

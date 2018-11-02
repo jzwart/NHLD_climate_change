@@ -1,4 +1,4 @@
-fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file, drivers_file, snow_file, fig_cfg_yml, gd_config){
+fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file, drivers_file, snow_file, fig_cfg_yml, basemap, gd_config){
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
@@ -650,7 +650,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     draw_plot(precip_diff, x = .8 , y = .8, width = .15, height = .15) +
     draw_plot(evap_diff, x = .3, y = .5, width = .15, height = .15) +
     draw_plot(r_b_diff, x = .8, y = .5, width = .15, height = .15) +
-    draw_plot(ice_panel, x = 0, y = 0, width = 1, height = .45)
+    draw_plot(ice_panel, x = 0, y = 0, width = .6, height = .45) +
+    draw_plot(basemap, x = .6, y = 0, width = .4, height = .45)
 
   g
 

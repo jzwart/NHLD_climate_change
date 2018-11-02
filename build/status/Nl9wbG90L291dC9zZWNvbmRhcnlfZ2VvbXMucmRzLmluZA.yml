@@ -1,0 +1,13 @@
+version: 0.3.0
+name: 6_plot/out/secondary_geoms.rds.ind
+type: file
+hash: ecf85a606c04d6b7209bcf6ec4f3bb41
+time: 2018-11-02 20:00:32 UTC
+depends:
+  secondary_geoms_config: 101f76a4f3a98f099eac4c06fc792aa2
+  view_polygon: b85468c3117b6cff095635b5c6d199c2
+fixed: 775260019436d14fa3e2fb56a43dfac1
+code:
+  functions:
+    fetch_geoms: 7b98163f4666e40d599580eca950f004
+

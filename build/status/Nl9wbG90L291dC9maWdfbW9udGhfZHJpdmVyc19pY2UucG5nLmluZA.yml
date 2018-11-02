@@ -1,17 +1,18 @@
 version: 0.3.0
 name: 6_plot/out/fig_month_drivers_ice.png.ind
 type: file
-hash: 8dbe5895eebd45dd0a9786d510fc221f
-time: 2018-10-29 13:16:20 UTC
+hash: 9421aa9a14e03974b9998673a167fa4b
+time: 2018-11-02 20:49:04 UTC
 depends:
   3_summarize/out/ice_dur.rds.ind: 6d8a6116d991f6fc20bc14b6856f6801
   1_data/out/monthly_drivers_nhld.rds: 6e631fb43b2842dc124f259cf558c0f5
   3_summarize/out/snow.rds: b415eaa53a979fd4d4e1405613b0929f
   6_plot/cfg/fig_config.yml: 89ac044e302d4060738e733dd0a59e8c
+  basemap_fun: e8c92bf1d1a0134ecfba18a9d2fac4be
   lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
 fixed: 9b089eed7bdbaa84158bd31ffd97dd1b
 code:
   functions:
-    fig_drivers_ice: 6d92f6f581aee348bdb7fd2e85d80ca1
+    fig_drivers_ice: d25a34269ea0f63a0b977d5c4257ef26
     t_col: 4c5766f0f30a2ee720753f95b94fa634
 

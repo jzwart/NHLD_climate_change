@@ -13,9 +13,11 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
            Bury_areal = Bury / Area, #  bury in g C / m2 / year
            DOC_load = DOC_Load / Area,
            # R_B = (SWin + Baseflow) / Area_m2,
-           Precip_lake = DirectP / Area) %>%
-    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,
-           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP)
+           Precip_lake = DirectP / Area,
+           NEP = GPP*Vepi*.15-DOC_Respired) %>%
+    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Burial_phyto, Burial_tPOC, Burial_total, Area, DOC_load,
+           HRT, Stage, Vol, doc_conc, dicLoadvResp, DOC_Respired, Sed_phyto, Sed_tPOC, NEP, Vepi,
+           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, FracRet)
 
   total <- all %>%
     group_by(period, gcm) %>%
@@ -64,9 +66,11 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
     ungroup()
 
   retro <- all %>%
-    dplyr::filter(gcm == 'Retro')
+    dplyr::filter(gcm == 'Retro') %>%
+    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm'))
 
   merged <- dplyr::filter(all, gcm != 'Retro') %>%
+    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm')) %>%
     left_join(retro, by = 'Permanent_', suffix = c('_future', '_retro'))
 
   merged$doc_change = merged$doc_conc_future/merged$doc_conc_retro
@@ -99,8 +103,10 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
           legend.position = c(.35,.7),
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
-    scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
-                           low = 'lightblue',high = 'darkblue') +
+    # scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+    #                        low = 'lightblue',high = 'darkblue') +
+    scale_color_viridis_c(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
     geom_hline(yintercept = 1, linetype = 'dashed', size =1)+
     geom_smooth(aes(y = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1),
                     x = percentEvap_future,
@@ -136,7 +142,52 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
 
   # gpp_doc_ratio
 
+  low_doc = ggplot(dplyr::filter(merged, doc_conc_retro <= 10),
+                   aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
+                       y = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1),
+                       color = percentEvap_future)) +
+    geom_point() +
+    ylim(c(-100,250)) +
+    xlim(c(-30,150)) +
+    theme_classic() +
+    xlab(expression(Delta~DOC~('%'))) +
+    ylab(expression(Delta~GPP~('%')))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.4,.85),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    scale_color_continuous(guide = guide_colorbar(title = expression(FHEE)),
+                           low = 'orange',high = 'darkblue') +
+    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
+    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+
+  high_doc = ggplot(dplyr::filter(merged, doc_conc_retro >=15),
+                   aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
+                       y = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1),
+                       color = percentEvap_future)) +
+    geom_point() +
+    ylim(c(-100,250)) +
+    xlim(c(-30,150)) +
+    theme_classic() +
+    xlab(expression(Delta~DOC~('%'))) +
+    ylab(expression(Delta~GPP~('%')))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.4,.85),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    scale_color_continuous(guide = guide_colorbar(title = expression(FHEE)),
+                           low = 'orange',high = 'darkblue') +
+    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
+    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+
+
   g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('A', 'B'), align = 'h')
+
+  g = plot_grid(doc_fhee, low_doc, high_doc, labels = c('a','b','c'), align = 'h', rows = 1)
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width = 14, height = 7)

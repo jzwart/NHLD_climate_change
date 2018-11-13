@@ -10,6 +10,7 @@ packages:
   - maps
   - mapdata
   - sf
+  - viridis
 
 include:
   - lib.yml

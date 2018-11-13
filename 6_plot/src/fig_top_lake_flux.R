@@ -70,31 +70,15 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
     mutate(emit_diff = Emit_future - Emit_retro) %>%
     group_by(period_future, gcm_future) %>%
     arrange(Emit_retro, .by_group = T) %>%
-    mutate(cumsum_emit_diff = cumsum(emit_diff)) %>%
-    ungroup()
-
-  doc <- all %>%
-    group_by(period, gcm) %>%
-    arrange(percentEvap, .by_group = T) %>%
-    ungroup() %>%
-    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm'))
-
-  doc_retro <- doc %>%
-    dplyr::filter(gcm == 'Retro')
-
-  doc_future <- doc %>%
-    dplyr::filter(gcm != 'Retro') %>%
-    left_join(doc_retro, by = 'Permanent_', suffix = c('_future','_retro')) %>%
-    mutate(doc_ratio = doc_conc_future / doc_conc_retro) %>%
-    group_by(period_future, gcm_future) %>%
-    arrange(percentEvap_retro, .by_group = T) %>%
+    mutate(cumsum_emit_diff = abs(cumsum(emit_diff))/ max(cumsum_emit_retro) *100*ifelse(cumsum(emit_diff)>0,1,-1)) %>%
     ungroup()
 
   top_bury <- all %>%
     group_by(period, gcm) %>%
     arrange(Bury, .by_group = T) %>%
     mutate(cumsum_bury = cumsum(Bury),
-           cumsum_frac_bury = cumsum_bury / sum(Bury)) %>%
+           cumsum_frac_bury = cumsum_bury / sum(Bury),
+           frac_lakes = seq(1:length(cumsum_frac_bury))/length(cumsum_frac_bury)) %>%
     arrange(desc(Bury), .by_group = T) %>%
     mutate(top_bury = case_when(cumsum_frac_bury >= top_frac ~ 'top',
                                 TRUE ~ 'bottom'),
@@ -112,7 +96,7 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
     mutate(bury_diff = Bury_future - Bury_retro) %>%
     group_by(period_future, gcm_future) %>%
     arrange(Bury_retro, .by_group = T) %>%
-    mutate(cumsum_bury_diff = cumsum(bury_diff)) %>%
+    mutate(cumsum_bury_diff = abs(cumsum(bury_diff))/ max(cumsum_bury_retro) *100*ifelse(cumsum(bury_diff)>0,1,-1)) %>%
     ungroup()
 
   emit_minus_bury <- all %>%
@@ -142,12 +126,42 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
     ungroup()
 
   # cumulative fraction plotted against total emissions diff; make this colored by runoff + baseflow
-  emit = ggplot(top_emit_future, aes(x = cumsum_frac_emit_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
-              group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+  # emit = ggplot(top_emit_future, aes(x = cumsum_frac_emit_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
+  #             group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+  #   geom_line(size = 2) +
+  #   theme_classic() +
+  #   ylab(expression(Cumulative~Emissions~Difference~(Gg~C~year^-1))) +
+  #   xlab(expression(Fraction~of~Total~Emissions))+
+  #   theme(axis.text = element_text(size=16),
+  #         axis.title = element_text(size = 16),
+  #         legend.title = element_text(size =14),
+  #         legend.position = c(.25,.8),
+  #         legend.background = element_blank(),
+  #         legend.text = element_text(size = 14))+
+  #   geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+  #   scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
+  #     low = 'lightblue',high = 'darkblue') +
+  #   scale_linetype_manual(name = 'period_future',
+  #                         values = c('2050s' = 'twodash',
+  #                                    '2080s' = 'solid'),
+  #                         labels = c('2050\'s', '2080\'s'),
+  #                         guide = guide_legend(title = expression(Period)))
+
+
+  inset_lim_e = .1 # where 90% of emissions occur
+  inset_xmin_e = mean(top_emit_future$frac_lakes_retro[which(round(top_emit_future$cumsum_frac_emit_retro,digits = 3) == inset_lim_e)])
+  inset_xmax_e = 1.0
+  inset_ymin_e = min(top_emit_future$cumsum_emit_diff)
+  inset_ymax_e = max(top_emit_future$cumsum_emit_diff)
+
+  emit = ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff, linetype = period_future,
+                              group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
     geom_line(size = 2) +
+    geom_rect(mapping = aes(xmin = inset_xmin_e, xmax = inset_xmax_e, ymin = inset_ymin_e, ymax= inset_ymax_e), fill = NA,
+              color = 'black' , linetype = 'dotted', show.legend = F, size = 1) +
     theme_classic() +
-    ylab(expression(Cumulative~Emissions~Difference~(Gg~C~year^-1))) +
-    xlab(expression(Fraction~of~Total~Emissions))+
+    ylab(expression(Cumulative~Delta~Emissions~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
           legend.title = element_text(size =14),
@@ -155,20 +169,147 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
           legend.background = element_blank(),
           legend.text = element_text(size = 14))+
     geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
-    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-      low = 'lightblue',high = 'darkblue') +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
     scale_linetype_manual(name = 'period_future',
                           values = c('2050s' = 'twodash',
                                      '2080s' = 'solid'),
                           labels = c('2050\'s', '2080\'s'),
                           guide = guide_legend(title = expression(Period)))
+
+  emit_inset = ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff, linetype = period_future,
+                                           group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 1.5, show.legend = F) +
+    xlim(c(inset_xmin_e, inset_xmax_e)) +
+    theme_classic() +
+    ylab(expression(Cumulative~Delta~Emissions~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
+    theme(axis.text = element_text(size=12),
+          axis.title = element_blank(),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
+
 #
-#   ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
-#                               group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+#   breaks = seq(0,1,length.out = 11)
+#   area_breaks = c(0,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10)
+#
+#   lake_summary <- top_emit_future %>%
+#     mutate(frac_bins = cut(frac_lakes_retro, breaks = breaks),
+#            area_bins =cut(Area_future, breaks = area_breaks)) %>%
+#     group_by(frac_bins) %>%
+#     summarise(area = min(Area_retro),
+#               hrt = mean(HRT_retro),
+#               emit_areal = max(Emit_areal_retro),
+#               doc = mean(doc_conc_retro),
+#               frac_evap = mean(percentEvap_retro)) %>%
+#     ungroup()
+#
+#   lake_summary
+#
+#   ggplot(lake_summary, aes(x = frac_lakes_retro, y = Area_retro/ 10000)) +
+#     geom_point() +
+#     scale_y_log10() +
+#     geom_point(aes(x=frac_lakes_retro, y= Emit_areal_retro), color= 'blue') +
+#     geom_smooth(aes(x=frac_lakes_retro, y= Emit_areal_retro), method = 'lm')
+#
+#   ggplot(lake_summary, aes(x = area_bins, y = Emit_areal_future)) +
+#     geom_boxplot() +
+#     scale_y_log10()
+#
+#     ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
+#                                 group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+#       geom_line(size = 2) +
+#       theme_classic() +
+#       ylab(expression(Cumulative~Emissions~Difference~(Gg~C~year^-1))) +
+#       xlab(expression(Fraction~of~Total~Emissions))+
+#       theme(axis.text = element_text(size=16),
+#             axis.title = element_text(size = 16),
+#             legend.title = element_text(size =14),
+#             legend.position = c(.25,.8),
+#             legend.background = element_blank(),
+#             legend.text = element_text(size = 14))+
+#       geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+#       scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
+#                              low = 'lightblue',high = 'darkblue') +
+#       scale_linetype_manual(name = 'period_future',
+#                             values = c('2050s' = 'twodash',
+#                                        '2080s' = 'solid'),
+#                             labels = c('2050\'s', '2080\'s'),
+#                             guide = guide_legend(title = expression(Period)))
+      # geom_vline(xintercept = top_emit_future$cumsum_frac_emit_retro[which(round(top_emit_future$frac_lakes_retro,digits = 4) %in% c(.9))],
+      #            linetype = 'dashed')
+
+  inset_lim_b = .1 # where 90% of emissions occur
+  inset_xmin_b = mean(top_bury_future$frac_lakes_retro[which(round(top_bury_future$cumsum_frac_bury_retro,digits = 3) == inset_lim_b)])
+  inset_xmax_b = 1.0
+  inset_ymin_b = min(top_bury_future$cumsum_bury_diff)
+  inset_ymax_b = max(top_bury_future$cumsum_bury_diff)
+
+  bury = ggplot(top_bury_future, aes(x = frac_lakes_retro, y = cumsum_bury_diff, linetype = period_future,
+                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 1.5,show.legend = F) +
+    geom_rect(mapping = aes(xmin = inset_xmin_b, xmax = inset_xmax_b, ymin = inset_ymin_b, ymax= inset_ymax_b), fill = NA,
+              color = 'black' , linetype = 'dotted', show.legend = F, size = 1) +
+    theme_classic() +
+    ylab(expression(Cumulative~Delta~Burial~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
+  bury_inset = ggplot(top_bury_future, aes(x = frac_lakes_retro, y = cumsum_bury_diff, linetype = period_future,
+                                           group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 1.5, show.legend = F) +
+    xlim(c(inset_xmin_b, inset_xmax_b)) +
+    theme_classic() +
+    ylab(expression(Cumulative~Delta~Burial~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
+    theme(axis.text = element_text(size=12),
+          axis.title = element_blank(),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
+
+#
+#   emit_minus_bury = ggplot(emit_minus_bury_future, aes(x = cumsum_frac_emit_minus_bury_retro,
+#                                                        y = cumsum_emit_minus_bury_diff/10^9, linetype = period_future,
+#                                      group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
 #     geom_line(size = 2) +
 #     theme_classic() +
-#     ylab(expression(Cumulative~Emissions~Difference~(Gg~C~year^-1))) +
-#     xlab(expression(Cumulative~Fraction~of~Lakes))+
+#     ylab(expression(Cumulative~Emit-Burial~Difference~(Gg~C~year^-1))) +
+#     xlab(expression(Fraction~of~Total~Emit-Burial))+
 #     theme(axis.text = element_text(size=16),
 #           axis.title = element_text(size = 16),
 #           legend.title = element_text(size =14),
@@ -182,121 +323,15 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
 #                           values = c('2050s' = 'twodash',
 #                                      '2080s' = 'solid'),
 #                           labels = c('2050\'s', '2080\'s'),
-#                           guide = guide_legend(title = expression(Period)))
+                          # guide = guide_legend(title = expression(Period)))
 
-  breaks = seq(0,1,length.out = 11)
-  area_breaks = c(0,1e3,1e4,1e5,1e6,1e7,1e8,1e9,1e10)
+  # g = plot_grid(emit, bury, labels = c('A', 'B'), align = 'h')
 
-  lake_summary <- top_emit_future %>%
-    mutate(frac_bins = cut(frac_lakes_retro, breaks = breaks),
-           area_bins =cut(Area_future, breaks = area_breaks)) %>%
-    group_by(frac_bins) %>%
-    summarise(area = min(Area_retro),
-              hrt = mean(HRT_retro),
-              emit_areal = max(Emit_areal_retro),
-              doc = mean(doc_conc_retro),
-              frac_evap = mean(percentEvap_retro)) %>%
-    ungroup()
-
-  lake_summary
-
-  ggplot(lake_summary, aes(x = frac_lakes_retro, y = Area_retro/ 10000)) +
-    geom_point() +
-    scale_y_log10() +
-    geom_point(aes(x=frac_lakes_retro, y= Emit_areal_retro), color= 'blue') +
-    geom_smooth(aes(x=frac_lakes_retro, y= Emit_areal_retro), method = 'lm')
-
-  ggplot(lake_summary, aes(x = area_bins, y = Emit_areal_future)) +
-    geom_boxplot() +
-    scale_y_log10()
-
-    ggplot(top_emit_future, aes(x = frac_lakes_retro, y = cumsum_emit_diff/10^9, linetype = period_future,
-                                group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
-      geom_line(size = 2) +
-      theme_classic() +
-      ylab(expression(Cumulative~Emissions~Difference~(Gg~C~year^-1))) +
-      xlab(expression(Fraction~of~Total~Emissions))+
-      theme(axis.text = element_text(size=16),
-            axis.title = element_text(size = 16),
-            legend.title = element_text(size =14),
-            legend.position = c(.25,.8),
-            legend.background = element_blank(),
-            legend.text = element_text(size = 14))+
-      geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
-      scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-                             low = 'lightblue',high = 'darkblue') +
-      scale_linetype_manual(name = 'period_future',
-                            values = c('2050s' = 'twodash',
-                                       '2080s' = 'solid'),
-                            labels = c('2050\'s', '2080\'s'),
-                            guide = guide_legend(title = expression(Period)))
-      # geom_vline(xintercept = top_emit_future$cumsum_frac_emit_retro[which(round(top_emit_future$frac_lakes_retro,digits = 4) %in% c(.9))],
-      #            linetype = 'dashed')
-
-
-  bury = ggplot(top_bury_future, aes(x = cumsum_frac_bury_retro, y = cumsum_bury_diff/10^9, linetype = period_future,
-                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
-    geom_line(size = 2) +
-    theme_classic() +
-    ylab(expression(Cumulative~Burial~Difference~(Gg~C~year^-1))) +
-    xlab(expression(Fraction~of~Total~Burial))+
-    theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.25,.8),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 14))+
-    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
-    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-                           low = 'lightblue',high = 'darkblue') +
-    scale_linetype_manual(name = 'period_future',
-                          values = c('2050s' = 'twodash',
-                                     '2080s' = 'solid'),
-                          labels = c('2050\'s', '2080\'s'),
-                          guide = guide_legend(title = expression(Period)))
-
-  doc_fhee = ggplot(doc_future, aes(x = percentEvap_retro, y = doc_ratio, color = Runoff_and_baseflow_future)) +
-    geom_point(size = 2, pch=16, alpha = .2) +
-    theme_classic() +
-    ylab(expression(DOC~Ratio~(Future:Historic))) +
-    xlab(expression(FHEE))+
-    theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.25,.8),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 14))+
-    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-                           low = 'orange',high = 'blue') +
-    geom_smooth(aes(x = percentEvap_retro, y = doc_ratio, color = Runoff_and_baseflow_future, group = Runoff_and_baseflow_future),
-                method = 'loess', se = F, inherit.aes = F, size = 2, linetype = 'solid') +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1)
-
-  doc_fhee
-
-  emit_minus_bury = ggplot(emit_minus_bury_future, aes(x = cumsum_frac_emit_minus_bury_retro,
-                                                       y = cumsum_emit_minus_bury_diff/10^9, linetype = period_future,
-                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
-    geom_line(size = 2) +
-    theme_classic() +
-    ylab(expression(Cumulative~Emit-Burial~Difference~(Gg~C~year^-1))) +
-    xlab(expression(Fraction~of~Total~Emit-Burial))+
-    theme(axis.text = element_text(size=16),
-          axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.25,.8),
-          legend.background = element_blank(),
-          legend.text = element_text(size = 14))+
-    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
-    scale_color_continuous(guide = guide_colorbar(title = expression(Runoff+Baseflow~(mm~yr^-1))),
-                           low = 'lightblue',high = 'darkblue') +
-    scale_linetype_manual(name = 'period_future',
-                          values = c('2050s' = 'twodash',
-                                     '2080s' = 'solid'),
-                          labels = c('2050\'s', '2080\'s'),
-                          guide = guide_legend(title = expression(Period)))
-
-  g = plot_grid(emit, bury, labels = c('A', 'B'), align = 'h')
+  g = ggdraw() +
+    draw_plot(emit, x = 0, y = 0, width = .5, height = 1) +
+    draw_plot(emit_inset, x= .1, y= .1, width = .18, height = .38) +
+    draw_plot(bury, x = 0.5, y = 0, width = .5, height = 1) +
+    draw_plot(bury_inset, x= .6, y= .1, width = .18, height = .38)
 
 
   fig_file = as_data_file(fig_ind)

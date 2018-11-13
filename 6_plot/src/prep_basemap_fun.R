@@ -40,7 +40,10 @@ prep_basemap_fun <- function(focus_geoms_ind, secondary_geoms_ind = NULL, detail
           panel.grid.major = element_line(color= 'transparent'),
           rect = element_blank(),
           plot.background = element_blank(),
-          panel.ontop = T)
+          panel.ontop = T,
+          axis.title = element_blank()) +
+    annotate('text', x = c(-160153,0), y = c(1577179,1670000), label = c('Wisconsin','Michigan'), size = 6, color = 'grey30')
+
   # zoom
 
 

@@ -127,7 +127,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     #                        low = 'lightblue',high = 'darkblue') +
     scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                         begin = 0, end = 1, direction = -1) +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     geom_smooth(aes(y = abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future > Bury_retro,1,-1),
                     x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
                     linetype = period_future),
@@ -154,7 +154,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     #                        low = 'lightblue',high = 'darkblue') +
     scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                         begin = 0, end = 1, direction = -1) +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     geom_smooth(aes(y = abs((Emit_future-Bury_future)-(Emit_retro-Bury_retro))/(Emit_retro-Bury_retro)*100*
                       ifelse((Emit_future-Bury_future)>(Emit_retro-Bury_retro),1,-1),
                     x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
@@ -301,7 +301,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                aes(y = abs(FracRet_future*100-FracRet_retro*100)*ifelse(FracRet_future>FracRet_retro,1,-1), x = percentEvap_future,
                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1) +
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     theme_classic() +
     ylab(expression(Delta~Percent~C~Removed~('%'))) +
     xlab(expression(FHEE))+

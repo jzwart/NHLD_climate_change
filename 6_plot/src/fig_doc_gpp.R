@@ -19,6 +19,12 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
            HRT, Stage, Vol, doc_conc, dicLoadvResp, DOC_Respired, Sed_phyto, Sed_tPOC, NEP, Vepi,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, FracRet)
 
+  sum <- readRDS(scenarios) %>%
+    dplyr::filter(season == 'open_water') %>%
+    select(Permanent_, period, gcm, pco2)
+
+  all <- left_join(all, sum, by = c('Permanent_' = 'Permanent_', 'period' = 'period', 'gcm' = 'gcm'))
+
   total <- all %>%
     group_by(period, gcm) %>%
     dplyr::summarise(Emit = sum(Emit),
@@ -107,7 +113,7 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
     #                        low = 'lightblue',high = 'darkblue') +
     scale_color_viridis_c(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
                         begin = 0, end = 1, direction = -1) +
-    geom_hline(yintercept = 1, linetype = 'dashed', size =1)+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1)+
     geom_smooth(aes(y = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1),
                     x = percentEvap_future,
                     color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
@@ -137,8 +143,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(Historic~DOC~(mg~L^-1))),
                            low = 'orange',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
-    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+    geom_hline(yintercept = 0, linetype ='dashed', color ='black',size = 1) +
+    geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1)
 
   # gpp_doc_ratio
 
@@ -160,8 +166,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(FHEE)),
                            low = 'orange',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
-    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+    geom_hline(yintercept = 0, linetype ='dashed', color ='black',size = 1) +
+    geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1)
 
   high_doc = ggplot(dplyr::filter(merged, doc_conc_retro >=15),
                    aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
@@ -181,8 +187,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
           legend.text = element_text(size = 14))+
     scale_color_continuous(guide = guide_colorbar(title = expression(FHEE)),
                            low = 'orange',high = 'darkblue') +
-    geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
-    geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
+    geom_hline(yintercept = 0, linetype ='dashed', color ='black',size = 1) +
+    geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1)
 
 
   g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('A', 'B'), align = 'h')

@@ -199,6 +199,22 @@ ggplot(data = quad, aes(x = quadrant,
                    labels = c('-DOC, +GPP','+DOC, +GPP','+DOC, -GPP','-DOC, -GPP')) +
   scale_y_log10()
 
+ggplot(data = quad, aes(x = quadrant,
+                        y = Emit_areal_future,
+                        group = quadrant)) +
+  geom_boxplot(size =1.3) +
+  theme_classic() +
+  ylab(expression(DIC~Load:DIC~Produced)) +
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        axis.title.x = element_blank(),
+        legend.title = element_text(size =14),
+        legend.position = c(.35,.7),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14)) +
+  scale_x_discrete(breaks = c(1,2,3,4),
+                   labels = c('-DOC, +GPP','+DOC, +GPP','+DOC, -GPP','-DOC, -GPP')) +
+  scale_y_log10()
 
 
 quad$sed_ratio_future = quad$Sed_phyto_future / quad$Sed_tPOC_future
@@ -361,9 +377,10 @@ ggplot(dplyr::filter(merged, doc_conc_retro <10),
 
 ggplot(dplyr::filter(merged, doc_conc_retro <=40),
        aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
-           y = abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1), color = doc_conc_retro)) +
+           y = abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future>Bury_retro,1,-1), color = doc_conc_retro)) +
   geom_point() +
   xlim(c(-30,150)) +
+  ylim(c(-60,60)) +
   theme_classic() +
   xlab(expression(Delta~DOC~('%'))) +
   ylab(expression(Delta~GPP~('%')))+
@@ -378,4 +395,288 @@ ggplot(dplyr::filter(merged, doc_conc_retro <=40),
   geom_hline(yintercept = 1, linetype ='dashed', color ='black',size = 1) +
   geom_vline(xintercept = 1, linetype ='dashed', color ='black',size =1)
 
-# gpp_doc_ratio
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
+           y = Emit_areal_future ,color = percentEvap_retro)) +
+  geom_point() +
+  xlim(c(-30,150)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~FHEE~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  scale_y_log10(limits = c(5,2000))
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
+           y = Bury_future ,color = percentEvap_retro)) +
+  geom_point() +
+  xlim(c(-30,150)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~FHEE~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  scale_y_log10()
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(doc_conc_future - doc_conc_retro)/doc_conc_retro *100*ifelse(doc_conc_future > doc_conc_retro,1,-1),
+           y = abs((Emit_future-Bury_future) - (Emit_retro-Bury_retro))/(Emit_retro-Bury_retro)*100*
+             ifelse((Emit_future-Bury_future) > (Emit_retro-Bury_retro),1,-1),color = (Precip_future-Evap_future))) +
+  geom_point() +
+  xlim(c(-30,150)) +
+  ylim(c(-100,150)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~FHEE~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.4,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size = 1) +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1)
+
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(dicLoadvResp_future - dicLoadvResp_retro)/dicLoadvResp_retro *100*ifelse(dicLoadvResp_future > dicLoadvResp_retro,1,-1),
+           y = Emit_future,color = (Precip_future-Evap_future))) +
+  geom_point() +
+  xlim(c(-80,100)) +
+  ylim(c(-100,150)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~FHEE~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.4,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size = 1) +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  scale_y_log10()
+
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1) ,
+           y = abs(Emit_areal_future-Emit_areal_retro)/Emit_areal_retro*100*ifelse(Emit_areal_future>Emit_areal_retro,1,-1) ,color = doc_conc_retro)) +
+  geom_point() +
+  xlim(c(-100,250)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~GPP~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1) ,
+           y = abs(Bury_areal_future-Bury_areal_retro)/Bury_areal_retro*100*ifelse(Bury_areal_future>Bury_areal_retro,1,-1) ,color = doc_conc_retro)) +
+  geom_point() +
+  xlim(c(-100,250)) +
+  ylim(c(-60,60)) +
+  theme_classic() +
+  xlab(expression(Delta~GPP~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1) ,
+           y = abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1) ,color = doc_conc_retro)) +
+  geom_point() +
+  xlim(c(-40,150)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(waterIn_future-waterIn_retro)/waterIn_retro*100*ifelse(waterIn_future>waterIn_retro,1,-1) ,
+           y = abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1) ,color = doc_conc_retro)) +
+  geom_point() +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(waterIn_future-waterIn_retro)/waterIn_retro*100*ifelse(waterIn_future>waterIn_retro,1,-1) ,
+           y = abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future>Bury_retro,1,-1) ,color = doc_conc_retro)) +
+  geom_point() +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40, abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1) <=250),
+       aes(x = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1) ,
+           y = abs(Emit_areal_future-Emit_areal_retro)/Emit_areal_retro*100*ifelse(Emit_areal_future>Emit_areal_retro,1,-1) ,
+           color = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1))) +
+  geom_point() +
+  xlim(c(-40,150)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40, abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1) <=250),
+       aes(x = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1) ,
+           y = abs(Bury_areal_future-Bury_areal_retro)/Bury_areal_retro*100*ifelse(Bury_areal_future>Bury_areal_retro,1,-1) ,
+           color = abs(GPP_future-GPP_retro)/GPP_retro*100*ifelse(GPP_future>GPP_retro,1,-1))) +
+  geom_point() +
+  xlim(c(-40,150)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(Delta~GPP~('%'))),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40,
+                     abs(Emit_areal_future-Emit_areal_retro)/Emit_areal_retro*100*ifelse(Emit_areal_future>Emit_areal_retro,1,-1) <=100),
+       aes(x = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1) ,
+           y = abs(Area_future-Area_retro)/Area_retro*100*ifelse(Area_future>Area_retro,1,-1) ,
+           color = abs(Emit_areal_future-Emit_areal_retro)/Emit_areal_retro*100*ifelse(Emit_areal_future>Emit_areal_retro,1,-1))) +
+  geom_point() +
+  xlim(c(-40,150)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(Delta~GPP~('%'))),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)
+
+
+
+ggplot(merged, aes(x = percentEvap_future,
+           y = abs(Emit_areal_future-Emit_areal_retro)/Emit_areal_retro*100*ifelse(Emit_areal_future>Emit_areal_retro,1,-1) ,
+           color = Precip_future-Evap_future, group = Precip_future-Evap_future)) +
+  geom_point(alpha= .08) +
+  ylim(c(-60,150)) +
+  theme_classic() +
+  xlab(expression(Delta~DOC~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.4,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_viridis(direction = -1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_smooth(method = 'loess', se = F )
+
+
+ggplot(dplyr::filter(merged, doc_conc_retro <=40),
+       aes(x = abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1) ,
+           y = abs(pco2_future-pco2_retro)/pco2_retro*100*ifelse(pco2_future>pco2_retro,1,-1) ,color = Precip_future - Evap_future)) +
+  geom_point() +
+  xlim(c(-100,250)) +
+  ylim(c(-60,100)) +
+  theme_classic() +
+  xlab(expression(Delta~GPP~('%'))) +
+  ylab(expression(Delta~Emissions~('%')))+
+  theme(axis.text = element_text(size=16),
+        axis.title = element_text(size = 16),
+        legend.title = element_text(size =14),
+        legend.position = c(.8,.85),
+        legend.background = element_blank(),
+        legend.text = element_text(size = 14))+
+  scale_color_continuous(guide = guide_colorbar(title = expression(FHEE~Historic)),
+                         low = 'orange',high = 'darkblue') +
+  geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1) +
+  geom_hline(yintercept = 0, linetype ='dashed', color ='black',size =1)

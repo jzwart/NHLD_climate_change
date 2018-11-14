@@ -37,6 +37,15 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               DOC = median(doc_conc)) %>%
     ungroup()
 
+  retro <- all %>%
+    dplyr::filter(gcm == 'Retro')
+
+  merged <- dplyr::filter(all, gcm != 'Retro') %>%
+    left_join(retro, by = 'Permanent_', suffix = c('_future', '_retro')) %>%
+    group_by(period_future, gcm_future) %>%
+    summarise(frac_doc_increase = sum(doc_conc_future>doc_conc_retro)/n()) %>%
+    ungroup()
+
   ave_drivers <- drivers %>%
     group_by(period, gcm, var) %>%
     dplyr::summarise(var_value = sum(var_value)) %>%
@@ -44,6 +53,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
     spread(key = 'var', value = 'var_value')
 
   c_and_drivers <- left_join(total, ave_drivers, by = c('period' = 'period', 'gcm' = 'gcm')) %>%
+    left_join(merged, by = c('period' = 'period_future', 'gcm' = 'gcm_future')) %>%
     mutate(period = factor(period, levels = c('Retro', '2050s', '2080s')))
 
   retro_emit = c_and_drivers$Emit[c_and_drivers$gcm =='Retro']
@@ -63,12 +73,12 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                                   TRUE ~ -1),
                           doc_load_change = case_when(DOC_Load > retro_doc_load ~ 1,
                                                                     TRUE ~ -1),
-                          gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 1,
-                                                gcm == 'FIO_ESM' ~ 2,
-                                                gcm == 'GFDL_CM3' ~ 3,
-                                                gcm == 'GFDL_ESM2M' ~ 4,
-                                                gcm == 'HadGEM2_AO' ~ 5,
-                                                gcm == 'HadGEM2_CC' ~ 6))
+                          gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 3,
+                                                gcm == 'FIO_ESM' ~ 4,
+                                                gcm == 'GFDL_CM3' ~ 2,
+                                                gcm == 'GFDL_ESM2M' ~ 6,
+                                                gcm == 'HadGEM2_AO' ~ 1,
+                                                gcm == 'HadGEM2_CC' ~ 5))
 
   # r_b_emit = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = Emit / 10^9, color = period, size =period, shape = period)) +  # converting to gigagrams
   #   geom_point() +

@@ -39,6 +39,7 @@ sources:
   - 6_plot/src/map_utils.R
   - 6_plot/src/prep_basemap_fun.R
   - 6_plot/src/fetch_river_geometry.R
+  - 6_plot/src/fig_relative_contribution.R
 
 targets:
 
@@ -203,6 +204,7 @@ targets:
       - 6_plot/out/secondary_geoms.rds
       - 6_plot/out/focus_geoms.rds
       - 6_plot/out/waterbodies.rds
+      - 6_plot/out/fig_relative_contribution.png.ind
 
 
   6_plot/out/fig_doc_delta.png.ind:
@@ -662,6 +664,16 @@ targets:
 
   6_plot/out/fig_flux_vs_fhee.png.ind:
     command: fig_flux_vs_fhee(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  6_plot/out/fig_relative_contribution.png.ind:
+    command: fig_relative_contribution(
       fig_ind = target_name,
       transparent = I(60),
       scenarios = '1_data/out/scenarios_qa.rds',

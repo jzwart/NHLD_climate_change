@@ -13,10 +13,12 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
            DOC_load = DOC_Load / Area,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
-    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,FracRet, DOC_Load,
+    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,FracRet, DOC_Load, GPP, Vepi,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp)
 
   total <- all %>%
+    mutate(GPP = GPP * Vepi, # converting mol C m-3 day-1 to mol C day-1
+           DOC = doc_conc * Vepi) %>%
     group_by(period, gcm) %>%
     dplyr::summarise(Emit = sum(Emit),
               Bury = sum(Bury),
@@ -34,7 +36,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               HRT = median(HRT),
               regional_DOC = sum(doc_conc * Vol) / sum(Vol),
               Vol = sum(Vol),
-              DOC = median(doc_conc)) %>%
+              DOC = sum(DOC)/sum(Vepi),
+              GPP = sum(GPP)/sum(Vepi)) %>%
     ungroup()
 
   retro <- all %>%
@@ -61,6 +64,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   retro_emit_minus_bury = retro_emit-retro_bury
   retro_fracRet = c_and_drivers$FracRet[c_and_drivers$gcm == 'Retro']
   retro_doc_load = c_and_drivers$DOC_Load[c_and_drivers$gcm == 'Retro']
+  retro_gpp = c_and_drivers$GPP[c_and_drivers$gcm == 'Retro']
 
   c_and_drivers <- mutate(c_and_drivers,
                           emit_change = case_when(Emit > retro_emit ~ 1,
@@ -73,6 +77,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                                   TRUE ~ -1),
                           doc_load_change = case_when(DOC_Load > retro_doc_load ~ 1,
                                                                     TRUE ~ -1),
+                          gpp_change = case_when(GPP > retro_gpp ~ 1,
+                                                 TRUE ~ -1),
                           gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 3,
                                                 gcm == 'FIO_ESM' ~ 4,
                                                 gcm == 'GFDL_CM3' ~ 2,
@@ -114,7 +120,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   p_e_emit_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(Emit - retro_emit)/retro_emit * 100 * emit_change,
                                        color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
-    geom_smooth(aes(x = Runoff_and_baseflow, y = abs(Emit - retro_emit)/retro_emit * 100 * emit_change),
+    geom_smooth(aes(x = (Precip - Evap), y = abs(Emit - retro_emit)/retro_emit * 100 * emit_change),
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid')  +
     geom_point() +
@@ -178,7 +184,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   p_e_bury_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(Bury - retro_bury)/retro_bury * 100 * bury_change,
                                             color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
-    geom_smooth(aes(x = Runoff_and_baseflow, y = abs(Bury - retro_bury)/retro_bury * 100 * bury_change),
+    geom_smooth(aes(x = (Precip - Evap), y = abs(Bury - retro_bury)/retro_bury * 100 * bury_change),
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
@@ -269,7 +275,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   p_e_emit_minus_bury_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs((Emit-Bury) - retro_emit_minus_bury)/retro_emit_minus_bury * 100 * emit_bury_change,
                                             color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
-    geom_smooth(aes(x = Runoff_and_baseflow, y = abs((Emit-Bury) - retro_emit_minus_bury)/retro_emit_minus_bury * 100 * emit_bury_change),
+    geom_smooth(aes(x = (Precip - Evap), y = abs((Emit-Bury) - retro_emit_minus_bury)/retro_emit_minus_bury * 100 * emit_bury_change),
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
@@ -387,7 +393,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   p_e_fracRet_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(FracRet*100 - retro_fracRet*100) * fracRet_change,
                                                color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
-    geom_smooth(aes(x = Runoff_and_baseflow, y = abs(FracRet*100 - retro_fracRet*100) * fracRet_change),
+    geom_smooth(aes(x = (Precip - Evap), y = abs(FracRet*100 - retro_fracRet*100) * fracRet_change),
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
@@ -451,6 +457,39 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   #                      labels = c('Historic','2050\'s', '2080\'s'))
   #
   # p_e_doc_load_perc
+  p_e_gpp_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(GPP - retro_gpp)/retro_gpp * 100 * gpp_change,
+                                            color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
+    geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
+    geom_smooth(aes(x = (Precip-Evap), y = abs(GPP - retro_gpp)/retro_gpp * 100 * gpp_change),
+                method = 'lm', se = F, color = 'black',
+                inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
+    geom_point(show.legend = F) +
+    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    theme_classic() +
+    ylab(expression(Delta~GPP~('%'))) +
+    xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
+    theme(axis.text = element_text(size=16),
+          axis.title.y = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                       values = c('2050s' = 15,
+                                  '2080s' = 17,
+                                  'Retro' = 16),
+                       labels = c('Historic','2050\'s', '2080\'s'))
+
+  p_e_gpp_perc
 
   # g = ggdraw() +
   #   draw_plot(p_e_emit_perc, x = 0, y = .5, width = .5, height = .5) +
@@ -458,8 +497,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   #   draw_plot(p_e_emit_minus_bury_perc, x = 0, y = 0, width = .5, height = .5) +
   #   draw_plot(p_e_fracRet_perc, x= .5, y= 0, width = .5, height = .5)
 
-  g = plot_grid(p_e_emit_perc, p_e_bury_perc, p_e_emit_minus_bury_perc, p_e_fracRet_perc,
-            labels = c('A', 'B', 'C', 'D'), nrow = 2, align = 'hv')
+  g = plot_grid(p_e_emit_perc, p_e_bury_perc, p_e_gpp_perc, p_e_fracRet_perc,
+            labels = c('a', 'b', 'c', 'd'), nrow = 2, align = 'hv')
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width = 11, height = 10)

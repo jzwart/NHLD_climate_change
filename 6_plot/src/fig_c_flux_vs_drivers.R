@@ -10,10 +10,10 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
            Bury = Burial_total * 12 * 365, # bury in g C / year
            Emit_areal = Emit / Area, # emissions in g C/ m2/ year
            Bury_areal = Bury / Area, #  bury in g C / m2 / year
-           DOC_load = DOC_Load / Area,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
-    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,FracRet, DOC_Load, GPP, Vepi,
+    select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, HRT, Stage, Vol,
+           doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp)
 
   total <- all %>%
@@ -25,7 +25,6 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               Area = sum(Area),
               Emit_areal = mean(Emit_areal), # mean for all lakes
               Bury_areal = mean(Bury_areal),
-              DOC_load = median(DOC_load),
               FracRet = sum(DOC_Load * FracRet) / sum(DOC_Load),
               DOC_Load = sum(DOC_Load),
               Precip_lake = mean(Precip_lake),
@@ -37,7 +36,11 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               regional_DOC = sum(doc_conc * Vol) / sum(Vol),
               Vol = sum(Vol),
               DOC = sum(DOC)/sum(Vepi),
-              GPP = sum(GPP)/sum(Vepi)) %>%
+              total_resp = sum(DOC_Respired + sed_resp),
+              NEP = sum(GPP*.15 - DOC_Respired),
+              GPP = sum(GPP),
+              DOC_resp = sum(DOC_Respired),
+              Sed_resp = sum(sed_resp)) %>%
     ungroup()
 
   retro <- all %>%
@@ -65,6 +68,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   retro_fracRet = c_and_drivers$FracRet[c_and_drivers$gcm == 'Retro']
   retro_doc_load = c_and_drivers$DOC_Load[c_and_drivers$gcm == 'Retro']
   retro_gpp = c_and_drivers$GPP[c_and_drivers$gcm == 'Retro']
+  retro_doc_resp = c_and_drivers$DOC_resp[c_and_drivers$gcm == 'Retro']
+  retro_total_resp = c_and_drivers$total_resp[c_and_drivers$gcm == 'Retro']
+  retro_nep = c_and_drivers$NEP[c_and_drivers$gcm == 'Retro']
 
   c_and_drivers <- mutate(c_and_drivers,
                           emit_change = case_when(Emit > retro_emit ~ 1,
@@ -79,6 +85,12 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                                                     TRUE ~ -1),
                           gpp_change = case_when(GPP > retro_gpp ~ 1,
                                                  TRUE ~ -1),
+                          doc_resp_change = case_when(DOC_resp > retro_doc_resp ~ 1,
+                                                      TRUE ~ -1),
+                          total_resp_change = case_when(total_resp > retro_total_resp ~ 1,
+                                                      TRUE ~ -1),
+                          nep_change = case_when(NEP > retro_nep ~ 1,
+                                                        TRUE ~ -1),
                           gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 3,
                                                 gcm == 'FIO_ESM' ~ 4,
                                                 gcm == 'GFDL_CM3' ~ 2,
@@ -285,6 +297,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_blank(),
           legend.position = c(.15,.8),
           legend.text = element_text(size = 12)) +
@@ -403,6 +416,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_blank(),
           legend.position = c(.15,.8),
           legend.text = element_text(size = 12)) +
@@ -469,7 +483,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
     ylab(expression(Delta~GPP~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
     theme(axis.text = element_text(size=16),
-          axis.title.y = element_text(size = 16),
+          axis.title = element_text(size = 16),
           legend.title = element_blank(),
           legend.position = c(.15,.8),
           legend.text = element_text(size = 12)) +
@@ -491,16 +505,49 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
 
   p_e_gpp_perc
 
+  p_e_nep_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(NEP - retro_nep)/abs(retro_nep) * 100 * nep_change,
+                                           color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
+    geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
+    geom_smooth(aes(x = (Precip-Evap), y = abs(NEP - retro_nep)/abs(retro_nep) * 100 * nep_change),
+                method = 'lm', se = F, color = 'black',
+                inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
+    geom_point(show.legend = F) +
+    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    theme_classic() +
+    ylab(expression(Delta~NEP~('%'))) +
+    xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_blank(),
+          legend.position = c(.15,.8),
+          legend.text = element_text(size = 12)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 8,
+                                 '2080s' = 8,
+                                 'Retro' = 8),
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_shape_manual(name = 'period',
+                       values = c('2050s' = 15,
+                                  '2080s' = 17,
+                                  'Retro' = 16),
+                       labels = c('Historic','2050\'s', '2080\'s'))
+
+
   # g = ggdraw() +
   #   draw_plot(p_e_emit_perc, x = 0, y = .5, width = .5, height = .5) +
   #   draw_plot(p_e_bury_perc, x= .5, y= .5, width = .5, height = .5) +
   #   draw_plot(p_e_emit_minus_bury_perc, x = 0, y = 0, width = .5, height = .5) +
   #   draw_plot(p_e_fracRet_perc, x= .5, y= 0, width = .5, height = .5)
 
-  g = plot_grid(p_e_emit_perc, p_e_bury_perc, p_e_gpp_perc, p_e_fracRet_perc,
-            labels = c('a', 'b', 'c', 'd'), nrow = 2, align = 'hv')
+  g = plot_grid(p_e_emit_perc, p_e_bury_perc, p_e_emit_minus_bury_perc, p_e_fracRet_perc, p_e_gpp_perc, p_e_nep_perc,
+            labels = c('a', 'b', 'c', 'd', 'e','f'), nrow = 3, align = 'hv')
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 11, height = 10)
+  ggsave(fig_file, plot=g, width = 11, height = 15)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

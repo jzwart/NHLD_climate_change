@@ -14,9 +14,11 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
            DOC_load = DOC_Load / Area,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area,
-           GPP = GPP * Vepi) %>%
+           GPP = GPP * Vepi,
+           NEP = GPP*.15 - DOC_Respired) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,emergent_d_epi,pH,
-           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, Vepi, dicLoadvResp, FracRet, fracCO2)
+           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, Vepi, dicLoadvResp, FracRet, fracCO2,
+           DOC_Respired, NEP)
 
   total <- all %>%
     group_by(period, gcm) %>%
@@ -141,12 +143,13 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                aes(y = abs((Emit_future-Bury_future)-(Emit_retro-Bury_retro))/(Emit_retro-Bury_retro)*100*
                      ifelse((Emit_future-Bury_future)>(Emit_retro-Bury_retro),1,-1),
                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
-    geom_point(pch =16, alpha =.08, size = 2) +
+    geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
     ylab(expression(Delta~Emissions-Burial~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.25,.75),
           legend.background = element_blank(),
@@ -160,7 +163,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                       ifelse((Emit_future-Bury_future)>(Emit_retro-Bury_retro),1,-1),
                     x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
                     linetype = period_future),
-                method = 'loess', se = F, inherit.aes = F, size = 2) +
+                method = 'loess', se = F, inherit.aes = F, size = 2, show.legend = F) +
     ylim(c(-80,150)) +
     scale_linetype_discrete(name='',
                             labels = c('2050\'s', '2080\'s'))
@@ -194,6 +197,35 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                             labels = c('2050\'s', '2080\'s'))
 
   gpp = ggExtra::ggMarginal(gpp, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
+
+  nep = ggplot(stage_future,
+               aes(y = abs((NEP_future)-(NEP_retro))/abs(NEP_retro)*100*ifelse((NEP_future)>(NEP_retro),1,-1),
+                   x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
+    geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
+    theme_classic() +
+    ylab(expression(Delta~NEP~('%'))) +
+    xlab(expression(FHEE))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.75),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    # scale_color_continuous(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+    #                        low = 'lightblue',high = 'darkblue') +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    geom_smooth(aes(y = abs((NEP_future)-(NEP_retro))/abs(NEP_retro)*100*ifelse((NEP_future)>(NEP_retro),1,-1),
+                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future),
+                    linetype = period_future),
+                method = 'loess', se = F, inherit.aes = F, size = 2, show.legend = F) +
+    ylim(c(-100,100)) +
+    scale_linetype_discrete(name='',
+                            labels = c('2050\'s', '2080\'s'))
+
+  nep = ggExtra::ggMarginal(nep, type = 'density', margins = 'y', groupColour = T, size = 6, aes(size = 2))
+
 
   # dic_v_resp = ggplot(stage_future,
   #               aes(y = abs(dicLoadvResp_future-dicLoadvResp_retro)/dicLoadvResp_retro*100*ifelse(dicLoadvResp_future>dicLoadvResp_retro,1,-1),
@@ -336,6 +368,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.25,.8),
           legend.background = element_blank(),
@@ -397,10 +430,10 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
   #
   # d = ggExtra::ggMarginal(d, type = 'density', groupColour = T, size = 6, aes(size = 2))
 
-  g = plot_grid(emit, bury, gpp, frac_ret,
-                labels = c('a', 'b', 'c', 'd'), align = 'hv',nrow = 2)
+  g = plot_grid(emit, bury, e_b, frac_ret, gpp, nep,
+                labels = c('a', 'b', 'c', 'd', 'e','f'), align = 'hv',nrow = 3)
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 14, height = 14)
+  ggsave(fig_file, plot=g, width = 14, height = 20)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }

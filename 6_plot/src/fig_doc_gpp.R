@@ -101,7 +101,7 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
                    color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2) +
     theme_classic() +
-    ylab(expression(Delta~DOC~('%'))) +
+    ylab(expression(Delta~DOC~concentration~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -133,8 +133,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
     ylim(c(-100,250)) +
     xlim(c(-30,150)) +
     theme_classic() +
-    xlab(expression(Delta~DOC~('%'))) +
-    ylab(expression(Delta~GPP~('%')))+
+    xlab(expression(Delta~DOC~concentration~('%'))) +
+    ylab(expression(Delta~volumetric~GPP~('%')))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
           legend.title = element_text(size =14),
@@ -191,9 +191,9 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
     geom_vline(xintercept = 0, linetype ='dashed', color ='black',size =1)
 
 
-  g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('A', 'B'), align = 'h')
+  g = plot_grid(doc_fhee, gpp_doc_ratio, labels = c('a', 'b'), align = 'h')
 
-  g = plot_grid(doc_fhee, low_doc, high_doc, labels = c('a','b','c'), align = 'h', rows = 1)
+  # g = plot_grid(doc_fhee, low_doc, high_doc, labels = c('a','b','c'), align = 'h', rows = 1)
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=g, width = 14, height = 7)

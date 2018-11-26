@@ -90,7 +90,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
              x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Emissions~('%'))) +
+    ylab(expression(Delta~mol~C~emissions~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -117,7 +117,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                     x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Burial~('%'))) +
+    ylab(expression(Delta~mol~C~burial~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -145,7 +145,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~Emissions-Burial~('%'))) +
+    ylab(expression(Delta~(mol~C~emissions-mol~C~burial)~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -175,7 +175,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~GPP~('%'))) +
+    ylab(expression(Delta~mol~C~GPP~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -203,7 +203,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
                    x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +
     geom_point(pch =16, alpha =.08, size = 2, show.legend = F) +
     theme_classic() +
-    ylab(expression(Delta~NEP~('%'))) +
+    ylab(expression(Delta~mol~C~NEP~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),
@@ -364,7 +364,7 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
     geom_point(pch =16, alpha =.08, size = 2) +
     geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
     theme_classic() +
-    ylab(expression(Delta~Percent~C~Removed~('%'))) +
+    ylab(expression(Delta~percent~C~removed~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.title = element_text(size = 16),

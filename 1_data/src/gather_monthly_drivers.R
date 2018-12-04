@@ -48,7 +48,14 @@ gather_monthly_drivers <- function(ind_file, gd_config){
            var_value = var_value.x + var_value.y) %>%
     select(period, gcm, month, var, var_value)
 
-  out <- bind_rows(out, r_b)
+  p <- out %>% dplyr::filter(var =='Precip')
+  e <- out %>% dplyr::filter(var == 'Evap')
+  p_e <- left_join(p, e, by = c('period' = 'period', 'gcm'='gcm', 'month'='month')) %>%
+    mutate(var = 'P-E',
+           var_value = var_value.x - var_value.y) %>%
+    select(period, gcm, month, var, var_value)
+
+  out <- bind_rows(out, r_b, p_e)
 
   data_file = as_data_file(ind_file)
   saveRDS(out, data_file)

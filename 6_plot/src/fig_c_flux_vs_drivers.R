@@ -163,6 +163,13 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        labels = c('Historic','2050\'s', '2080\'s'))
 
   p_e_emit_perc
+  delta_emit = abs(c_and_drivers$Emit - retro_emit)/retro_emit * 100 * c_and_drivers$emit_change
+  p_e = c_and_drivers$Precip - c_and_drivers$Evap
+  temp = c_and_drivers$Temp
+
+  summary(lm(delta_emit~p_e))
+  res = resid(lm(delta_emit~p_e))
+  summary(lm(res~temp))
 
   # r_b_bury = ggplot(c_and_drivers, aes(x = (Precip-Evap), y = Bury / 10^9, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -227,6 +234,11 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        labels = c('Historic','2050\'s', '2080\'s'))
 
   p_e_bury_perc
+  delta_bury = abs(c_and_drivers$Bury - retro_bury)/retro_bury * 100 * c_and_drivers$bury_change
+
+  summary(lm(delta_bury~p_e))
+  res = resid(lm(delta_bury~p_e))
+  summary(lm(res~temp))
 
   # r_b_emit_to_bury = ggplot(c_and_drivers, aes(x = (Precip-Evap), y = Emit / Bury, fill = period, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -318,6 +330,11 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        labels = c('Historic','2050\'s', '2080\'s'))
 
   p_e_emit_minus_bury_perc
+  delta_emit_minus_bury = abs((c_and_drivers$Emit-c_and_drivers$Bury) - retro_emit_minus_bury)/retro_emit_minus_bury * 100 * c_and_drivers$emit_bury_change
+
+  summary(lm(delta_emit_minus_bury~p_e))
+  res = resid(lm(delta_emit_minus_bury~p_e))
+  summary(lm(res~temp))
 
   # doc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = DOC, fill = period, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -437,6 +454,11 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        labels = c('Historic','2050\'s', '2080\'s'))
 
   p_e_fracRet_perc
+  delta_fracRet = abs(c_and_drivers$FracRet*100 - retro_fracRet*100) * c_and_drivers$fracRet_change
+
+  summary(lm(delta_fracRet~p_e))
+  res = resid(lm(delta_fracRet~p_e))
+  summary(lm(res~temp))
 
   # p_e_doc_load_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(DOC_Load - retro_doc_load)/retro_doc_load * 100 * doc_load_change,
   #                                              color = period, size =period, shape = period)) +  # converting to %

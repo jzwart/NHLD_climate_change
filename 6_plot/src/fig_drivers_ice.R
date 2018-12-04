@@ -41,6 +41,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     left_join(drivers_retro, by = 'tmp', suffix = c('_future', '_retro')) %>%
     select(-tmp)
 
+  drivers <- mutate(drivers, period = factor(period, levels = c('Retro','2050s','2080s')))
+
   snow <- readRDS(snow_file)
 
   month_temp = ggplot(dplyr::filter(drivers, var == 'Temp'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
@@ -61,24 +63,24 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
                                   'Retro' = fig_config$period$Retro),
-                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+                       labels = c('2050\'s','2080\'s', 'Historic')) +
     scale_fill_manual(name = 'period',
                       values = c('2050s' = fig_config$period$`2050s`,
                                  '2080s' = fig_config$period$`2080s`,
                                  'Retro' = fig_config$period$Retro),
-                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+                      labels = c('2050\'s','2080\'s', 'Historic')) +
     scale_size_manual(name = 'period',
                       values = c('2050s' = 3,
                                  '2080s' = 3,
                                  'Retro' = 2),
-                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+                      labels = c('2050\'s','2080\'s', 'Historic')) +
     scale_linetype_manual(name = 'period',
                           values = c('2050s' = 'solid',
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
-                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+                          labels = c('2050\'s','2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b')) +
-    labs(tag = 'A')
+    labs(tag = 'a')
 
   month_precip = ggplot(dplyr::filter(drivers, var == 'Precip'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Precip'),
@@ -115,7 +117,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))+
-    labs(tag = 'C')
+    labs(tag = 'c')
 
   month_evap = ggplot(dplyr::filter(drivers, var == 'Evap'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Evap'),
@@ -152,7 +154,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))+
-    labs(tag = 'E')
+    labs(tag = 'e')
 
   month_runoff = ggplot(dplyr::filter(drivers, var == 'Runoff'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Runoff'),
@@ -225,7 +227,44 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                      'Retro' = 'dashed'),
                           labels = c('2050\'s', '2080\'s', 'Historic')) +
     scale_x_date(labels = scales::date_format('%b'))+
-    labs(tag = 'G')
+    labs(tag = 'g')
+
+  month_p_e = ggplot(dplyr::filter(drivers, var == 'P-E'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'P-E'),
+                aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
+                alpha = .2, size = .5, show.legend = F) +
+    geom_line(show.legend = F) +
+    theme_classic() +
+    ylab(bquote(Precip-Evap~(mm))) +
+    theme(legend.title = element_blank(),
+          axis.text = element_text(size=16),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 16),
+          legend.position = c(.15,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 10)) +
+    scale_color_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_fill_manual(name = 'period',
+                      values = c('2050s' = fig_config$period$`2050s`,
+                                 '2080s' = fig_config$period$`2080s`,
+                                 'Retro' = fig_config$period$Retro),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_size_manual(name = 'period',
+                      values = c('2050s' = 3,
+                                 '2080s' = 3,
+                                 'Retro' = 2),
+                      labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_linetype_manual(name = 'period',
+                          values = c('2050s' = 'solid',
+                                     '2080s' = 'solid',
+                                     'Retro' = 'dashed'),
+                          labels = c('2050\'s', '2080\'s', 'Historic')) +
+    scale_x_date(labels = scales::date_format('%b'))+
+    labs(tag = 'g')
 
   temp_diff = ggplot(drivers_future, aes(x = period, y = Temp_future - Temp_retro, color = period, fill = period,
                                   size =period, shape = period)) +
@@ -255,7 +294,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16),
                        labels = c('2050\'s', '2080\'s'))+
-    labs(tag = 'B')
+    labs(tag = 'b')
 
   temp_diff
 
@@ -287,7 +326,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16),
                        labels = c('2050\'s', '2080\'s'))+
-    labs(tag = 'D')
+    labs(tag = 'd')
 
   precip_diff
 
@@ -319,7 +358,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16),
                        labels = c('2050\'s', '2080\'s'))+
-    labs(tag = 'F')
+    labs(tag = 'f')
 
   evap_diff
 
@@ -351,7 +390,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = 16,
                                   '2080s' = 16),
                        labels = c('2050\'s', '2080\'s'))+
-    labs(tag = 'H')
+    labs(tag = 'h')
 
   r_b_diff
 
@@ -623,7 +662,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                                 'Retro' = fig_config$period$Retro)) +
     scale_y_continuous(breaks = date_breaks,
                        labels = strftime(as.Date(water_day_to_date$date[water_day_to_date$water_day %in% date_breaks], format = '%b %d'), format = '%b'))+
-    labs(tag = 'I') +
+    labs(tag = 'i') +
     ggrepel::geom_text_repel(data = max_snow,
                              aes(x = max_snow, y = max_snow_date, label = paste('Max Snow:',round(max_label, digits = 2), 'm')),
                              segment.size  = 1,

@@ -13,11 +13,12 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, HRT, Stage, Vol,
-           doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp,
+           doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp, Vepi,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp)
 
   total <- all %>%
-    mutate(GPP = GPP * Vepi, # converting mol C m-3 day-1 to mol C day-1
+    mutate(GPP_vol = GPP,
+           GPP = GPP * Vepi, # converting mol C m-3 day-1 to mol C day-1
            DOC = doc_conc * Vepi) %>%
     group_by(period, gcm) %>%
     dplyr::summarise(Emit = sum(Emit),
@@ -35,10 +36,12 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               HRT = median(HRT),
               regional_DOC = sum(doc_conc * Vol) / sum(Vol),
               Vol = sum(Vol),
+              Vepi = sum(Vepi),
               DOC = sum(DOC)/sum(Vepi),
               total_resp = sum(DOC_Respired + sed_resp),
               NEP = sum(GPP*.15 - DOC_Respired),
               GPP = sum(GPP),
+              GPP_vol = GPP/Vepi,
               DOC_resp = sum(DOC_Respired),
               Sed_resp = sum(sed_resp)) %>%
     ungroup()
@@ -56,7 +59,16 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
     group_by(period, gcm, var) %>%
     dplyr::summarise(var_value = sum(var_value)) %>%
     ungroup() %>%
-    spread(key = 'var', value = 'var_value')
+    spread(key = 'var', value = 'var_value') %>% select(-Temp)
+
+  # temperature is average rather than cumulative like the other vars
+  ave_temp <- drivers %>%
+    group_by(period, gcm, var) %>%
+    dplyr::summarise(var_value = mean(var_value)) %>%
+    ungroup() %>%
+    spread(key = 'var', value = 'var_value') %>% select(period, gcm, Temp)
+
+  ave_drivers <- left_join(ave_drivers, ave_temp, by = c('period', 'gcm'))
 
   c_and_drivers <- left_join(total, ave_drivers, by = c('period' = 'period', 'gcm' = 'gcm')) %>%
     left_join(merged, by = c('period' = 'period_future', 'gcm' = 'gcm_future')) %>%
@@ -68,6 +80,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   retro_fracRet = c_and_drivers$FracRet[c_and_drivers$gcm == 'Retro']
   retro_doc_load = c_and_drivers$DOC_Load[c_and_drivers$gcm == 'Retro']
   retro_gpp = c_and_drivers$GPP[c_and_drivers$gcm == 'Retro']
+  retro_gpp_vol = c_and_drivers$GPP_vol[c_and_drivers$gcm == 'Retro']
   retro_doc_resp = c_and_drivers$DOC_resp[c_and_drivers$gcm == 'Retro']
   retro_total_resp = c_and_drivers$total_resp[c_and_drivers$gcm == 'Retro']
   retro_nep = c_and_drivers$NEP[c_and_drivers$gcm == 'Retro']
@@ -84,6 +97,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                           doc_load_change = case_when(DOC_Load > retro_doc_load ~ 1,
                                                                     TRUE ~ -1),
                           gpp_change = case_when(GPP > retro_gpp ~ 1,
+                                                 TRUE ~ -1),
+                          gpp_vol_change = case_when(GPP_vol > retro_gpp_vol ~ 1,
                                                  TRUE ~ -1),
                           doc_resp_change = case_when(DOC_resp > retro_doc_resp ~ 1,
                                                       TRUE ~ -1),
@@ -170,6 +185,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   summary(lm(delta_emit~p_e))
   res = resid(lm(delta_emit~p_e))
   summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   # r_b_bury = ggplot(c_and_drivers, aes(x = (Precip-Evap), y = Bury / 10^9, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -239,6 +255,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   summary(lm(delta_bury~p_e))
   res = resid(lm(delta_bury~p_e))
   summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   # r_b_emit_to_bury = ggplot(c_and_drivers, aes(x = (Precip-Evap), y = Emit / Bury, fill = period, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -335,6 +352,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   summary(lm(delta_emit_minus_bury~p_e))
   res = resid(lm(delta_emit_minus_bury~p_e))
   summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   # doc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = DOC, fill = period, color = period)) +  # converting to gigagrams
   #   geom_point(size = 8, shape = 16, show.legend = F) +
@@ -459,6 +477,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   summary(lm(delta_fracRet~p_e))
   res = resid(lm(delta_fracRet~p_e))
   summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   # p_e_doc_load_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(DOC_Load - retro_doc_load)/retro_doc_load * 100 * doc_load_change,
   #                                              color = period, size =period, shape = period)) +  # converting to %
@@ -526,6 +545,20 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                        labels = c('Historic','2050\'s', '2080\'s'))
 
   p_e_gpp_perc
+  delta_gpp = abs(c_and_drivers$GPP - retro_gpp)/retro_gpp * 100 * c_and_drivers$gpp_change
+  delta_gpp_vol = abs(c_and_drivers$GPP_vol - retro_gpp_vol)/retro_gpp_vol * 100 * c_and_drivers$gpp_vol_change
+
+  # total GPP
+  summary(lm(delta_gpp~p_e))
+  res = resid(lm(delta_gpp~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
+
+  # volumetric GPP
+  summary(lm(delta_gpp_vol~p_e))
+  res = resid(lm(delta_gpp_vol~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   p_e_nep_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(NEP - retro_nep)/abs(retro_nep) * 100 * nep_change,
                                            color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
@@ -559,6 +592,13 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                   'Retro' = 16),
                        labels = c('Historic','2050\'s', '2080\'s'))
 
+  p_e_nep_perc
+  delta_nep = abs(c_and_drivers$NEP - retro_nep)/abs(retro_nep) * 100 * c_and_drivers$nep_change
+
+  summary(lm(delta_nep~p_e))
+  res = resid(lm(delta_nep~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
 
   # g = ggdraw() +
   #   draw_plot(p_e_emit_perc, x = 0, y = .5, width = .5, height = .5) +

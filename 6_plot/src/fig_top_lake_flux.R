@@ -15,7 +15,9 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, DOC_load, HRT, Stage, Vol, doc_conc,
-           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap)
+           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, lakeSizeBins, percentEvap, GPP, Vepi) %>%
+    mutate(GPP = GPP * Vepi) # converting from volumetric to mol C
+
 
   total <- all %>%
     group_by(period, gcm) %>%
@@ -98,6 +100,33 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
     arrange(Bury_retro, .by_group = T) %>%
     mutate(cumsum_bury_diff = abs(cumsum(bury_diff))/ max(cumsum_bury_retro) *100*ifelse(cumsum(bury_diff)>0,1,-1)) %>%
     ungroup()
+
+  top_gpp <- all %>%
+    group_by(period, gcm) %>%
+    arrange(GPP, .by_group = T) %>%
+    mutate(cumsum_gpp = cumsum(GPP),
+           cumsum_frac_gpp = cumsum_gpp / sum(GPP),
+           frac_lakes = seq(1:length(cumsum_frac_gpp))/length(cumsum_frac_gpp)) %>%
+    arrange(desc(GPP), .by_group = T) %>%
+    mutate(top_gpp = case_when(cumsum_frac_gpp >= top_frac ~ 'top',
+                                TRUE ~ 'bottom'),
+           top_gpp = factor(top_gpp, levels = c('top','bottom')),
+           cumsum_frac_gpp_bins = cut(cumsum_frac_gpp, breaks = bins)) %>%
+    ungroup() %>%
+    left_join(ave_drivers, by = c('period' = 'period','gcm' = 'gcm'))
+
+  top_gpp_retro <- top_gpp %>%
+    dplyr::filter(gcm == 'Retro')
+
+  top_gpp_future <- top_gpp %>%
+    dplyr::filter(gcm != 'Retro') %>%
+    left_join(top_gpp_retro, by = 'Permanent_', suffix = c('_future','_retro')) %>%
+    mutate(gpp_diff = GPP_future - GPP_retro) %>%
+    group_by(period_future, gcm_future) %>%
+    arrange(GPP_retro, .by_group = T) %>%
+    mutate(cumsum_gpp_diff = abs(cumsum(gpp_diff))/ max(cumsum_gpp_retro) *100*ifelse(cumsum(gpp_diff)>0,1,-1)) %>%
+    ungroup()
+
 
   emit_minus_bury <- all %>%
     mutate(emit_minus_bury = Emit - Bury) %>%
@@ -302,7 +331,14 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
                           guide = guide_legend(title = expression(Period)))
 
 
-#
+  high_bury = top_bury_future %>%
+    dplyr::filter(frac_lakes_retro > inset_xmin_b)
+
+  hi = high_bury %>%
+    select(Area_future, percentEvap_future) %>%
+    summarise_all(median)
+
+  #
 #   emit_minus_bury = ggplot(emit_minus_bury_future, aes(x = cumsum_frac_emit_minus_bury_retro,
 #                                                        y = cumsum_emit_minus_bury_diff/10^9, linetype = period_future,
 #                                      group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
@@ -324,6 +360,65 @@ fig_top_lake_flux <- function(fig_ind, transparent, scenarios, drivers_file, fig
 #                                      '2080s' = 'solid'),
 #                           labels = c('2050\'s', '2080\'s'),
                           # guide = guide_legend(title = expression(Period)))
+
+  inset_lim_g = .1 # where 90% of gpp occur
+  inset_xmin_g = mean(top_gpp_future$frac_lakes_retro[which(round(top_gpp_future$cumsum_frac_gpp_retro,digits = 3) == inset_lim_b)])
+  inset_xmax_g = 1.0
+  inset_ymin_g = min(top_gpp_future$cumsum_gpp_diff)
+  inset_ymax_g = max(top_gpp_future$cumsum_gpp_diff)
+
+  gpp = ggplot(top_gpp_future, aes(x = frac_lakes_retro, y = cumsum_gpp_diff, linetype = period_future,
+                                     group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 1.5,show.legend = F) +
+    geom_rect(mapping = aes(xmin = inset_xmin_g, xmax = inset_xmax_g, ymin = inset_ymin_g, ymax= inset_ymax_g), fill = NA,
+              color = 'black' , linetype = 'dotted', show.legend = F, size = 1) +
+    theme_classic() +
+    ylab(expression(Cumulative~Delta~GPP~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
+    theme(axis.text = element_text(size=16),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
+  gpp_inset = ggplot(top_gpp_future, aes(x = frac_lakes_retro, y = cumsum_gpp_diff, linetype = period_future,
+                                           group = interaction(period_future, gcm_future), color = Runoff_and_baseflow_future)) +
+    geom_line(size = 1.5, show.legend = F) +
+    xlim(c(inset_xmin_g, inset_xmax_g)) +
+    theme_classic() +
+    ylab(expression(Cumulative~Delta~Burial~('%'))) +
+    xlab(expression(Cumulative~Fraction~of~Lakes))+
+    theme(axis.text = element_text(size=12),
+          axis.title = element_blank(),
+          legend.title = element_text(size =14),
+          legend.position = c(.25,.8),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    scale_color_viridis(guide = guide_colorbar(title = expression(Precip-Evap~(mm~yr^-1))),
+                        begin = 0, end = 1, direction = -1) +
+    scale_linetype_manual(name = 'period_future',
+                          values = c('2050s' = 'twodash',
+                                     '2080s' = 'solid'),
+                          labels = c('2050\'s', '2080\'s'),
+                          guide = guide_legend(title = expression(Period)))
+
+  high_gpp = top_gpp_future %>%
+    dplyr::filter(frac_lakes_retro > inset_xmin_g)
+
+  hi = high_gpp %>%
+    select(Area_future, percentEvap_future) %>%
+    summarise_all(median)
+
 
   # g = plot_grid(emit, bury, labels = c('A', 'B'), align = 'h')
 

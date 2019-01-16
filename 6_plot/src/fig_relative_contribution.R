@@ -257,7 +257,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           strip.background = element_blank(),
           strip.text = element_blank())+
     facet_wrap(~period_gcm)+
-    ylim(c(-40,50))
+    ylim(c(-40,25))
 
   bury_facet
 
@@ -285,14 +285,15 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           strip.background = element_blank(),
           strip.text = element_blank())+
     facet_wrap(~period_gcm)+
-    ylim(c(-60,40))
+    ylim(c(-60,30))
 
   gpp_facet
 
-  g = plot_grid(emit_facet, bury_facet, labels = c('a', 'b'), align = 'hv', rows = 2)
+  g = plot_grid(emit_facet, bury_facet, gpp_facet,
+                labels = c('a', 'b', 'c'), align = 'hv', rows = 3)
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 7, height = 14)
+  ggsave(fig_file, plot=g, width = 7, height = 21)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }
 

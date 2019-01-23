@@ -85,6 +85,12 @@ fig_flux_vs_fhee <- function(fig_ind, transparent, scenarios, drivers_file, fig_
 
   merged$doc_change = merged$doc_conc_future/merged$doc_conc_retro
 
+  # picking the wettest and driest scenario for two time periods to see if it can help improve clarity of figure
+  #   wettest = GFDL_CM3 ; driest = HadGEM2_AO
+  stage_future = stage_future %>%
+    dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
+
+
   emit = ggplot(stage_future,
          aes(y = abs(Emit_future-Emit_retro)/Emit_retro*100 * ifelse(Emit_future > Emit_retro, 1, -1),
              x = percentEvap_future, color = (Precip_future - Evap_future), group = (Precip_future - Evap_future))) +

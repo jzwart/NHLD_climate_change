@@ -94,6 +94,11 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
   #   geom_point(data= dplyr::filter(merged, doc_conc_retro <30, doc_change < .9),
   #              aes(x = doc_conc_retro, y = GPP_future/GPP_retro), color ='red')
 
+  # picking the wettest and driest scenario for two time periods to see if it can help improve clarity of figure
+  #   wettest = GFDL_CM3 ; driest = HadGEM2_AO
+  doc_future = doc_future %>%
+    dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
+
 
   doc_fhee = ggplot(doc_future,
                aes(y = abs(doc_conc_future-doc_conc_retro)/doc_conc_retro*100*ifelse(doc_conc_future>doc_conc_retro,1,-1),
@@ -124,6 +129,11 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
                             labels = c('2050\'s', '2080\'s'))
 
   doc_fhee = ggExtra::ggMarginal(doc_fhee, type = 'density',groupColour = T, size = 6, aes(size = 2))
+
+  # picking the wettest and driest scenario for two time periods to see if it can help improve clarity of figure
+  #   wettest = GFDL_CM3 ; driest = HadGEM2_AO
+  merged = merged %>%
+    dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
 
 
   gpp_doc_ratio = ggplot(dplyr::filter(merged, doc_conc_retro <=40),

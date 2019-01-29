@@ -183,6 +183,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   temp = c_and_drivers$Temp
 
   summary(lm(delta_emit~p_e))
+  summary(lm(delta_emit~p_e+temp))
   res = resid(lm(delta_emit~p_e))
   summary(lm(res~temp))
   plot(res~temp, pch = 16)
@@ -253,6 +254,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   delta_bury = abs(c_and_drivers$Bury - retro_bury)/retro_bury * 100 * c_and_drivers$bury_change
 
   summary(lm(delta_bury~p_e))
+  summary(lm(delta_bury~p_e+temp))
   res = resid(lm(delta_bury~p_e))
   summary(lm(res~temp))
   plot(res~temp, pch = 16)
@@ -350,6 +352,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   delta_emit_minus_bury = abs((c_and_drivers$Emit-c_and_drivers$Bury) - retro_emit_minus_bury)/retro_emit_minus_bury * 100 * c_and_drivers$emit_bury_change
 
   summary(lm(delta_emit_minus_bury~p_e))
+  summary(lm(delta_emit_minus_bury~p_e+temp))
   res = resid(lm(delta_emit_minus_bury~p_e))
   summary(lm(res~temp))
   plot(res~temp, pch = 16)
@@ -475,6 +478,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   delta_fracRet = abs(c_and_drivers$FracRet*100 - retro_fracRet*100) * c_and_drivers$fracRet_change
 
   summary(lm(delta_fracRet~p_e))
+  summary(lm(delta_fracRet~p_e+temp))
   res = resid(lm(delta_fracRet~p_e))
   summary(lm(res~temp))
   plot(res~temp, pch = 16)
@@ -550,14 +554,18 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
 
   # total GPP
   summary(lm(delta_gpp~p_e))
+  summary(lm(delta_gpp~p_e+temp))
   res = resid(lm(delta_gpp~p_e))
   summary(lm(res~temp))
+  cor(res, temp)
   plot(res~temp, pch = 16)
 
   # volumetric GPP
   summary(lm(delta_gpp_vol~p_e))
+  summary(lm(delta_gpp_vol~p_e+temp))
   res = resid(lm(delta_gpp_vol~p_e))
   summary(lm(res~temp))
+  cor(res,temp)
   plot(res~temp, pch = 16)
 
   p_e_nep_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(NEP - retro_nep)/abs(retro_nep) * 100 * nep_change,
@@ -596,6 +604,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   delta_nep = abs(c_and_drivers$NEP - retro_nep)/abs(retro_nep) * 100 * c_and_drivers$nep_change
 
   summary(lm(delta_nep~p_e))
+  summary(lm(delta_nep~p_e+temp))
   res = resid(lm(delta_nep~p_e))
   summary(lm(res~temp))
   plot(res~temp, pch = 16)

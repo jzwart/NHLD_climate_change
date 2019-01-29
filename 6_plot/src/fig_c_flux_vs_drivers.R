@@ -607,6 +607,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   summary(lm(delta_nep~p_e+temp))
   res = resid(lm(delta_nep~p_e))
   summary(lm(res~temp))
+  cor(res, temp)
   plot(res~temp, pch = 16)
 
   # g = ggdraw() +

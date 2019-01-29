@@ -96,8 +96,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
 
   # picking the wettest and driest scenario for two time periods to see if it can help improve clarity of figure
   #   wettest = GFDL_CM3 ; driest = HadGEM2_AO
-  doc_future = doc_future %>%
-    dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
+  # doc_future = doc_future %>%
+  #   dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
 
 
   doc_fhee = ggplot(doc_future,
@@ -132,8 +132,8 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
 
   # picking the wettest and driest scenario for two time periods to see if it can help improve clarity of figure
   #   wettest = GFDL_CM3 ; driest = HadGEM2_AO
-  merged = merged %>%
-    dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
+  # merged = merged %>%
+  #   dplyr::filter(gcm_future %in% c('GFDL_CM3','HadGEM2_AO'))
 
 
   gpp_doc_ratio = ggplot(dplyr::filter(merged, doc_conc_retro <=40),

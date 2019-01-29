@@ -30,6 +30,14 @@ quad = merged %>%
 
 quad$quadrant = factor(quad$quadrant)
 
+quad_total_gpp = merged %>%
+  mutate(quadrant = case_when(doc_conc_future > doc_conc_retro & GPP_future*Vepi_future>GPP_retro*Vepi_retro ~ 2,
+                              doc_conc_future > doc_conc_retro & GPP_future*Vepi_future<GPP_retro*Vepi_retro ~ 3,
+                              doc_conc_future < doc_conc_retro & GPP_future*Vepi_future<GPP_retro*Vepi_retro ~ 4,
+                              doc_conc_future < doc_conc_retro & GPP_future*Vepi_future>GPP_retro*Vepi_retro ~ 1))
+
+quad_total_gpp$quadrant = factor(quad_total_gpp$quadrant)
+
 
 ggplot(data = quad, aes(x = quadrant, y = abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1), group = quadrant)) +
   geom_boxplot()
@@ -48,7 +56,29 @@ ggplot(data = quad, aes(x = quadrant, y = abs(waterIn_future-waterIn_retro)/wate
   geom_boxplot() +
   ylim(-100,100)
 
-quad %>%
+summary = quad %>%
+  group_by(quadrant) %>%
+  summarise(count = n(),
+            bury = sum(Bury_retro)/10^9,
+            bury_future = sum(Bury_future)/10^9,
+            frac_hetero = sum(NEP_future<NEP_retro)/count,
+            emit_bury = sum((Emit_future - Bury_future)-(Emit_retro - Bury_retro))/10^9,
+            delta_bury = median(abs(Bury_future-Bury_retro)/Bury_retro*100*ifelse(Bury_future>Bury_retro,1,-1)),
+            delta_emit = median(abs(Emit_future-Emit_retro)/Emit_retro*100*ifelse(Emit_future>Emit_retro,1,-1)),
+            delta_dic_v_resp = median(abs(dicLoadvResp_future-dicLoadvResp_retro)/dicLoadvResp_retro*100*ifelse(dicLoadvResp_future>dicLoadvResp_retro,1,-1)),
+            dic_v_resp = median(dicLoadvResp_future),
+            doc_resp = median(abs(DOC_Respired_future-DOC_Respired_retro)/DOC_Respired_retro*100*ifelse(DOC_Respired_future>DOC_Respired_retro,1,-1)),
+            delta_fhee = median(abs(percentEvap_future-percentEvap_retro)/percentEvap_retro*100*ifelse(percentEvap_future>percentEvap_retro,1,-1)),
+            fhee = median(percentEvap_retro),
+            delta_water_in = median(abs(waterIn_future-waterIn_retro)/waterIn_retro*100*ifelse(waterIn_future>waterIn_retro,1,-1)),
+            doc = mean(doc_conc_retro),
+            doc_future = mean(doc_conc_future),
+            area = median(Area_retro),
+            gpp = median(GPP_retro),
+            emit = sum(Emit_retro)/10^9,
+            emit_future = sum(Emit_future)/sum(quad$Emit_future))
+
+summary_total_gpp = quad_total_gpp %>%
   group_by(quadrant) %>%
   summarise(count = n(),
             bury = sum(Bury_retro)/10^9,

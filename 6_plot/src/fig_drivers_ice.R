@@ -45,10 +45,17 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
 
   snow <- readRDS(snow_file)
 
-  month_temp = ggplot(dplyr::filter(drivers, var == 'Temp'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
-    geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Temp'),
+  # copying driver file and filling retro with NA's so we can plot the legend appropriately
+  drivers_na_retro = drivers %>%
+    mutate(mean = case_when(var == 'Temp' & period != 'Retro' ~ mean),
+           min = case_when(var == 'Temp' & period != 'Retro' ~ min),
+           max = case_when(var == 'Temp' & period != 'Retro' ~ max))
+
+  month_temp = ggplot(dplyr::filter(drivers, var == 'Temp'),
+                      aes(x = month, y = mean, color = period, size = period, linetype = period)) +
+    geom_ribbon(data = dplyr::filter(drivers_na_retro,  var == 'Temp'),
                 aes(x = month, y = mean, ymax = max, ymin = min, color = period, fill = period),
-                alpha = .2, size = .5, show.legend = F) +
+                alpha = .2, size = .5, show.legend = F, inherit.aes = F) +
     geom_line() +
     theme_classic() +
     ylab(bquote(Air~Temperature~(C))) +
@@ -63,24 +70,26 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
                                   'Retro' = fig_config$period$Retro),
-                       labels = c('2050\'s','2080\'s', 'Historic')) +
-    scale_fill_manual(name = 'period',
-                      values = c('2050s' = fig_config$period$`2050s`,
-                                 '2080s' = fig_config$period$`2080s`,
-                                 'Retro' = fig_config$period$Retro),
-                      labels = c('2050\'s','2080\'s', 'Historic')) +
+                       labels = c('Historic','2050\'s', '2080\'s'))+
     scale_size_manual(name = 'period',
                       values = c('2050s' = 3,
                                  '2080s' = 3,
                                  'Retro' = 2),
-                      labels = c('2050\'s','2080\'s', 'Historic')) +
+                      labels = c('Historic','2050\'s', '2080\'s')) +
+    scale_fill_manual(name = 'period',
+                       values = c('2050s' = fig_config$period$`2050s`,
+                                  '2080s' = fig_config$period$`2080s`,
+                                  'Retro' = fig_config$period$Retro),
+                       labels = c('Historic','2050\'s', '2080\'s'))+
     scale_linetype_manual(name = 'period',
                           values = c('2050s' = 'solid',
                                      '2080s' = 'solid',
                                      'Retro' = 'dashed'),
-                          labels = c('2050\'s','2080\'s', 'Historic')) +
+                          labels = c('Historic','2050\'s', '2080\'s')) +
     scale_x_date(labels = scales::date_format('%b')) +
     labs(tag = 'a')
+
+  month_temp
 
   month_precip = ggplot(dplyr::filter(drivers, var == 'Precip'), aes(x = month, y = mean, color = period, size = period, linetype = period)) +
     geom_ribbon(data = dplyr::filter(drivers, period != 'Retro', var == 'Precip'),
@@ -690,7 +699,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     draw_plot(evap_diff, x = .3, y = .5, width = .15, height = .15) +
     draw_plot(r_b_diff, x = .8, y = .5, width = .15, height = .15) +
     draw_plot(ice_panel, x = 0, y = 0, width = .6, height = .45) +
-    draw_plot(basemap, x = .6, y = 0, width = .4, height = .45)
+    draw_plot(basemap, x = .6, y = 0, width = .4, height = .45) +
+    draw_label('j', x = .62, y = .41) # panel for map
 
   g
 

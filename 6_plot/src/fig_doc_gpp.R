@@ -125,8 +125,9 @@ fig_doc_gpp <- function(fig_ind, transparent, scenarios, drivers_file, fig_cfg_y
                     linetype = period_future),
                 method = 'loess', se = F, inherit.aes = F, size = 2) +
     ylim(c(-30,150))+
-    scale_linetype_discrete(name='',
-                            labels = c('2050\'s', '2080\'s'))
+    scale_linetype_discrete(name = 'period_future',
+                            labels = c('2050\'s', '2080\'s'),
+                            guide = guide_legend(title = expression(Period)))
 
   doc_fhee = ggExtra::ggMarginal(doc_fhee, type = 'density',groupColour = T, size = 6, aes(size = 2))
 

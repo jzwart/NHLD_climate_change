@@ -127,7 +127,8 @@ fig_gpp_vol_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = T) +
-    geom_text(hjust = 0, nudge_x = .4, nudge_y = 1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .4, nudge_y = 1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~m^-3~GPP~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -161,7 +162,8 @@ fig_gpp_vol_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~m^-3~GPP~('%')~(P-E)~~residuals)) +
     xlab(expression(Ave.~Annual~Temperature~(degree~C)))+
@@ -189,7 +191,7 @@ fig_gpp_vol_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file
   temp_gpp_vol_resid
 
 
-  g = plot_grid(p_e_gpp_vol_perc, temp_gpp_resid,
+  g = plot_grid(p_e_gpp_vol_perc, temp_gpp_vol_resid,
             labels = c('a', 'b'), nrow = 1, align = 'hv')
 
   fig_file = as_data_file(fig_ind)

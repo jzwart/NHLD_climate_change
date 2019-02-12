@@ -151,7 +151,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid')  +
     geom_point() +
-    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 5),  show.legend = F, size = 5, color = 'black') +
+
     theme_classic() +
     ylab(expression(Delta~mol~C~emissions~('%'))) +
     # xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
@@ -224,7 +226,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = 6, nudge_y = .5, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 6, nudge_y = .5, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 4),  show.legend = F, size = 5, color = 'black') +
+
     theme_classic() +
     ylab(expression(Delta~mol~C~burial~('%'))) +
     # xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
@@ -322,7 +326,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 4),  show.legend = F, size = 5, color = 'black') +
+
     theme_classic() +
     ylab(expression(Delta~(mol~C~emission-mol~C~burial)~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -448,7 +454,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = 5, nudge_y = .15, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 5, nudge_y = .15, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 4),  show.legend = F, size = 5, color = 'black') +
+
     theme_classic() +
     ylab(expression(Delta~percent~C~removed~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -523,7 +531,9 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 4),  show.legend = F, size = 5, color = 'black') +
+
     theme_classic() +
     ylab(expression(Delta~mol~C~GPP~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -575,7 +585,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = 4, nudge_y = 1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = 4),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~NEP~('%'))) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+

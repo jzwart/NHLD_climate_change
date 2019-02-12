@@ -207,6 +207,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
 
   plot_data = dplyr::filter(plot_data, p_e %in% c(max_pe, min_pe))
 
+  levels(plot_data$period_gcm) <- c('Dry',rep(NA,10),'Wet')
 
   emit_facet = ggplot(plot_data, aes(y = emit, x = fhee)) +
     geom_ribbon(aes(x =fhee, ymin = emit_areal + (emit - emit_areal), ymax = emit_areal),
@@ -222,7 +223,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     ylab(expression(Delta~Emissions~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
-          axis.text.x = element_text(size = 13),
+          axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
           axis.title.x = element_blank(),
           legend.title = element_text(size =14),
@@ -230,9 +231,12 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
           strip.background = element_blank(),
-          strip.text = element_blank())+
+          strip.text = element_text(size = 20),
+          panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm) +
     ylim(c(-40,50))
+
+  emit_facet
 
   bury_facet = ggplot(plot_data, aes(y = bury, x = fhee)) +
     geom_ribbon(aes(x =fhee, ymin = bury_areal + (bury - bury_areal), ymax = bury_areal),
@@ -248,14 +252,16 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     ylab(expression(Delta~Burial~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
-          axis.text.x = element_text(size = 13),
+          axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
+          axis.title.x = element_blank(),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
           strip.background = element_blank(),
-          strip.text = element_blank())+
+          strip.text = element_blank(),
+          panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
     ylim(c(-40,25))
 
@@ -276,14 +282,15 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     ylab(expression(Delta~GPP~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
-          axis.text.x = element_text(size = 13),
+          axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
           legend.title = element_text(size =14),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
           strip.background = element_blank(),
-          strip.text = element_blank())+
+          strip.text = element_blank(),
+          panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
     ylim(c(-60,30))
 

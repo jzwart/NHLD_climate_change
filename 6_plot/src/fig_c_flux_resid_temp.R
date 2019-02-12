@@ -123,7 +123,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                                        color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
     geom_point() +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~emissions~('%')~(P-E)~~residuals)) +
     # xlab(expression(Runoff+Baseflow~(mm~year^-1)))+
@@ -160,7 +161,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                                             color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .35, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .35, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~burial~('%')~(P-E)~~residuals)) +
     theme(axis.text = element_text(size=16),
@@ -195,7 +197,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                                             color = period, size =period, shape = period, label = gcm_label)) +  # converting to %
     geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~(mol~C~emission-mol~C~burial)~('%')~(P-E)~~residuals)) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -234,7 +237,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid') +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .1, nudge_y = .1, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .1, nudge_y = .1, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~percent~C~removed~('%')~(P-E)~~residuals)) +
     xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
@@ -274,7 +278,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .8, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .8, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~GPP~('%')~(P-E)~~residuals)) +
     xlab(expression(Ave.~Annual~Temperature~(degree~C)))+
@@ -308,7 +313,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .4, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~m^-3~GPP~('%')~(P-E)~~residuals)) +
     xlab(expression(Ave.~Annual~Temperature~(degree~C)))+
@@ -345,7 +351,8 @@ fig_c_flux_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file,
                 method = 'lm', se = F, color = 'black',
                 inherit.aes = F, size = 2, linetype = 'solid', show.legend = F)  +
     geom_point(show.legend = F) +
-    geom_text(hjust = 0, nudge_x = .2, nudge_y = .8, show.legend = F, size = 6) +
+    # geom_text(hjust = 0, nudge_x = .2, nudge_y = .8, show.legend = F, size = 6) +
+    geom_text(position = position_dodge2(width = .2),  show.legend = F, size = 5, color = 'black') +
     theme_classic() +
     ylab(expression(Delta~mol~C~NEP~('%')~(P-E)~~residuals)) +
     xlab(expression(Ave.~Annual~Temperature~(degree~C)))+

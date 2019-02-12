@@ -210,15 +210,15 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
   levels(plot_data$period_gcm) <- c('Dry',rep(NA,10),'Wet')
 
   emit_facet = ggplot(plot_data, aes(y = emit, x = fhee)) +
-    geom_ribbon(aes(x =fhee, ymin = emit_areal + (emit - emit_areal), ymax = emit_areal),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
-    geom_ribbon(aes(x =fhee, ymin = (emit - emit_areal), ymax = emit_areal),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
+    geom_ribbon(aes(x =fhee, ymin = emit_areal + (emit - emit_areal), ymax = emit_areal,
+                    fill = 'areal')) +
+    geom_ribbon(aes(x =fhee, ymin = (emit - emit_areal), ymax = emit_areal,
+                    fill = 'areal')) +
     geom_ribbon(aes(x = fhee, ymin = emit_areal,
-                    ymax = rep(0,nrow(plot_data))),
-                fill = wesanderson::wes_palettes$Zissou1[3]) +
+                    ymax = rep(0,nrow(plot_data)),
+                    fill = 'area')) +
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
-    geom_line(color = 'black', size = 2)+
+    geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
     ylab(expression(Delta~Emissions~('%'))) +
     xlab(expression(FHEE))+
@@ -226,28 +226,34 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
           axis.title.x = element_blank(),
-          legend.title = element_text(size =14),
+          legend.title = element_blank(),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
+          legend.spacing = unit(0, 'lines'),
           strip.background = element_blank(),
           strip.text = element_text(size = 20),
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm) +
-    ylim(c(-40,50))
+    ylim(c(-40,50))+
+    scale_fill_manual(values = c('areal' = wesanderson::wes_palettes$Zissou1[2],
+                                 'area' = wesanderson::wes_palettes$Zissou1[3]),
+                      labels = c('Areal Emissions', 'Lake Area'))+
+    scale_color_manual(values = c('total' = 'black'),
+                       labels = 'Total Emissions')
 
   emit_facet
 
   bury_facet = ggplot(plot_data, aes(y = bury, x = fhee)) +
-    geom_ribbon(aes(x =fhee, ymin = bury_areal + (bury - bury_areal), ymax = bury_areal),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
-    geom_ribbon(aes(x =fhee, ymin = (bury - bury_areal), ymax = bury_areal),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
+    geom_ribbon(aes(x =fhee, ymin = bury_areal + (bury - bury_areal), ymax = bury_areal,
+                fill = 'areal')) +
+    geom_ribbon(aes(x =fhee, ymin = (bury - bury_areal), ymax = bury_areal,
+                fill = 'areal')) +
     geom_ribbon(aes(x = fhee, ymin = bury_areal,
-                    ymax = rep(0,nrow(plot_data))),
-                fill = wesanderson::wes_palettes$Zissou1[3]) +
+                    ymax = rep(0,nrow(plot_data)),
+                fill = 'area')) +
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
-    geom_line(color = 'black', size = 2)+
+    geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
     ylab(expression(Delta~Burial~('%'))) +
     xlab(expression(FHEE))+
@@ -255,44 +261,56 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
           axis.title.x = element_blank(),
-          legend.title = element_text(size =14),
+          legend.title = element_blank(),
           legend.position = c(.2,.9),
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
+          legend.spacing = unit(0,'lines'),
           strip.background = element_blank(),
           strip.text = element_blank(),
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
-    ylim(c(-40,25))
+    ylim(c(-40,25))+
+    scale_fill_manual(values = c('areal' = wesanderson::wes_palettes$Zissou1[2],
+                                 'area' = wesanderson::wes_palettes$Zissou1[3]),
+                      labels = c('Areal Burial', 'Lake Area'))+
+    scale_color_manual(values = c('total' = 'black'),
+                       labels = 'Total Burial')
 
   bury_facet
 
 
   gpp_facet = ggplot(plot_data, aes(y = gpp, x = fhee)) +
-    geom_ribbon(aes(x =fhee, ymin = gpp_vol + (gpp - gpp_vol), ymax = gpp_vol),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
-    geom_ribbon(aes(x =fhee, ymin = (gpp - gpp_vol), ymax = gpp_vol),
-                fill = wesanderson::wes_palettes$Zissou1[2]) +
+    geom_ribbon(aes(x =fhee, ymin = gpp_vol + (gpp - gpp_vol), ymax = gpp_vol,
+                fill = 'volumetric')) +
+    geom_ribbon(aes(x =fhee, ymin = (gpp - gpp_vol), ymax = gpp_vol,
+                fill = 'volumetric')) +
     geom_ribbon(aes(x = fhee, ymin = gpp_vol,
-                    ymax = rep(0,nrow(plot_data))),
-                fill = wesanderson::wes_palettes$Zissou1[3]) +
+                    ymax = rep(0,nrow(plot_data)),
+                fill = 'volume')) +
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
-    geom_line(color = 'black', size = 2)+
+    geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
     ylab(expression(Delta~GPP~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.text.x = element_text(size = 16),
           axis.title = element_text(size = 16),
-          legend.title = element_text(size =14),
-          legend.position = c(.2,.9),
+          legend.title = element_blank(),
+          legend.position = c(.8,.2),
           legend.background = element_blank(),
           legend.text = element_text(size = 14),
+          legend.spacing = unit(0,'lines'),
           strip.background = element_blank(),
           strip.text = element_blank(),
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
-    ylim(c(-60,30))
+    ylim(c(-60,30))+
+    scale_fill_manual(values = c('volumetric' = wesanderson::wes_palettes$Zissou1[2],
+                                 'volume' = wesanderson::wes_palettes$Zissou1[3]),
+                      labels = c('Volumetric GPP', 'Epilimnion Volume'))+
+    scale_color_manual(values = c('total' = 'black'),
+                       labels = 'Total GPP')
 
   gpp_facet
 

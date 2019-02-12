@@ -13,7 +13,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
            # R_B = (SWin + Baseflow) / Area_m2,
            Precip_lake = DirectP / Area) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, HRT, Stage, Vol,
-           doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp, Vepi,
+           doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp, Vepi, tp_load,
            waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp)
 
   total <- all %>%
@@ -43,7 +43,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               GPP = sum(GPP),
               GPP_vol = GPP/Vepi,
               DOC_resp = sum(DOC_Respired),
-              Sed_resp = sum(sed_resp)) %>%
+              Sed_resp = sum(sed_resp),
+              TP_Load = sum(tp_load)) %>%
     ungroup()
 
   retro <- all %>%
@@ -84,6 +85,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   retro_doc_resp = c_and_drivers$DOC_resp[c_and_drivers$gcm == 'Retro']
   retro_total_resp = c_and_drivers$total_resp[c_and_drivers$gcm == 'Retro']
   retro_nep = c_and_drivers$NEP[c_and_drivers$gcm == 'Retro']
+  retro_tp_load = c_and_drivers$TP_Load[c_and_drivers$gcm == 'Retro']
 
   c_and_drivers <- mutate(c_and_drivers,
                           emit_change = case_when(Emit > retro_emit ~ 1,
@@ -106,6 +108,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                                       TRUE ~ -1),
                           nep_change = case_when(NEP > retro_nep ~ 1,
                                                         TRUE ~ -1),
+                          tp_load_change = case_when(TP_Load > retro_tp_load ~ 1,
+                                                     TRUE ~ -1),
                           gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 3,
                                                 gcm == 'FIO_ESM' ~ 4,
                                                 gcm == 'GFDL_CM3' ~ 2,
@@ -445,6 +449,36 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   #                                 'Retro' = 16),
   #                      labels = c('Historic','2050\'s', '2080\'s'))+
   #   geom_smooth(aes(x = Runoff_and_baseflow, y = DOC_load), method = 'lm', se = F, color = 'grey60',
+  #               inherit.aes = F, size = 2, linetype = 'dashed')
+  # tp_load = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(TP_Load - retro_tp_load)/retro_tp_load * 100 * tp_load_change,
+  #                                     fill = period, color = period)) +
+  #   geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +
+  #   geom_point(size = 8, shape = 16, show.legend = F) +
+  #   theme_classic() +
+  #   ylab(expression(TP~Load)) +
+  #   xlab(expression(Precipitation-Evapotranspiration~(mm~year^-1)))+
+  #   theme(axis.text = element_text(size=16),
+  #         axis.title = element_text(size = 16),
+  #         legend.title = element_blank(),
+  #         legend.position = c(.15,.8),
+  #         legend.text = element_text(size = 12)) +
+  #   scale_color_manual(name = 'period',
+  #                      values = c('2050s' = fig_config$period$`2050s`,
+  #                                 '2080s' = fig_config$period$`2080s`,
+  #                                 'Retro' = fig_config$period$Retro),
+  #                      labels = c('Historic','2050\'s', '2080\'s')) +
+  #   scale_size_manual(name = 'period',
+  #                     values = c('2050s' = 8,
+  #                                '2080s' = 8,
+  #                                'Retro' = 8),
+  #                     labels = c('Historic','2050\'s', '2080\'s')) +
+  #   scale_shape_manual(name = 'period',
+  #                      values = c('2050s' = 16,
+  #                                 '2080s' = 16,
+  #                                 'Retro' = 16),
+  #                      labels = c('Historic','2050\'s', '2080\'s'))+
+  #   geom_smooth(aes(x = Runoff_and_baseflow, y = abs(TP_Load - retro_tp_load)/retro_tp_load * 100 * tp_load_change),
+  #               method = 'lm', se = F, color = 'grey60',
   #               inherit.aes = F, size = 2, linetype = 'dashed')
 
   p_e_fracRet_perc = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(FracRet*100 - retro_fracRet*100) * fracRet_change,

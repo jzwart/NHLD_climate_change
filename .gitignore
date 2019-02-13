@@ -29,3 +29,5 @@ lib/cfg/gd_config.yml
 *_tasks.yml
 */tmp/*
 !*1_data/out/*
+!*3_summarize/out/ice_dur*
+!*3_summarize/out/snow*

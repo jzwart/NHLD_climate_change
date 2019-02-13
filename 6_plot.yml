@@ -633,18 +633,6 @@ targets:
   6_plot/out/focus_geoms.rds:
     command: gd_get('6_plot/out/focus_geoms.rds.ind')
 
-  # -- get waterbodies -- #
-#  fetch_waterbody_areasqkm:
-#    command: map_config[I('fetch_waterbody_areasqkm')]
-#
-#  6_plot/out/waterbodies.rds.ind:
-#    command: fetch_waterbody_geoms(ind_file=target_name,
-#                                   view_polygon=view_polygon,
-#                                   fetch_waterbody_areasqkm=fetch_waterbody_areasqkm)
-#  6_plot/out/waterbodies.rds:
-#    command: gd_get('6_plot/out/waterbodies.rds.ind')
-#    waterbodies_ind = '6_plot/out/waterbodies.rds.ind',
-
   basemap_fun:
     command: prep_basemap_fun(
       focus_geoms_ind = '6_plot/out/focus_geoms.rds.ind',

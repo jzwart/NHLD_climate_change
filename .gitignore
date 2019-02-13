@@ -28,3 +28,4 @@ lib/cfg/gd_config.yml
 !*/in/*.ind
 *_tasks.yml
 */tmp/*
+!*1_data/out/*

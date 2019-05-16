@@ -1,0 +1,13 @@
+version: 0.3.0
+name: 8_publish_data/out/metadata_out.rds.ind
+type: file
+hash: 80139e117e4f8760c4d426dac859df6c
+time: 2019-05-16 15:58:51 UTC
+depends:
+  1_data/out/scenarios_qa.rds: be20593af22a56782a3d45aa1a7e4f8d
+  lib/cfg/gd_config.yml: 3aea44ee04dc3811de858bc592d3d68a
+fixed: 541000b61b4851458b765f90b12cabfb
+code:
+  functions:
+    metadata_to_publish: 8aea4bbe3192b16073e56ea3b20afeba
+

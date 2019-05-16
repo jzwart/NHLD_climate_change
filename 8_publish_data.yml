@@ -1,0 +1,40 @@
+target_default: 8_publish_data
+
+include:
+  - lib.yml
+
+file_extensions:
+  - feather
+  - ind
+
+packages:
+  - dplyr
+  - rlang
+  - magrittr
+
+sources:
+  - 8_publish_data/src/model_output_metadata.R
+
+targets:
+
+  8_publish_data:
+    depends:
+      - 1_data/out/scenarios_qa.rds
+
+  1_data/out/scenarios_qa.rds:
+    command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/metadata.rds.ind:
+    command: metadata_to_publish(
+      ind_file = target_name,
+      data_in_file = '1_data/out/scenarios_qa.rds',
+      remake_file = I('8_publish_data.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  8_publish_data/out/data.rds.ind:
+    command: data_to_publish(
+      ind_file = target_name,
+      data_in_file = '1_data/out/scenarios_qa.rds',
+      remake_file = I('8_publish_data.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+

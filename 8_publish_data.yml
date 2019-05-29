@@ -14,6 +14,7 @@ packages:
 
 sources:
   - 8_publish_data/src/model_output_metadata.R
+  - 8_publish_data/src/collate_scenario.R
 
 targets:
 
@@ -38,3 +39,84 @@ targets:
       remake_file = I('8_publish_data.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+  ##### aggregating files so they can be published on ScienceBase #######
+  ##### notes from ScienceBase curators:
+  # You can attach up to 100 unique files to a single item. Normally, I tell users that we have a ~10 GB limit per file.
+  # This is more a limitation of the USGS network than a hard cap per se (relative to your internet connection, timeouts, etc.) but
+  # it is a good rule of thumb. You may want to experiment with the large file uploader with some files
+  # to see (I've been able to upload single files as large as 23 GB but I'm in Denver and may get a performance boost).
+  #
+  # You can review the link here for a little more info.
+  #
+  # https://www.sciencebase.gov/about/content/upload-and-download-files
+  #
+  # You will also want to make sure you consider the nature of your file (bit depth relative to the values
+  # you are storing, compression, etc.) to make sure you optimize things. Data integrity is the top priority but If we
+  # can preserve data integrity and optimize file size for storage and transfer though, it makes sense to do that both for
+  # economy on storage and facilitating successful downloads for downstream users. We use S3 for our downloads, to the biggest
+  # challenge is usually the initial upload.
+  #
+  #  If the data do not lend themselves to being separated out into chunks (by timeframe, theme, etc.) and are still 120 GB after
+  #  compression, we also have another option we can use to support your case. It's a little more involved, but we can set you up
+  #  with an account and have you download a file transfer client to move content to Denver. We can then connect your files to
+  #  ScienceBase from a back-end process we'd do here.
+  #
+  ## Jake's thoughts:
+  ## Organize data by scenario (e.g. gcm_timeperiod) in a long format. Include associated driver data or maybe we could have a lookup
+  ## table that assoicates NHD_ID with driver data. Rounding model output to 3 decimal places where it makes sense to cut down on
+  ## file size
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/CESM1_CAM5_2050s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')

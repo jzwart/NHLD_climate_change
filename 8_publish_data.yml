@@ -15,6 +15,7 @@ packages:
 sources:
   - 8_publish_data/src/model_output_metadata.R
   - 8_publish_data/src/collate_scenario.R
+  - 8_publish_data/src/daily_metadata.R
 
 targets:
 
@@ -25,14 +26,14 @@ targets:
   1_data/out/scenarios_qa.rds:
     command: gd_get('1_data/out/scenarios_qa.rds.ind', config_file='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/metadata.rds.ind:
+  8_publish_data/out/aggregated_metadata.rds.ind:
     command: metadata_to_publish(
       ind_file = target_name,
       data_in_file = '1_data/out/scenarios_qa.rds',
       remake_file = I('8_publish_data.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
-  8_publish_data/out/data.rds.ind:
+  8_publish_data/out/aggregated_data.rds.ind:
     command: data_to_publish(
       ind_file = target_name,
       data_in_file = '1_data/out/scenarios_qa.rds',
@@ -72,51 +73,101 @@ targets:
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/FIO_ESM_2050s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/GFDL_CM3_2050s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/GFDL_ESM2M_2050s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/HadGEM2_AO_2050s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/HadGEM2_CC_2050s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/CESM1_CAM5_2080s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
 
-  8_publish_data/out/CESM1_CAM5_2050s.rds:
+  8_publish_data/out/FIO_ESM_2080s.rds:
     command: collate_scenario(
       data_file=target_name,
       scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
       results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
       gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/GFDL_CM3_2080s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/GFDL_ESM2M_2080s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/HadGEM2_AO_2080s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/HadGEM2_CC_2080s.rds:
+    command: collate_scenario(
+      data_file=target_name,
+      scenarios_lookup_dir = '8_publish_data/in/Results/C_model_output',
+      results_dir = '8_publish_data/in/Results/C_model_output/Condor_Results',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/retro.rds:
+    command: collate_retro(
+      data_file=target_name,
+      forcing_file = '8_publish_data/in/Results/C_model_output/Present/forcing_lookup.csv',
+      results_dir = '8_publish_data/in/Results/C_model_output/Present/20170819',
+      gd_config='lib/cfg/gd_config.yml')
+
+  8_publish_data/out/daily_metadata_retro.rds:
+    command: daily_metadata_to_publish_retro(
+      data_file = target_name,
+      data_in_file = '8_publish_data/out/retro.rds',
+      remake_file = I('8_publish_data.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+
+  8_publish_data/out/daily_metadata_scenarios.rds:
+    command: daily_metadata_to_publish_scenarios(
+      data_file = target_name,
+      data_in_file = '8_publish_data/out/CESM1_CAM5_2050s.rds',
+      remake_file = I('8_publish_data.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')
+

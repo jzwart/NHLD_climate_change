@@ -14,7 +14,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
            Precip_lake = DirectP / Area) %>%
     select(Permanent_, period, gcm, Emit, Bury, Emit_areal, Bury_areal, Area, HRT, Stage, Vol,
            doc_conc,FracRet, DOC_Load, GPP, Vepi, DOC_Respired, sed_resp, Vepi, tp_load,
-           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp)
+           waterIn, fluvialOut, Precip_lake, ndays_ice, epiTemp, DIC_load)
 
   total <- all %>%
     mutate(GPP_vol = GPP,
@@ -28,6 +28,7 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
               Bury_areal = mean(Bury_areal),
               FracRet = sum(DOC_Load * FracRet) / sum(DOC_Load),
               DOC_Load = sum(DOC_Load),
+              DIC_Load = sum(DIC_load),
               Precip_lake = mean(Precip_lake),
               Water_in = sum(waterIn),
               # R_B = median(R_B, na.rm = T),
@@ -86,6 +87,8 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   retro_total_resp = c_and_drivers$total_resp[c_and_drivers$gcm == 'Retro']
   retro_nep = c_and_drivers$NEP[c_and_drivers$gcm == 'Retro']
   retro_tp_load = c_and_drivers$TP_Load[c_and_drivers$gcm == 'Retro']
+  retro_dic_load = c_and_drivers$DIC_Load[c_and_drivers$gcm == 'Retro']
+  retro_hrt = c_and_drivers$HRT[c_and_drivers$gcm == 'Retro']
 
   c_and_drivers <- mutate(c_and_drivers,
                           emit_change = case_when(Emit > retro_emit ~ 1,
@@ -110,6 +113,10 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
                                                         TRUE ~ -1),
                           tp_load_change = case_when(TP_Load > retro_tp_load ~ 1,
                                                      TRUE ~ -1),
+                          dic_load_change = case_when(DIC_Load > retro_dic_load ~ 1,
+                                                     TRUE ~ -1),
+                          hrt_change = case_when(HRT > retro_hrt ~ 1,
+                                                      TRUE ~ -1),
                           gcm_label = case_when(gcm == 'CESM1_CAM5' ~ 3,
                                                 gcm == 'FIO_ESM' ~ 4,
                                                 gcm == 'GFDL_CM3' ~ 2,
@@ -450,6 +457,50 @@ fig_c_flux_vs_drivers <- function(fig_ind, transparent, scenarios, drivers_file,
   #                      labels = c('Historic','2050\'s', '2080\'s'))+
   #   geom_smooth(aes(x = Runoff_and_baseflow, y = DOC_load), method = 'lm', se = F, color = 'grey60',
   #               inherit.aes = F, size = 2, linetype = 'dashed')
+  #
+  delta_doc_load = abs(c_and_drivers$DOC_Load - retro_doc_load)/retro_doc_load * 100 * c_and_drivers$doc_load_change
+
+  summary(lm(delta_doc_load~p_e))
+  summary(lm(delta_doc_load~p_e+temp))
+  res = resid(lm(delta_doc_load~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
+
+  delta_dic_load = abs(c_and_drivers$DIC_Load - retro_dic_load)/retro_dic_load * 100 * c_and_drivers$dic_load_change
+
+  summary(lm(delta_dic_load~p_e))
+  summary(lm(delta_dic_load~p_e+temp))
+  res = resid(lm(delta_dic_load~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
+
+  delta_hrt = abs(c_and_drivers$HRT - retro_hrt)/retro_hrt * 100 * c_and_drivers$hrt_change
+
+  summary(lm(delta_hrt~p_e))
+  summary(lm(delta_hrt~p_e+temp))
+  res = resid(lm(delta_hrt~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
+
+  delta_tp = abs(c_and_drivers$TP_Load - retro_tp_load)/retro_tp_load * 100 * c_and_drivers$tp_load_change
+
+  summary(lm(delta_tp~p_e))
+  summary(lm(delta_tp~p_e+temp))
+  res = resid(lm(delta_tp~p_e))
+  summary(lm(res~temp))
+  plot(res~temp, pch = 16)
+
+  suptable2 = tibble(GCM = c_and_drivers$gcm,
+                     period = c_and_drivers$period,
+                     P_E = round(p_e, digits = 2),
+                     temp = round(temp, digits = 2),
+                     hrt = round(c_and_drivers$HRT - retro_hrt, digits = 2),
+                     delta_dic_load = round(delta_dic_load, 2),
+                     delta_doc_load = round(delta_doc_load, 2),
+                     delta_tp_load = round(delta_tp, 2))
+  suptable2 = suptable2[sort.list(suptable2$P_E),]
+
+  #
   # tp_load = ggplot(c_and_drivers, aes(x = (Precip - Evap), y = abs(TP_Load - retro_tp_load)/retro_tp_load * 100 * tp_load_change,
   #                                     fill = period, color = period)) +
   #   geom_hline(yintercept = 0, linetype = 'dashed', color ='grey60', size = 1.5) +

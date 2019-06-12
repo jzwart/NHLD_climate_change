@@ -96,7 +96,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
            Delta_GPP_vol = abs(GPP_future - GPP_retro)/(GPP_retro) *100*ifelse(GPP_future > GPP_retro,1,-1),
            Delta_Vol = abs(Vepi_future - Vepi_retro)/Vepi_retro*100*ifelse(Vepi_future>Vepi_retro,1,-1))
 
-  plot_data = data_frame()
+  plot_data = tibble()
 
   gcms = unique(stage_future$gcm_future)
   periods = unique(stage_future$period_future)
@@ -220,7 +220,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
     geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
-    ylab(expression(Delta~Emissions~('%'))) +
+    ylab(expression(Delta~Areal~or~Total~Emissions~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.text.x = element_text(size = 16),
@@ -236,6 +236,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm) +
     ylim(c(-40,50))+
+    scale_y_continuous(sec.axis = sec_axis(~., name = expression(Delta~Lake~Area~('%')))) +
     scale_fill_manual(values = c('areal' = wesanderson::wes_palettes$Zissou1[2],
                                  'area' = wesanderson::wes_palettes$Zissou1[3]),
                       labels = c('Areal Emissions', 'Lake Area'))+
@@ -255,7 +256,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
     geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
-    ylab(expression(Delta~Burial~('%'))) +
+    ylab(expression(Delta~Areal~or~Total~Burial~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.text.x = element_text(size = 16),
@@ -271,6 +272,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
     ylim(c(-40,25))+
+    scale_y_continuous(sec.axis = sec_axis(~., name = expression(Delta~Lake~Area~('%')))) +
     scale_fill_manual(values = c('areal' = wesanderson::wes_palettes$Zissou1[2],
                                  'area' = wesanderson::wes_palettes$Zissou1[3]),
                       labels = c('Areal Burial', 'Lake Area'))+
@@ -291,7 +293,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
     geom_hline(yintercept = 0, size =1, linetype = 'dashed', color = 'grey40') +
     geom_line(aes(color = 'total'), size = 2)+
     theme_classic()+
-    ylab(expression(Delta~GPP~('%'))) +
+    ylab(expression(Delta~Volumetric~or~Total~GPP~('%'))) +
     xlab(expression(FHEE))+
     theme(axis.text = element_text(size=16),
           axis.text.x = element_text(size = 16),
@@ -306,6 +308,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
           panel.spacing = unit(2,'lines'))+
     facet_wrap(~period_gcm)+
     ylim(c(-60,30))+
+    scale_y_continuous(sec.axis = sec_axis(~., name = expression(Delta~Epilimnion~Volume~('%')))) +
     scale_fill_manual(values = c('volumetric' = wesanderson::wes_palettes$Zissou1[2],
                                  'volume' = wesanderson::wes_palettes$Zissou1[3]),
                       labels = c('Volumetric GPP', 'Epilimnion Volume'))+
@@ -318,7 +321,7 @@ fig_relative_contribution <- function(fig_ind, transparent, scenarios, drivers_f
                 labels = c('a', 'b', 'c'), align = 'hv', rows = 3)
 
   fig_file = as_data_file(fig_ind)
-  ggsave(fig_file, plot=g, width = 7, height = 21)
+  ggsave(fig_file, plot=g, width = 9, height = 21)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }
 

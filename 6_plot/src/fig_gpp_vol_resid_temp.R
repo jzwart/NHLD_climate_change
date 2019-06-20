@@ -190,6 +190,9 @@ fig_gpp_vol_resid_temp <- function(fig_ind, transparent, scenarios, drivers_file
 
   temp_gpp_vol_resid
 
+  summary(lm(c_and_drivers$gpp_vol_resid~c_and_drivers$Temp))
+  cor(c_and_drivers$gpp_vol_resid,c_and_drivers$Temp)
+
 
   g = plot_grid(p_e_gpp_vol_perc, temp_gpp_vol_resid,
             labels = c('a', 'b'), nrow = 1, align = 'hv')

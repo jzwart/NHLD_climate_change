@@ -2,6 +2,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
 
   fig_config <- yaml::yaml.load_file(fig_cfg_yml) # colors for figs
 
+  panel_label_size = 28
+
   drivers <- readRDS(drivers_file) %>%
     group_by(month, var, period) %>%
     summarise(mean = mean(var_value),
@@ -65,7 +67,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -104,7 +107,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -141,7 +145,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -178,7 +183,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -214,7 +220,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -251,7 +258,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.y = element_text(size = 16),
           legend.position = c(.15,.9),
           legend.background = element_blank(),
-          legend.text = element_text(size = 10)) +
+          legend.text = element_text(size = 10),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period',
                        values = c('2050s' = fig_config$period$`2050s`,
                                   '2080s' = fig_config$period$`2080s`,
@@ -286,7 +294,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.x = element_blank(),
           axis.ticks.x = element_blank(),
           axis.text.x = element_blank(),
-          axis.line.x = element_blank()) +
+          axis.line.x = element_blank(),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period_future',
                        values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
                                   '2080s' = t_col(fig_config$period$`2080s`, 0)),
@@ -318,7 +327,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.x = element_blank(),
           axis.ticks.x = element_blank(),
           axis.text.x = element_blank(),
-          axis.line.x = element_blank()) +
+          axis.line.x = element_blank(),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period_future',
                        values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
                                   '2080s' = t_col(fig_config$period$`2080s`, 0)),
@@ -350,7 +360,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.x = element_blank(),
           axis.ticks.x = element_blank(),
           axis.text.x = element_blank(),
-          axis.line.x = element_blank()) +
+          axis.line.x = element_blank(),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period_future',
                        values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
                                   '2080s' = t_col(fig_config$period$`2080s`, 0)),
@@ -382,7 +393,8 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           axis.title.x = element_blank(),
           axis.ticks.x = element_blank(),
           axis.text.x = element_blank(),
-          axis.line.x = element_blank()) +
+          axis.line.x = element_blank(),
+          plot.tag = element_text(size = panel_label_size)) +
     scale_color_manual(name = 'period_future',
                        values = c('2050s' = t_col(fig_config$period$`2050s`, 0),
                                   '2080s' = t_col(fig_config$period$`2080s`, 0)),
@@ -641,6 +653,15 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     annotate(geom = 'text',
              x = c(0, 2, 4), y = c(20,20,20), hjust = .5, angle = 90, size = 6,
              label = c('Historic','2050s','2080s')) +
+    annotate(geom = 'text',
+             x = c(.46), y = c(47), hjust = 0,
+             label = c('Ice On \nDensity \nDistirbution')) +
+    annotate(geom = 'text',
+             x = c(.46), y = c(210), hjust = 0,
+             label = c('Ice Off \nDensity \nDistirbution')) +
+    annotate(geom = 'text',
+             x = c(.25), y = c(120), hjust = 0,
+             label = c('Average Snow Depth')) +
     geom_point(data = ice, aes(x = mid_plot, y = ice_on_water_day, group = period, shape = 'ice_on'),size = 2) +
     geom_point(data = ice, aes(x = mid_plot, y = ice_off_water_day, group = period, shape = 'ice_off'), size = 3) +
     scale_shape_manual(breaks = c('ice_on', 'ice_off'),
@@ -657,7 +678,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
           legend.title = element_blank(),
           legend.position = c(.9,.3),
           legend.text = element_text(size = 16),
-          plot.tag = element_text(size = 16),
+          plot.tag = element_text(size = panel_label_size),
           plot.tag.position = c(.12,.93)) +
     scale_fill_manual(name = 'period',
                       breaks=c('2080s','2050s','Retro'),
@@ -687,7 +708,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
                              segment.color = "grey50",
                              direction     = "both")
 
-  # ice_panel
+  ice_panel
 
   g = ggdraw() +
     draw_plot(month_temp, x = 0, y = .75, width = .3, height = .25) +
@@ -700,7 +721,7 @@ fig_drivers_ice <- function(fig_ind, transparent, ice_dur_ind_file, remake_file,
     draw_plot(r_b_diff, x = .8, y = .5, width = .15, height = .15) +
     draw_plot(ice_panel, x = 0, y = 0, width = .6, height = .45) +
     draw_plot(basemap, x = .6, y = 0, width = .4, height = .45) +
-    draw_label('j', x = .62, y = .41) # panel for map
+    draw_label('j', x = .62, y = .41, size = panel_label_size) # panel for map
 
   g
 

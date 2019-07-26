@@ -1,6 +1,7 @@
 # NHLD_climate_change
 
-Aggregated output used for all analyses as described in Zwart et al. ____ can be found in `8_publish_data/out/data.rds`. Description of the column names can be found at `8_publish_data/out/metadata.rds`.
+Aggregated output used for all analyses as described in Zwart et al. ____ can be found in `8_publish_data/out/data.rds`. Description of the column names can be found at `8_publish_data/out/metadata.rds`. Manuscript code release: [![DOI](https://zenodo.org/badge/113368289.svg)](https://zenodo.org/badge/latestdoi/113368289)
+
 
 For full daily-scale model output, see the published data release: 
 

@@ -42,6 +42,8 @@ sources:
   - 6_plot/src/fig_relative_contribution.R
   - 6_plot/src/fig_c_flux_resid_temp.R
   - 6_plot/src/fig_gpp_vol_resid_temp.R
+  - 6_plot/src/fig_hydro_map.R
+  - 6_plot/src/prep_basemap_hydro.R
 
 targets:
 
@@ -694,3 +696,22 @@ targets:
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+################ hydrologic response manuscript figures ###############
+
+  basemap_hydro:
+    command: prep_basemap_hydro(
+      focus_geoms_ind = '6_plot/out/focus_geoms.rds.ind',
+      secondary_geoms_ind = '6_plot/out/secondary_geoms.rds.ind',
+      lakes_loc = 'Data/GIS/LakeLocations/NHLDandBuffLakes_Original_ZJH_Rev1.shp',
+      polygon = view_polygon,
+      scenarios = '1_data/out/scenarios_qa.rds',
+      remake_file = '6_plot.yml')
+
+  6_plot/out/hydro/fig_map.png.ind:
+    command: fig_hydro_map(
+      fig_ind = target_name,
+      transparent = I(60),
+      remake_file = I('6_plot.yml'),
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      basemap = basemap_hydro,
+      gd_config = 'lib/cfg/gd_config.yml')

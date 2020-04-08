@@ -97,7 +97,7 @@ prep_basemap_hydro <- function(focus_geoms_ind, secondary_geoms_ind = NULL, deta
   g = ggdraw() +
     draw_plot(zoom, x = 0, y = 0, width = 1, height = 1) +
     draw_plot(context, x= 0.104, y= .65, width = .35, height = .35) +
-    draw_plot(trout_zoom, x = .4939, y = .499, width = .5, height = .5)
+    draw_plot(trout_zoom, x = .491, y = .499, width = .5, height = .5)
 
   g
 

@@ -737,3 +737,12 @@ targets:
       remake_file = I('6_plot.yml'),
       gd_config = 'lib/cfg/gd_config.yml')
 
+  6_plot/out/hydro/fig_hrt_fhee_3panels.png.ind:
+    command: fig_hrt_fhee_3panels(
+      fig_ind = target_name,
+      transparent = I(60),
+      scenarios = '1_data/out/scenarios_qa.rds',
+      drivers_file = '1_data/out/monthly_drivers_nhld.rds',
+      fig_cfg_yml = '6_plot/cfg/fig_config.yml',
+      remake_file = I('6_plot.yml'),
+      gd_config = 'lib/cfg/gd_config.yml')

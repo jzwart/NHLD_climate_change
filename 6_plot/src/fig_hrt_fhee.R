@@ -506,7 +506,81 @@ fig_hrt_fhee_3panels <- function(fig_ind,
 
   hrt_2
 
+  # new table for adding historic data
+  hrt_future = select(stage_future, HRT_future,
+                      HRT_retro, percentEvap_future, period_future)
+  hrt_retro = select(stage_retro, HRT, percentEvap, period) %>%
+    mutate(HRT_future = HRT,
+           HRT_retro = HRT,
+           percentEvap_future = percentEvap,
+           period_future = period) %>%
+    select(HRT_future,
+           HRT_retro, percentEvap_future, period_future)
+
+  hrt_future = bind_rows(hrt_future, hrt_retro)
+
   hrt_3 = ggplot(stage_future,
+                 aes(y = (HRT_future-HRT_retro)/365, x = percentEvap_future,
+                     color = period_future, group = period_future)) +
+    geom_point(pch =16, alpha =0, size = 2, show.legend = F) +
+    theme_classic() +
+    ylab(expression(Delta~HRT~('years'))) +
+    xlab(expression(FHEE))+
+    theme(axis.text = element_text(size=16),
+          axis.title.y = element_blank(),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.2,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14),
+          panel.border = element_rect(color = 'black', fill=NA, size=1))+
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = col_2050s,
+                                  '2080s' = col_2080s,
+                                  'Retro' = col_historic),
+                       labels = c('2050\'s', '2080\'s', 'Historic'))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    geom_smooth(aes(y = (HRT_future-HRT_retro)/365, x = percentEvap_future,
+                    group = period_future,color = period_future),
+                linetype = 'solid', method = 'loess', se = F,
+                inherit.aes = F, size = 2, show.legend = F)+
+    xlim(c(0,1))+
+    coord_cartesian(ylim = c(-.5, .1))
+
+  hrt_3 = ggExtra::ggMarginal(hrt_3, type = 'density',
+                              groupColour = T, size = 8, aes(size = 8))
+
+  hrt_5 = ggplot(hrt_future,
+                 aes(y = (HRT_future-HRT_retro)/365, x = percentEvap_future,
+                     color = period_future, group = period_future)) +
+    geom_point(pch =16, alpha =0, size = 2, show.legend = F) +
+    theme_classic() +
+    ylab(expression(Delta~HRT~('years'))) +
+    xlab(expression(FHEE))+
+    theme(axis.text = element_text(size=16),
+          axis.title.y = element_blank(),
+          axis.title = element_text(size = 16),
+          legend.title = element_text(size =14),
+          legend.position = c(.2,.9),
+          legend.background = element_blank(),
+          legend.text = element_text(size = 14),
+          panel.border = element_rect(color = 'black', fill=NA, size=1))+
+    scale_color_manual(name = 'period_future',
+                       values = c('2050s' = col_2050s,
+                                  '2080s' = col_2080s,
+                                  'Retro' = col_historic),
+                       labels = c('2050\'s', '2080\'s', 'Historic'))+
+    geom_hline(yintercept = 0, linetype = 'dashed', size =1) +
+    geom_smooth(aes(y = (HRT_future-HRT_retro)/365, x = percentEvap_future,
+                    group = period_future,color = period_future),
+                linetype = 'solid', method = 'loess', se = F,
+                inherit.aes = F, size = 2, show.legend = F)+
+    xlim(c(0,1))+
+    coord_cartesian(ylim = c(-.5, .1))
+  hrt_5 = ggExtra::ggMarginal(hrt_5, type = 'density',
+                              groupColour = T, size = 8, aes(size = 8))
+
+  hrt_4 = ggplot(stage_future,
                  aes(y = (HRT_future-HRT_retro)/365, x = percentEvap_future,
                      color = period_future, group = period_future)) +
     geom_point(pch =16, alpha =0, size = 2, show.legend = F) +
@@ -531,14 +605,18 @@ fig_hrt_fhee_3panels <- function(fig_ind,
                 linetype = 'solid', method = 'loess', se = F,
                 inherit.aes = F, size = 2, show.legend = F)+
     xlim(c(0,1))+
-    coord_cartesian(ylim = c(-.5, .1))
+    ylim(c(-.5, .1))
 
+  hrt_4 = ggExtra::ggMarginal(hrt_4, type = 'density',
+                              groupColour = T, size = 8, aes(size = 8))
 
   out = cowplot::plot_grid(hrt_1, hrt_2, hrt_3,
                            labels = c('A','B', 'C'), nrow = 1, align = 'hv')
 
   fig_file = as_data_file(fig_ind)
   ggsave(fig_file, plot=out, width = 21, height = 7)
+  ggsave('6_plot/out/hydro/fig_hrt_fhee_2.png', plot=hrt_4, width = 7, height = 7)
+  ggsave('6_plot/out/hydro/fig_hrt_fhee_3.png', plot=hrt_5, width = 7, height = 7)
   gd_put(remote_ind = fig_ind, local_source = fig_file, config_file = gd_config)
 }
 

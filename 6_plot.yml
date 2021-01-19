@@ -11,6 +11,7 @@ packages:
   - mapdata
   - sf
   - viridis
+  - ggsn
 
 include:
   - lib.yml

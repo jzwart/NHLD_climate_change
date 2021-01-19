@@ -92,7 +92,14 @@ prep_basemap_hydro <- function(focus_geoms_ind, secondary_geoms_ind = NULL, deta
     annotate('text', x = c(-77500,-73200), y = c(1616000,1612200),
              label = c('TR','CR'), size = 6, color = 'white')
 
-  trout_zoom
+  trout_zoom = trout_zoom + ggsn::scalebar(data = focus_lakes, # adding scale bar
+                                           location = 'bottomleft',
+                                           dist = 1,
+                                           dist_unit = 'km',
+                                           transform = F,
+                                           st.dist = .03,
+                                           st.size = 5,
+                                           st.bottom = F)
 
   g = ggdraw() +
     draw_plot(zoom, x = 0, y = 0, width = 1, height = 1) +

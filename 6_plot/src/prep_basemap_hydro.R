@@ -90,7 +90,14 @@ prep_basemap_hydro <- function(focus_geoms_ind, secondary_geoms_ind = NULL, deta
           axis.title = element_blank(),
           axis.text = element_text(size = 12)) +
     annotate('text', x = c(-77500,-73200), y = c(1616000,1612200),
-             label = c('TR','CR'), size = 6, color = 'white')
+             label = c('TR','CR'), size = 6, color = 'white') +
+    annotate('text', x = c(-73700,-73600,-80000, -72820,-78750),
+             y = c(1616500,1614300,1613200,1613000,1617350),
+             label = c('AL','BM','SP','CB','TB'), size = 6, color = 'grey40')#+
+    # annotate('segment',x = c(-78900), xend = c(-78650),
+    #          y = c(1617300), yend = c(1617150),
+    #          color = 'grey40', size = 1)
+
 
   trout_zoom = trout_zoom + ggsn::scalebar(data = focus_lakes, # adding scale bar
                                            location = 'bottomleft',
@@ -100,6 +107,7 @@ prep_basemap_hydro <- function(focus_geoms_ind, secondary_geoms_ind = NULL, deta
                                            st.dist = .03,
                                            st.size = 5,
                                            st.bottom = F)
+  trout_zoom
 
   g = ggdraw() +
     draw_plot(zoom, x = 0, y = 0, width = 1, height = 1) +
